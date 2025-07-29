@@ -1,0 +1,19 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+#login-section {
+    max-width: 500px;
+    margin: 50px auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Specific styles for signature pad */
+#signature-pad {
+    background-color: #fff;
+    cursor: crosshair;
+}
