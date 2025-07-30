@@ -7,7 +7,7 @@ body {
 }
 
 #login-section {
-    max-width: 500px;
+    max-width: 400px;
     margin: 50px auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
@@ -17,3 +17,29 @@ body {
     background-color: #fff;
     cursor: crosshair;
 }
+
+.signature-pad-container {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            height: 200px; /* Altura fija para el lienzo de firma */
+            background-color: #fff;
+            overflow: hidden; /* Asegura que el lienzo no se desborde */
+        }
+        .signature-pad {
+            width: 100%;
+            height: 100%;
+        }
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+        /* Estilos para ocultar los spin buttons de number input */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
