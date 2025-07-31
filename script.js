@@ -4,6 +4,7 @@ let users = JSON.parse(localStorage.getItem('users')) || [];
 let services = JSON.parse(localStorage.getItem('services')) || [];
 let reports = JSON.parse(localStorage.getItem('reports')) || [];
 let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+let currentTheme = localStorage.getItem('theme') || 'light'; // Tema actual
 
 // SignaturePad instances
 let signaturePadClient = null;
@@ -40,8 +41,20 @@ function saveNotifications() {
 
 // --- Reemplazo de Alerts y Confirms nativos ---
 function showAlert(message) {
+    console.log('showAlert llamado con mensaje:', message);
+    
+    // Limpiar contenido anterior
     document.getElementById('customAlertModalBody').textContent = message;
-    const alertModal = new bootstrap.Modal(document.getElementById('customAlertModal'));
+    
+    // Obtener o crear instancia del modal
+    let alertModal = bootstrap.Modal.getInstance(document.getElementById('customAlertModal'));
+    if (!alertModal) {
+        console.log('Creando nueva instancia del modal');
+        alertModal = new bootstrap.Modal(document.getElementById('customAlertModal'));
+    }
+    
+    console.log('Mostrando modal de alerta');
+    // Mostrar el modal
     alertModal.show();
 }
 
@@ -113,10 +126,24 @@ function showAdminDashboard() {
         renderReportsList();
         renderAdminNotifications();
         updateNotificationBadges(); // Update badges for admin
+        
+        // Establecer fechas por defecto (último mes)
+        setDefaultDateFilters();
     } else {
         showAlert('Acceso denegado. Solo administradores.');
         showLogin();
     }
+}
+
+function setDefaultDateFilters() {
+    const today = new Date();
+    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    
+    document.getElementById('filter-date-from').value = lastMonth.toISOString().split('T')[0];
+    document.getElementById('filter-date-to').value = today.toISOString().split('T')[0];
+    
+    // Aplicar filtros por defecto
+    filterServices();
 }
 
 function showEmployeeDashboard() {
@@ -272,39 +299,104 @@ function populateTechnicianDropdowns() {
 function renderAdminServicesList(filteredServices = services) {
     const servicesListElement = document.getElementById('services-list-admin');
     servicesListElement.innerHTML = '';
-    filteredServices.forEach(service => {
-        const row = document.createElement('tr');
-        const canEdit = !['Finalizado', 'Cancelado'].includes(service.status);
-        const editButton = canEdit ?
-            `<button class="btn btn-warning btn-sm" onclick="editService('${service.id}')">Editar</button>` :
-            `<button class="btn btn-warning btn-sm" disabled title="No se puede editar servicio finalizado/cancelado">Editar</button>`;
-        const deleteButton = canEdit ?
-            `<button class="btn btn-danger btn-sm" onclick="deleteService('${service.id}')">Eliminar</button>` :
-            `<button class="btn btn-danger btn-sm" disabled title="No se puede eliminar servicio finalizado/cancelado">Eliminar</button>`;
-
-        row.innerHTML = `
-            <td>${service.date}</td>
-            <td>${service.clientName}</td>
-            <td>${service.safeType}</td>
-            <td>${service.location}</td>
-            <td>${getTechnicianNameById(service.technicianId)}</td>
-            <td>${service.status}</td>
-            <td>
-                <button class="btn btn-info btn-sm" onclick="viewServiceDetails('${service.id}')">Ver</button>
-                ${editButton}
-                ${deleteButton}
+    
+    if (filteredServices.length === 0) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.innerHTML = `
+            <td colspan="7" class="text-center text-muted py-4">
+                <i class="bi bi-search" style="font-size: 2rem;"></i>
+                <br><br>
+                <strong>No se encontraron servicios</strong>
+                <br>
+                <small>Intenta ajustar los filtros de búsqueda</small>
             </td>
         `;
-        servicesListElement.appendChild(row);
-    });
+        servicesListElement.appendChild(noResultsRow);
+    } else {
+        filteredServices.forEach(service => {
+            const row = document.createElement('tr');
+            const canEdit = !['Finalizado', 'Cancelado'].includes(service.status);
+            const editButton = canEdit ?
+                `<button class="btn btn-warning btn-sm" onclick="editService('${service.id}')">Editar</button>` :
+                `<button class="btn btn-warning btn-sm" disabled title="No se puede editar servicio finalizado/cancelado">Editar</button>`;
+            const deleteButton = canEdit ?
+                `<button class="btn btn-danger btn-sm" onclick="deleteService('${service.id}')">Eliminar</button>` :
+                `<button class="btn btn-danger btn-sm" disabled title="No se puede eliminar servicio finalizado/cancelado">Eliminar</button>`;
+
+            row.innerHTML = `
+                <td>${service.date}</td>
+                <td>${service.clientName}</td>
+                <td>${service.safeType}</td>
+                <td>${service.location}</td>
+                <td>${getTechnicianNameById(service.technicianId)}</td>
+                <td>${service.status}</td>
+                <td>
+                    <button class="btn btn-info btn-sm" onclick="viewServiceDetails('${service.id}')">Ver</button>
+                    ${editButton}
+                    ${deleteButton}
+                </td>
+            `;
+            servicesListElement.appendChild(row);
+        });
+    }
+    
+    // Actualizar estadísticas cuando se renderiza la lista
+    updateServicesStatistics(filteredServices);
 }
 
-function filterClientServices() {
-    const searchTerm = document.getElementById('search-client-services').value.toLowerCase();
-    const filtered = services.filter(service =>
-        service.clientName.toLowerCase().includes(searchTerm)
-    );
+function filterServices() {
+    const searchTerm = document.getElementById('search-services').value.toLowerCase();
+    const dateFrom = document.getElementById('filter-date-from').value;
+    const dateTo = document.getElementById('filter-date-to').value;
+
+    let filtered = services;
+
+    // Filtrar por término de búsqueda
+    if (searchTerm) {
+        filtered = filtered.filter(service => {
+            const clientName = service.clientName.toLowerCase();
+            const safeType = service.safeType.toLowerCase();
+            const technicianName = getTechnicianNameById(service.technicianId).toLowerCase();
+            const status = service.status.toLowerCase();
+            
+            return clientName.includes(searchTerm) ||
+                   safeType.includes(searchTerm) ||
+                   technicianName.includes(searchTerm) ||
+                   status.includes(searchTerm);
+        });
+    }
+
+    // Filtrar por fecha desde
+    if (dateFrom) {
+        filtered = filtered.filter(service => service.date >= dateFrom);
+    }
+
+    // Filtrar por fecha hasta
+    if (dateTo) {
+        filtered = filtered.filter(service => service.date <= dateTo);
+    }
+
     renderAdminServicesList(filtered);
+    updateServicesStatistics(filtered);
+}
+
+function clearFilters() {
+    document.getElementById('search-services').value = '';
+    document.getElementById('filter-date-from').value = '';
+    document.getElementById('filter-date-to').value = '';
+    filterServices();
+}
+
+function updateServicesStatistics(servicesToCount = services) {
+    const total = servicesToCount.length;
+    const completed = servicesToCount.filter(s => s.status === 'Finalizado').length;
+    const inProgress = servicesToCount.filter(s => s.status === 'En proceso').length;
+    const pending = servicesToCount.filter(s => s.status === 'Pendiente').length;
+
+    document.getElementById('total-services-count').textContent = total;
+    document.getElementById('completed-services-count').textContent = completed;
+    document.getElementById('in-progress-services-count').textContent = inProgress;
+    document.getElementById('pending-services-count').textContent = pending;
 }
 
 document.getElementById('service-form').addEventListener('submit', (e) => {
@@ -402,8 +494,6 @@ function saveServiceData(serviceId, date, safeType, location, clientName, client
     }
 
     // Capture cancellation reason if status is 'Cancelado'
-    // This logic is now primarily handled by handleEmployeeServiceStatusChange for the prompt
-    // but the final assignment happens here.
     if (status === 'Cancelado' && currentUser.role === 'admin') { // Admin can change to cancelled and must provide reason
         if (cancellationReason === null) {
             showConfirm('Para cancelar el servicio, por favor ingrese el motivo de la cancelación:', (inputReason) => {
@@ -424,19 +514,44 @@ function saveServiceData(serviceId, date, safeType, location, clientName, client
 
     // Record finalization/cancellation time and location
     if ((status === 'Finalizado' || status === 'Cancelado') && currentUser.role === 'employee') {
+        const options = {
+            enableHighAccuracy: true,  // Solicitar la mejor precisión disponible
+            timeout: 10000,           // Timeout de 10 segundos
+            maximumAge: 0             // No usar ubicación en caché, obtener ubicación fresca
+        };
+
         navigator.geolocation.getCurrentPosition((position) => {
+            console.log('Ubicación de finalización (modal) obtenida:', position.coords);
+            
             finalizationOrCancellationTime = new Date().toISOString();
             finalizationOrCancellationLocation = {
                 latitude: position.coords.latitude,
-                longitude: position.coords.longitude
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy // Agregar precisión para debugging
             };
             // Proceed to save once location is obtained
             finalizeServiceSave();
         }, (error) => {
-            showAlert('No se pudo obtener la ubicación para la finalización/cancelación. Por favor, asegúrate de que la ubicación esté activada y permitida.');
-            console.error('Error al obtener ubicación:', error);
+            console.error('Error al obtener ubicación de finalización (modal):', error);
+            let errorMessage = 'No se pudo obtener la ubicación para la finalización/cancelación. ';
+            
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage += 'Información de ubicación no disponible.';
+                    break;
+                case error.TIMEOUT:
+                    errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
+                    break;
+                default:
+                    errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
+            }
+            
+            showAlert(errorMessage);
             return; // Stop if location cannot be obtained
-        });
+        }, options);
     } else {
         finalizeServiceSave(); // Save directly if not finalization/cancellation by employee
     }
@@ -457,30 +572,18 @@ function saveServiceData(serviceId, date, safeType, location, clientName, client
             cancellationReason: cancellationReason,
             startTime: startTime,
             startLocation: startLocation,
-            finalizationOrCancellationTime: finalizationOrCancellationTime, // New field
-            finalizationOrCancellationLocation: finalizationOrCancellationLocation // New field
+            finalizationOrCancellationTime: finalizationOrCancellationTime,
+            finalizationOrCancellationLocation: finalizationOrCancellationLocation
         };
 
         if (serviceId) {
             const serviceIndex = services.findIndex(s => s.id === serviceId);
             if (serviceIndex !== -1) {
                 if (['Finalizado', 'Cancelado'].includes(services[serviceIndex].status) && currentUser.role === 'admin' && serviceId) {
-                    // Allow admin to edit finalized/cancelled service IF it's only status or technician, not all fields
-                    // For full restriction:
-                    // showAlert('No se puede editar un servicio finalizado o cancelado.');
-                    // return;
-
-                    // If you want to prevent editing ALL fields, but allow technician assignment:
-                    // If the original status was fixed, only allow technicianId change if it's the admin,
-                    // and then only if the service is not currently finalizado/cancelado AND the technician field is visible.
                     if (['Finalizado', 'Cancelado'].includes(services[serviceIndex].status) && currentUser.role === 'admin' && services[serviceIndex].status === newService.status && services[serviceIndex].technicianId === newService.technicianId) {
-                        // If admin is trying to save a fixed service without changing status or technician, it's blocked.
-                        // This case is for when they open a fixed service and just click save without changing anything crucial.
-                         showAlert('No se puede editar un servicio finalizado o cancelado.');
-                         return;
+                        showAlert('No se puede editar un servicio finalizado o cancelado.');
+                        return;
                     }
-
-                    // Otherwise, allow the update
                 }
                 services[serviceIndex] = newService;
             }
@@ -490,15 +593,19 @@ function saveServiceData(serviceId, date, safeType, location, clientName, client
         saveServices();
         renderAdminServicesList();
         populateAssignServiceDropdown();
+        
+        // Cerrar el modal después de guardar exitosamente
         const modal = bootstrap.Modal.getInstance(document.getElementById('registerServiceModal'));
-        modal.hide();
+        if (modal) {
+            modal.hide();
+        }
+        
         document.getElementById('service-form').reset();
         clearSignaturePad('client');
         clearSignaturePad('technician');
         document.getElementById('service-photo-preview').classList.add('d-none');
         document.getElementById('edit-service-id').value = '';
         document.getElementById('service-photo').value = '';
-
 
         if (currentUser.role === 'employee') {
             renderEmployeeAssignedServices();
@@ -678,10 +785,10 @@ function viewServiceDetails(id) {
             <p><strong>Estado:</strong> ${service.status}</p>
             ${service.cancellationReason ? `<p><strong>Motivo de Cancelación:</strong> ${service.cancellationReason}</p>` : ''}
             ${service.startTime ? `<p><strong>Hora de Inicio:</strong> ${new Date(service.startTime).toLocaleString()}</p>` : ''}
-            ${service.startLocation ? `<p><strong>Ubicación de Inicio:</strong> Lat: ${service.startLocation.latitude}, Lon: ${service.startLocation.longitude}</p>` : ''}
+            ${service.startLocation ? `<p><strong>Ubicación de Inicio:</strong> Lat: ${service.startLocation.latitude.toFixed(6)}, Lon: ${service.startLocation.longitude.toFixed(6)}${service.startLocation.accuracy ? ` (Precisión: ±${Math.round(service.startLocation.accuracy)}m)` : ''}</p>` : ''}
             ${service.finalizationOrCancellationTime ? `<p><strong>Fecha/Hora de Finalización/Cancelación:</strong> ${new Date(service.finalizationOrCancellationTime).toLocaleString()}</p>` : ''}
-            ${service.finalizationOrCancellationLocation ? `<p><strong>Ubicación de Finalización/Cancelación:</strong> Lat: ${service.finalizationOrCancellationLocation.latitude}, Lon: ${service.finalizationOrCancellationLocation.longitude}</p>` : ''}
-            ${service.photo ? `<p><strong>Evidencia Fotográfica:</strong><br><img src="${service.photo}" class="img-fluid" alt="Evidencia"></p>` : ''}
+            ${service.finalizationOrCancellationLocation ? `<p><strong>Ubicación de Finalización/Cancelación:</strong> Lat: ${service.finalizationOrCancellationLocation.latitude.toFixed(6)}, Lon: ${service.finalizationOrCancellationLocation.longitude.toFixed(6)}${service.finalizationOrCancellationLocation.accuracy ? ` (Precisión: ±${Math.round(service.finalizationOrCancellationLocation.accuracy)}m)` : ''}</p>` : ''}
+            ${service.photo ? `<p><strong>Evidencia Fotográfica:</strong><br><img src="${service.photo}" class="service-photo-evidence" alt="Evidencia"></p>` : ''}
             ${service.clientSignature ? `<p><strong>Firma del Cliente:</strong><br><img src="${service.clientSignature}" class="img-fluid" alt="Firma del Cliente"></p>` : ''}
             ${service.technicianSignature ? `<p><strong>Firma del Técnico:</strong><br><img src="${service.technicianSignature}" class="img-fluid" alt="Firma del Técnico"></p>` : ''}
 
@@ -807,8 +914,7 @@ function unassignService(serviceId) {
                 renderAdminServicesList();
                 renderAssignedServicesList();
                 populateAssignServiceDropdown();
-                sendNotification('admin', `El servicio ID: ${serviceId} ha sido desasignado por el administrador.`);
-                // Notify the technician that the service was unassigned
+                // Solo notificar al técnico, no al admin
                 if (oldTechnicianId) {
                     sendNotification(oldTechnicianId, `El servicio ID: ${serviceId} (Cliente: ${service.clientName}, Tipo: ${service.safeType}) ha sido DESASIGNADO por el administrador. Ya no está asignado a ti.`);
                 }
@@ -1093,17 +1199,43 @@ function changeServiceStatus(id, newStatus, cancellationReason = null) {
 
         // Capture finalization/cancellation time and location
         if ((newStatus === 'Finalizado' || newStatus === 'Cancelado') && currentUser.role === 'employee') {
+            const options = {
+                enableHighAccuracy: true,  // Solicitar la mejor precisión disponible
+                timeout: 10000,           // Timeout de 10 segundos
+                maximumAge: 0             // No usar ubicación en caché, obtener ubicación fresca
+            };
+
             navigator.geolocation.getCurrentPosition((position) => {
+                console.log('Ubicación de finalización obtenida:', position.coords);
+                
                 oldService.finalizationOrCancellationTime = new Date().toISOString();
                 oldService.finalizationOrCancellationLocation = {
                     latitude: position.coords.latitude,
-                    longitude: position.coords.longitude
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy // Agregar precisión para debugging
                 };
                 saveAndNotify();
             }, (error) => {
-                showAlert('No se pudo obtener la ubicación para la finalización/cancelación. Por favor, asegúrate de que la ubicación esté activada y permitida.');
-                console.error('Error al obtener ubicación:', error);
-            });
+                console.error('Error al obtener ubicación de finalización:', error);
+                let errorMessage = 'No se pudo obtener la ubicación para la finalización/cancelación. ';
+                
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage += 'Información de ubicación no disponible.';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
+                        break;
+                    default:
+                        errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
+                }
+                
+                showAlert(errorMessage);
+                return; // Stop if location cannot be obtained
+            }, options);
         } else {
             saveAndNotify();
         }
@@ -1120,7 +1252,16 @@ function changeServiceStatus(id, newStatus, cancellationReason = null) {
 
 function startService(serviceId) {
     if (navigator.geolocation) {
+        // Configuración mejorada para obtener la ubicación más precisa
+        const options = {
+            enableHighAccuracy: true,  // Solicitar la mejor precisión disponible
+            timeout: 10000,           // Timeout de 10 segundos
+            maximumAge: 0             // No usar ubicación en caché, obtener ubicación fresca
+        };
+
         navigator.geolocation.getCurrentPosition((position) => {
+            console.log('Ubicación obtenida:', position.coords);
+            
             const serviceIndex = services.findIndex(s => s.id === serviceId);
             if (serviceIndex !== -1) {
                 if (['Finalizado', 'Cancelado', 'En proceso'].includes(services[serviceIndex].status)) {
@@ -1131,21 +1272,38 @@ function startService(serviceId) {
                 services[serviceIndex].startTime = new Date().toISOString();
                 services[serviceIndex].startLocation = {
                     latitude: position.coords.latitude,
-                    longitude: position.coords.longitude
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy // Agregar precisión para debugging
                 };
                 services[serviceIndex].status = 'En proceso';
                 saveServices();
                 renderEmployeeAssignedServices();
                 renderAdminServicesList();
 
-                const message = `El técnico ${currentUser.username} ha iniciado el servicio ID: ${serviceId} a las ${new Date().toLocaleString()} en la ubicación: Lat ${position.coords.latitude}, Lon ${position.coords.longitude}.`;
+                const message = `El técnico ${currentUser.username} ha iniciado el servicio ID: ${serviceId} a las ${new Date().toLocaleString()} en la ubicación: Lat ${position.coords.latitude.toFixed(6)}, Lon ${position.coords.longitude.toFixed(6)} (Precisión: ±${Math.round(position.coords.accuracy)}m).`;
                 sendNotification('admin', message);
-                showAlert('Servicio iniciado y notificación enviada al administrador.');
+                showAlert(`Servicio iniciado exitosamente. Ubicación: Lat ${position.coords.latitude.toFixed(6)}, Lon ${position.coords.longitude.toFixed(6)}`);
             }
         }, (error) => {
-            showAlert('No se pudo obtener la ubicación. Por favor, asegúrate de que la ubicación esté activada y permitida para este sitio.');
             console.error('Error al obtener la ubicación:', error);
-        });
+            let errorMessage = 'No se pudo obtener la ubicación. ';
+            
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage += 'Información de ubicación no disponible.';
+                    break;
+                case error.TIMEOUT:
+                    errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
+                    break;
+                default:
+                    errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
+            }
+            
+            showAlert(errorMessage);
+        }, options);
     } else {
         showAlert('Tu navegador no soporta la geolocalización.');
     }
@@ -1171,16 +1329,25 @@ function sendNotification(targetRoleOrUserId, message) {
         return;
     }
 
-
     if (targetUsers.length > 0) {
         targetUsers.forEach(user => {
-            notifications.push({
-                id: generateId(),
-                userId: user.id,
-                message: message,
-                timestamp: new Date().toISOString(),
-                read: false
-            });
+            // Evitar duplicar notificaciones para el mismo usuario con el mismo mensaje
+            const existingNotification = notifications.find(n => 
+                n.userId === user.id && 
+                n.message === message && 
+                !n.read &&
+                (new Date() - new Date(n.timestamp)) < 60000 // Solo verificar notificaciones de los últimos 60 segundos
+            );
+            
+            if (!existingNotification) {
+                notifications.push({
+                    id: generateId(),
+                    userId: user.id,
+                    message: message,
+                    timestamp: new Date().toISOString(),
+                    read: false
+                });
+            }
         });
         saveNotifications();
         updateNotificationBadges();
@@ -1229,8 +1396,13 @@ function renderEmployeeNotifications() {
         return;
     }
 
-    // Display regular notifications
+    // Display regular notifications (excluding report reply notifications)
     employeeNotifications.forEach(n => {
+        // Skip notifications that are about report replies to avoid duplication
+        if (n.message.includes('ha respondido a tu reporte')) {
+            return;
+        }
+        
         const notificationDiv = document.createElement('div');
         notificationDiv.className = `alert ${n.read ? 'alert-light' : 'alert-info'} d-flex justify-content-between align-items-center`;
         notificationDiv.innerHTML = `
@@ -1312,7 +1484,11 @@ function updateNotificationBadges() {
         }
 
     } else if (currentUser && currentUser.role === 'employee') {
-        const unreadEmployeeNotificationsCount = notifications.filter(n => n.userId === currentUser.id && !n.read).length;
+        const unreadEmployeeNotificationsCount = notifications.filter(n => 
+            n.userId === currentUser.id && 
+            !n.read && 
+            !n.message.includes('ha respondido a tu reporte')
+        ).length;
         const unreadReportRepliesCount = reports.filter(r => r.reporterId === currentUser.id && r.replies.some(reply => !reply.readForTechnician)).length;
 
         const totalUnreadEmployeeItems = unreadEmployeeNotificationsCount + unreadReportRepliesCount;
@@ -1345,8 +1521,38 @@ function exportUsersToExcel() {
 }
 
 function exportServicesToExcel() {
+    // Obtener los servicios filtrados actualmente
+    const searchTerm = document.getElementById('search-services').value.toLowerCase();
+    const dateFrom = document.getElementById('filter-date-from').value;
+    const dateTo = document.getElementById('filter-date-to').value;
+
+    let servicesToExport = services;
+
+    // Aplicar los mismos filtros que en la vista
+    if (searchTerm) {
+        servicesToExport = servicesToExport.filter(service => {
+            const clientName = service.clientName.toLowerCase();
+            const safeType = service.safeType.toLowerCase();
+            const technicianName = getTechnicianNameById(service.technicianId).toLowerCase();
+            const status = service.status.toLowerCase();
+            
+            return clientName.includes(searchTerm) ||
+                   safeType.includes(searchTerm) ||
+                   technicianName.includes(searchTerm) ||
+                   status.includes(searchTerm);
+        });
+    }
+
+    if (dateFrom) {
+        servicesToExport = servicesToExport.filter(service => service.date >= dateFrom);
+    }
+
+    if (dateTo) {
+        servicesToExport = servicesToExport.filter(service => service.date <= dateTo);
+    }
+
     // Ajustamos los datos del servicio para hacerlos más legibles en el Excel
-    const servicesToExport = services.map(service => {
+    const servicesToExportFormatted = servicesToExport.map(service => {
         const technicianName = getTechnicianNameById(service.technicianId);
         return {
             'ID Servicio': service.id,
@@ -1359,14 +1565,18 @@ function exportServicesToExcel() {
             'Estado': service.status,
             'Motivo de Cancelación': service.cancellationReason || 'N/A',
             'Hora de Inicio': service.startTime ? new Date(service.startTime).toLocaleString() : 'N/A',
-            'Ubicación de Inicio (Lat)': service.startLocation ? service.startLocation.latitude : 'N/A',
-            'Ubicación de Inicio (Lon)': service.startLocation ? service.startLocation.longitude : 'N/A',
+            'Ubicación de Inicio (Lat)': service.startLocation ? service.startLocation.latitude.toFixed(6) : 'N/A',
+            'Ubicación de Inicio (Lon)': service.startLocation ? service.startLocation.longitude.toFixed(6) : 'N/A',
+            'Precisión de Inicio (m)': service.startLocation && service.startLocation.accuracy ? Math.round(service.startLocation.accuracy) : 'N/A',
             'Hora de Finalización/Cancelación': service.finalizationOrCancellationTime ? new Date(service.finalizationOrCancellationTime).toLocaleString() : 'N/A',
-            'Ubicación de Finalización/Cancelación (Lat)': service.finalizationOrCancellationLocation ? service.finalizationOrCancellationLocation.latitude : 'N/A',
-            'Ubicación de Finalización/Cancelación (Lon)': service.finalizationOrCancellationLocation ? service.finalizationOrCancellationLocation.longitude : 'N/A'
+            'Ubicación de Finalización/Cancelación (Lat)': service.finalizationOrCancellationLocation ? service.finalizationOrCancellationLocation.latitude.toFixed(6) : 'N/A',
+            'Ubicación de Finalización/Cancelación (Lon)': service.finalizationOrCancellationLocation ? service.finalizationOrCancellationLocation.longitude.toFixed(6) : 'N/A',
+            'Precisión de Finalización (m)': service.finalizationOrCancellationLocation && service.finalizationOrCancellationLocation.accuracy ? Math.round(service.finalizationOrCancellationLocation.accuracy) : 'N/A'
         };
     });
-    exportToExcel(servicesToExport, 'servicios');
+    
+    const filename = `servicios_${new Date().toISOString().split('T')[0]}`;
+    exportToExcel(servicesToExportFormatted, filename);
 }
 
 
@@ -1429,6 +1639,9 @@ document.getElementById('service-photo').addEventListener('change', function(eve
 
 // Initial setup on page load
 document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar tema
+    initializeTheme();
+    
     showLogin();
 
     const createUserModalElement = document.getElementById('createUserModal');
@@ -1461,6 +1674,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // For employee finalization, openServiceFinalizationModal will handle visibility directly
         });
+
+        // Agregar evento para limpiar el modal de alerta cuando se cierre
+        const customAlertModalElement = document.getElementById('customAlertModal');
+        if (customAlertModalElement) {
+            customAlertModalElement.addEventListener('hidden.bs.modal', () => {
+                // Limpiar el contenido del modal
+                document.getElementById('customAlertModalBody').textContent = '';
+                // Habilitar interacciones con la página
+                document.body.style.pointerEvents = 'auto';
+                document.body.style.overflow = 'auto';
+            });
+        }
 
         registerServiceModalElement.addEventListener('hidden.bs.modal', () => {
             // Resetear el formulario completamente
@@ -1510,3 +1735,217 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeCanvas(document.getElementById('signature-pad-technician'), signaturePadTechnician);
     });
 });
+
+// Nota: Tendrás que encapsular tu lógica de guardado en una nueva función
+// llamada `saveServiceLogic` para que se ejecute después del redimensionamiento.
+
+function resizeImage(img, maxWidth, maxHeight) {
+    const canvas = document.createElement('canvas');
+    let width = img.width;
+    let height = img.height;
+
+    // Calcular el ratio para mantener las proporciones
+    if (width > height) {
+        if (width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
+        }
+        } else {
+        if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+        }
+    }
+    
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, width, height);
+
+    // Devolver la imagen redimensionada como data URL con calidad de compresión (0.7 por ejemplo)
+    return canvas.toDataURL('image/jpeg', 'image/jpg', 'image/png', 0.7);
+}
+
+// Función para probar la geolocalización
+function testGeolocation() {
+    console.log('Iniciando test de geolocalización');
+    
+    if (!navigator.geolocation) {
+        console.log('Geolocalización no soportada');
+        showAlert('Tu navegador no soporta la geolocalización.');
+        return;
+    }
+
+    const options = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+    };
+
+    console.log('Opciones de geolocalización:', options);
+
+    // Mostrar mensaje de carga simple
+    showAlert('Obteniendo ubicación actual... Por favor espera.');
+
+    navigator.geolocation.getCurrentPosition((position) => {
+        console.log('Geolocalización exitosa:', position);
+        
+        const coords = position.coords;
+        const accuracy = Math.round(coords.accuracy);
+        
+        let message = `✅ Ubicación obtenida exitosamente:\n\n`;
+        message += `📍 Latitud: ${coords.latitude.toFixed(6)}\n`;
+        message += `📍 Longitud: ${coords.longitude.toFixed(6)}\n`;
+        message += `🎯 Precisión: ±${accuracy} metros\n`;
+        message += `📏 Altitud: ${coords.altitude ? `${coords.altitude.toFixed(1)}m` : 'No disponible'}\n`;
+        message += `🚀 Velocidad: ${coords.speed ? `${coords.speed.toFixed(1)}m/s` : 'No disponible'}\n`;
+        message += `🧭 Dirección: ${coords.heading ? `${coords.heading.toFixed(1)}°` : 'No disponible'}\n\n`;
+        message += `🌐 Puedes verificar estas coordenadas en Google Maps:`;
+        message += `\nhttps://www.google.com/maps?q=${coords.latitude},${coords.longitude}`;
+
+        console.log('Mensaje a mostrar:', message);
+
+        // Cerrar el modal actual y mostrar el resultado
+        const currentModal = bootstrap.Modal.getInstance(document.getElementById('customAlertModal'));
+        if (currentModal) {
+            currentModal.hide();
+        }
+        
+        // Mostrar el resultado después de un breve delay
+        setTimeout(() => {
+            console.log('Mostrando resultado de geolocalización');
+            showAlert(message);
+        }, 300);
+        
+        // También mostrar en consola para debugging
+        console.log('Test de geolocalización exitoso:', {
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            accuracy: coords.accuracy,
+            altitude: coords.altitude,
+            speed: coords.speed,
+            heading: coords.heading
+        });
+    }, (error) => {
+        console.error('Error en test de geolocalización:', error);
+        let errorMessage = '❌ Error al obtener ubicación:\n\n';
+        
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                errorMessage += '❌ Permiso denegado\n\n';
+                errorMessage += 'Para solucionarlo:\n';
+                errorMessage += '1. Haz clic en el ícono de ubicación en la barra de direcciones\n';
+                errorMessage += '2. Selecciona "Permitir"\n';
+                errorMessage += '3. Recarga la página';
+                break;
+            case error.POSITION_UNAVAILABLE:
+                errorMessage += '❌ Información de ubicación no disponible\n\n';
+                errorMessage += 'Posibles causas:\n';
+                errorMessage += '• GPS desactivado en el dispositivo\n';
+                errorMessage += '• Sin señal GPS\n';
+                errorMessage += '• Problemas de conectividad';
+                break;
+            case error.TIMEOUT:
+                errorMessage += '❌ Tiempo de espera agotado\n\n';
+                errorMessage += 'Intenta de nuevo en unos segundos';
+                break;
+            default:
+                errorMessage += '❌ Error desconocido\n\n';
+                errorMessage += 'Verifica que:\n';
+                errorMessage += '• La ubicación esté activada\n';
+                errorMessage += '• Tengas conexión a internet\n';
+                errorMessage += '• El navegador tenga permisos';
+        }
+        
+        // Cerrar el modal actual y mostrar el error
+        const currentModal = bootstrap.Modal.getInstance(document.getElementById('customAlertModal'));
+        if (currentModal) {
+            currentModal.hide();
+        }
+        
+        setTimeout(() => {
+            showAlert(errorMessage);
+        }, 300);
+    }, options);
+}
+
+// --- Funciones de Tema ---
+function toggleTheme() {
+    const previousTheme = currentTheme;
+    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+    localStorage.setItem('theme', currentTheme);
+    applyTheme();
+    updateThemeIcon();
+    
+    // Mostrar notificación del cambio de tema
+    const themeName = currentTheme === 'dark' ? 'oscuro' : 'claro';
+    showAlert(`Tema cambiado a modo ${themeName}`);
+}
+
+function applyTheme() {
+    const html = document.documentElement;
+    if (currentTheme === 'dark') {
+        html.setAttribute('data-theme', 'dark');
+    } else {
+        html.removeAttribute('data-theme');
+    }
+}
+
+function updateThemeIcon() {
+    const themeIcon = document.getElementById('theme-icon');
+    const themeToggle = document.getElementById('theme-toggle');
+    
+    if (currentTheme === 'dark') {
+        themeIcon.className = 'bi bi-moon-fill';
+        themeToggle.title = 'Cambiar a modo claro';
+    } else {
+        themeIcon.className = 'bi bi-sun-fill';
+        themeToggle.title = 'Cambiar a modo oscuro';
+    }
+}
+
+function initializeTheme() {
+    // Detectar preferencia del sistema si no hay tema guardado
+    if (!localStorage.getItem('theme')) {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        currentTheme = prefersDark ? 'dark' : 'light';
+        localStorage.setItem('theme', currentTheme);
+    }
+    
+    applyTheme();
+    updateThemeIcon();
+    
+    // Escuchar cambios en la preferencia del sistema
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+            currentTheme = e.matches ? 'dark' : 'light';
+            applyTheme();
+            updateThemeIcon();
+        }
+    });
+}
+
+// Función para forzar el cierre de modales bloqueados
+function forceCloseModals() {
+    // Cerrar todos los modales abiertos
+    const allModals = document.querySelectorAll('.modal');
+    allModals.forEach(modal => {
+        const modalInstance = bootstrap.Modal.getInstance(modal);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+    });
+    
+    // Remover clases de backdrop
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+    
+    // Restaurar scroll del body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = 'auto';
+    document.body.style.paddingRight = '';
+    
+    // Habilitar interacciones
+    document.body.style.pointerEvents = 'auto';
+}

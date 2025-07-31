@@ -43,3 +43,734 @@ body {
         input[type="number"] {
             -moz-appearance: textfield;
         }
+
+    .service-photo-evidence {
+        max-width: 400px; /* Tamaño máximo para la imagen */
+        height: auto;    /* Mantiene la proporción original */
+        display: block;  /* Asegura que ocupe su propio espacio */
+        margin: 10px 0;  /* Añade un pequeño margen para separación */
+        border: 1px solid #ddd; /* Opcional: para un mejor aspecto visual */
+        border-radius: 5px;
+    }
+
+    /* Estilos para las tarjetas de estadísticas */
+    .card.bg-primary, .card.bg-success, .card.bg-warning, .card.bg-info {
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .card.bg-primary:hover, .card.bg-success:hover, .card.bg-warning:hover, .card.bg-info:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    /* Estilos para los filtros */
+    .input-group .btn {
+        border-left: none;
+    }
+
+    .input-group .form-control {
+        border-right: none;
+    }
+
+    .input-group .form-control:focus {
+        border-right: none;
+        box-shadow: none;
+    }
+
+    .input-group .btn:focus {
+        box-shadow: none;
+    }
+
+    /* Variables CSS para temas */
+    :root {
+        --bg-primary: #f8f9fa;
+        --bg-secondary: #ffffff;
+        --text-primary: #000000;
+        --text-secondary: #6c757d;
+        --border-color: #dee2e6;
+        --card-bg: #ffffff;
+        --navbar-bg: #343a40;
+        --navbar-text: #ffffff;
+        --table-stripe: #f8f9fa;
+        --shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    /* Modo Dark */
+    [data-theme="dark"] {
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --border-color: #404040;
+        --card-bg: #2d2d2d;
+        --navbar-bg: #000000;
+        --navbar-text: #ffffff;
+        --table-stripe: #3a3a3a;
+        --shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    /* Aplicar variables CSS */
+    body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Reglas específicas para texto con contraste correcto */
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--text-primary) !important;
+        font-weight: 600;
+    }
+
+    p, span, div, label {
+        color: var(--text-primary);
+    }
+
+    /* Títulos de módulos y secciones */
+    .card-header {
+        background-color: var(--card-bg) !important;
+        color: var(--text-primary) !important;
+        border-bottom-color: var(--border-color) !important;
+        font-weight: 600;
+    }
+
+    .card-header h4, .card-header h5, .card-header h6 {
+        color: var(--text-primary) !important;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    /* Títulos principales de secciones */
+    .container h2 {
+        color: var(--text-primary) !important;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 0.5rem;
+    }
+
+    /* Títulos de secciones secundarias */
+    .section-title {
+        color: var(--text-primary) !important;
+        font-weight: 600;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        padding: 0.5rem 0;
+        border-left: 4px solid var(--border-color);
+        padding-left: 1rem;
+    }
+
+    /* Títulos de módulos específicos */
+    .module-title {
+        color: var(--text-primary) !important;
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Asegurar contraste en modo light */
+    :root {
+        color: #000000;
+    }
+
+    /* Asegurar contraste en modo dark */
+    [data-theme="dark"] {
+        color: #ffffff;
+    }
+
+    .navbar-dark {
+        background-color: var(--navbar-bg) !important;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        box-shadow: var(--shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Estilos uniformes para tablas */
+    .table {
+        color: var(--text-primary);
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+    }
+
+    .table th {
+        background-color: var(--card-bg) !important;
+        color: var(--text-primary) !important;
+        border-bottom-color: var(--border-color) !important;
+        font-weight: 600;
+        padding: 0.75rem;
+    }
+
+    .table td {
+        background-color: var(--card-bg) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+        padding: 0.75rem;
+        vertical-align: middle;
+    }
+
+    /* Eliminar el efecto striped para uniformidad */
+    .table-striped > tbody > tr:nth-of-type(odd) > td {
+        background-color: var(--card-bg) !important;
+    }
+
+    .table-striped > tbody > tr:nth-of-type(even) > td {
+        background-color: var(--card-bg) !important;
+    }
+
+    /* Hover uniforme para todas las filas */
+    .table-hover > tbody > tr:hover > td {
+        background-color: var(--table-stripe) !important;
+        color: var(--text-primary) !important;
+    }
+
+    /* Bordes de tabla consistentes */
+    .table-bordered {
+        border-color: var(--border-color) !important;
+    }
+
+    .table-bordered th,
+    .table-bordered td {
+        border-color: var(--border-color) !important;
+    }
+
+    .form-control, .form-select {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: var(--card-bg);
+        border-color: #86b7fe;
+        color: var(--text-primary);
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .modal-content {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .modal-header {
+        border-bottom-color: var(--border-color);
+    }
+
+    .modal-footer {
+        border-top-color: var(--border-color);
+    }
+
+    .alert {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .list-group-item {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .dropdown-menu {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+    }
+
+    .dropdown-item {
+        color: var(--text-primary);
+    }
+
+    .dropdown-item:hover {
+        background-color: var(--table-stripe);
+        color: var(--text-primary);
+    }
+
+    /* Estilos específicos para el botón de tema */
+    #theme-toggle {
+        transition: all 0.3s ease;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+
+    #theme-toggle:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    #theme-toggle:active {
+        transform: scale(0.95);
+    }
+
+    /* Transiciones suaves para todos los elementos */
+    * {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Regla general para asegurar contraste de texto */
+    * {
+        color: inherit;
+    }
+
+    /* Asegurar que el texto heredado tenga el contraste correcto */
+    body * {
+        color: var(--text-primary);
+    }
+
+    /* Excepciones para elementos que deben mantener su color específico */
+    .btn-primary, .btn-success, .btn-info, .btn-danger, .btn-warning,
+    .badge.bg-primary, .badge.bg-success, .badge.bg-info, .badge.bg-danger, .badge.bg-warning,
+    .alert-success, .alert-danger, .alert-warning, .alert-info {
+        color: inherit;
+    }
+
+    /* Estados de servicios en tablas */
+    .table .status-pendiente {
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .table .status-en-proceso {
+        color: #ffc107;
+        font-weight: 600;
+    }
+
+    .table .status-finalizado {
+        color: #198754;
+        font-weight: 600;
+    }
+
+    .table .status-cancelado {
+        color: #dc3545;
+        font-weight: 600;
+    }
+
+    /* Estados en modo dark */
+    [data-theme="dark"] .table .status-pendiente {
+        color: #adb5bd;
+    }
+
+    [data-theme="dark"] .table .status-en-proceso {
+        color: #ffc107;
+    }
+
+    [data-theme="dark"] .table .status-finalizado {
+        color: #20c997;
+    }
+
+    [data-theme="dark"] .table .status-cancelado {
+        color: #ff6b6b;
+    }
+
+    /* Consistencia en elementos de tabla */
+    .table .text-center {
+        text-align: center !important;
+    }
+
+    .table .text-end {
+        text-align: right !important;
+    }
+
+    .table .text-start {
+        text-align: left !important;
+    }
+
+    /* Espaciado uniforme en tablas */
+    .table-responsive {
+        border-radius: 0.375rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+    }
+
+    /* Ajustes para elementos específicos en modo dark */
+    [data-theme="dark"] .text-muted {
+        color: var(--text-secondary) !important;
+    }
+
+    [data-theme="dark"] .border {
+        border-color: var(--border-color) !important;
+    }
+
+    /* Asegurar contraste en elementos específicos */
+    .card-title, .card-text {
+        color: var(--text-primary) !important;
+    }
+
+    .table th, .table td {
+        color: var(--text-primary) !important;
+    }
+
+    .nav-link {
+        color: var(--text-primary) !important;
+    }
+
+    .nav-link:hover {
+        color: var(--text-primary) !important;
+    }
+
+    .nav-link.active {
+        color: var(--text-primary) !important;
+    }
+
+    /* Ajustes específicos para modo light */
+    :root .text-dark {
+        color: #000000 !important;
+    }
+
+    :root .text-light {
+        color: #ffffff !important;
+    }
+
+    /* Ajustes específicos para modo dark */
+    [data-theme="dark"] .text-dark {
+        color: #ffffff !important;
+    }
+
+    [data-theme="dark"] .text-light {
+        color: #000000 !important;
+    }
+
+    [data-theme="dark"] .signature-pad-container {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .signature-pad {
+        background-color: var(--card-bg);
+    }
+
+    /* Ajustes específicos para tarjetas de estadísticas en modo dark */
+    [data-theme="dark"] .card.bg-primary {
+        background-color: #0d6efd !important;
+        color: #ffffff !important;
+    }
+
+    [data-theme="dark"] .card.bg-success {
+        background-color: #198754 !important;
+        color: #ffffff !important;
+    }
+
+    [data-theme="dark"] .card.bg-warning {
+        background-color: #ffc107 !important;
+        color: #000000 !important;
+    }
+
+    [data-theme="dark"] .card.bg-info {
+        background-color: #0dcaf0 !important;
+        color: #ffffff !important;
+    }
+
+    /* Asegurar contraste en tarjetas de estadísticas en modo light */
+    .card.bg-primary {
+        color: #ffffff !important;
+    }
+
+    .card.bg-success {
+        color: #ffffff !important;
+    }
+
+    .card.bg-warning {
+        color: #000000 !important;
+    }
+
+    .card.bg-info {
+        color: #ffffff !important;
+    }
+
+    /* Ajustes para botones en modo dark */
+    [data-theme="dark"] .btn-outline-light {
+        border-color: #ffffff;
+        color: #ffffff;
+    }
+
+    [data-theme="dark"] .btn-outline-light:hover {
+        background-color: #ffffff;
+        color: #000000;
+    }
+
+    /* Ajustes para tabs en modo dark */
+    [data-theme="dark"] .nav-tabs .nav-link {
+        color: var(--text-secondary);
+        border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .nav-tabs .nav-link.active {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .nav-tabs .nav-link:hover {
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    /* Estilos uniformes para tabs en ambos modos */
+    .nav-tabs {
+        border-bottom-color: var(--border-color);
+    }
+
+    .nav-tabs .nav-link {
+        color: var(--text-secondary) !important;
+        border-color: var(--border-color) !important;
+        background-color: transparent;
+        font-weight: 500;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+        background-color: var(--table-stripe);
+    }
+
+    .nav-tabs .nav-link.active {
+        color: var(--text-primary) !important;
+        background-color: var(--card-bg) !important;
+        border-color: var(--border-color) !important;
+        border-bottom-color: var(--card-bg) !important;
+        font-weight: 600;
+    }
+
+    /* Contenido de tabs */
+    .tab-content {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+    }
+
+    .tab-pane {
+        background-color: var(--card-bg);
+        color: var(--text-primary);
+    }
+
+    /* Ajustes para badges en modo dark */
+    [data-theme="dark"] .badge.bg-danger {
+        background-color: #dc3545 !important;
+    }
+
+    /* Ajustes para tooltips en modo dark */
+    [data-theme="dark"] .tooltip .tooltip-inner {
+        background-color: var(--card-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    [data-theme="dark"] .tooltip .tooltip-arrow::before {
+        border-top-color: var(--card-bg);
+    }
+
+    /* Ajustes adicionales para contraste */
+    .btn {
+        color: var(--text-primary);
+    }
+
+    .btn-outline-primary {
+        color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    .btn-outline-primary:hover {
+        color: #ffffff;
+        background-color: #0d6efd;
+    }
+
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .btn-outline-secondary:hover {
+        color: #ffffff;
+        background-color: #6c757d;
+    }
+
+    .btn-outline-success {
+        color: #198754;
+        border-color: #198754;
+    }
+
+    .btn-outline-success:hover {
+        color: #ffffff;
+        background-color: #198754;
+    }
+
+    .btn-outline-danger {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-outline-danger:hover {
+        color: #ffffff;
+        background-color: #dc3545;
+    }
+
+    .btn-outline-warning {
+        color: #ffc107;
+        border-color: #ffc107;
+    }
+
+    .btn-outline-warning:hover {
+        color: #000000;
+        background-color: #ffc107;
+    }
+
+    .btn-outline-info {
+        color: #0dcaf0;
+        border-color: #0dcaf0;
+    }
+
+    .btn-outline-info:hover {
+        color: #000000;
+        background-color: #0dcaf0;
+    }
+
+    /* Asegurar que los badges tengan contraste */
+    .badge {
+        color: #ffffff;
+    }
+
+    .badge.bg-light {
+        color: #000000;
+    }
+
+    /* Ajustes para elementos de formulario */
+    .form-label {
+        color: var(--text-primary) !important;
+        font-weight: 500;
+    }
+
+    .form-text {
+        color: var(--text-secondary) !important;
+    }
+
+    /* Botones en tablas con estilo uniforme */
+    .table .btn {
+        margin: 0.125rem;
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        transition: all 0.2s ease;
+    }
+
+    .table .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Estados de botones en tablas */
+    .table .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* Dropdowns en tablas */
+    .table .dropdown-menu {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        box-shadow: var(--shadow);
+    }
+
+    .table .dropdown-item {
+        color: var(--text-primary);
+        padding: 0.5rem 1rem;
+    }
+
+    .table .dropdown-item:hover {
+        background-color: var(--table-stripe);
+        color: var(--text-primary);
+    }
+
+    .table .dropdown-item:active {
+        background-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    /* Ajustes para elementos de navegación */
+    .navbar-brand {
+        color: var(--navbar-text) !important;
+    }
+
+    .navbar-nav .nav-link {
+        color: var(--navbar-text) !important;
+    }
+
+    .navbar-nav .nav-link:hover {
+        color: var(--navbar-text) !important;
+        opacity: 0.8;
+    }
+
+    /* Ajustes para elementos de lista */
+    .list-group-item {
+        color: var(--text-primary) !important;
+    }
+
+    .list-group-item-action:hover {
+        background-color: var(--table-stripe);
+        color: var(--text-primary) !important;
+    }
+
+    /* Ajustes para elementos de alerta */
+    .alert {
+        color: var(--text-primary) !important;
+    }
+
+    .alert-success {
+        background-color: #d1e7dd;
+        border-color: #badbcc;
+        color: #0f5132;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c2c7;
+        color: #842029;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        border-color: #ffecb5;
+        color: #664d03;
+    }
+
+    .alert-info {
+        background-color: #cff4fc;
+        border-color: #b6effb;
+        color: #055160;
+    }
+
+    /* Ajustes para modo dark en alertas */
+    [data-theme="dark"] .alert-success {
+        background-color: #0f5132;
+        border-color: #badbcc;
+        color: #d1e7dd;
+    }
+
+    [data-theme="dark"] .alert-danger {
+        background-color: #842029;
+        border-color: #f5c2c7;
+        color: #f8d7da;
+    }
+
+    [data-theme="dark"] .alert-warning {
+        background-color: #664d03;
+        border-color: #ffecb5;
+        color: #fff3cd;
+    }
+
+    [data-theme="dark"] .alert-info {
+        background-color: #055160;
+        border-color: #b6effb;
+        color: #cff4fc;
+    }
