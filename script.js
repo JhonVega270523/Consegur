@@ -129,6 +129,11 @@ function showAdminDashboard() {
         
         // Establecer fechas por defecto (último mes)
         setDefaultDateFilters();
+        
+        // Reinicializar navegación táctil para tablas
+        setTimeout(() => {
+            initializeTableNavigation();
+        }, 100);
     } else {
         showAlert('Acceso denegado. Solo administradores.');
         showLogin();
@@ -158,6 +163,11 @@ function showEmployeeDashboard() {
         renderEmployeeAssignedServices();
         renderEmployeeNotifications();
         updateNotificationBadges(); // Update badges for employee
+        
+        // Reinicializar navegación táctil para tablas
+        setTimeout(() => {
+            initializeTableNavigation();
+        }, 100);
     } else {
         showAlert('Acceso denegado. Solo empleados.');
         showLogin();
@@ -1642,6 +1652,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar tema
     initializeTheme();
     
+    // Inicializar navegación táctil para tablas
+    initializeTableNavigation();
+    
     showLogin();
 
     const createUserModalElement = document.getElementById('createUserModal');
@@ -1948,4 +1961,56 @@ function forceCloseModals() {
     
     // Habilitar interacciones
     document.body.style.pointerEvents = 'auto';
+}
+
+// --- Funciones de Navegación Táctil para Tablas ---
+function initializeTableNavigation() {
+    const tableResponsives = document.querySelectorAll('.table-responsive');
+    
+    tableResponsives.forEach(tableResponsive => {
+        // Gestos táctiles para navegación
+        let startX = 0;
+        let startY = 0;
+        let isScrolling = false;
+        
+        tableResponsive.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isScrolling = false;
+        });
+        
+        tableResponsive.addEventListener('touchmove', (e) => {
+            if (!isScrolling) {
+                const deltaX = Math.abs(e.touches[0].clientX - startX);
+                const deltaY = Math.abs(e.touches[0].clientY - startY);
+                
+                if (deltaX > deltaY && deltaX > 10) {
+                    isScrolling = true;
+                }
+            }
+        });
+        
+        tableResponsive.addEventListener('touchend', (e) => {
+            if (isScrolling) {
+                const deltaX = e.changedTouches[0].clientX - startX;
+                const threshold = 50; // Umbral mínimo para considerar un swipe
+                
+                if (Math.abs(deltaX) > threshold) {
+                    if (deltaX > 0) {
+                        // Swipe hacia la derecha - scroll izquierda
+                        tableResponsive.scrollBy({
+                            left: -200,
+                            behavior: 'smooth'
+                        });
+                    } else {
+                        // Swipe hacia la izquierda - scroll derecha
+                        tableResponsive.scrollBy({
+                            left: 200,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            }
+        });
+    });
 }
