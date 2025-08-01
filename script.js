@@ -10,6 +10,115 @@ let currentTheme = localStorage.getItem('theme') || 'light'; // Tema actual
 let signaturePadClient = null;
 let signaturePadTechnician = null;
 
+// --- Sistema de Paginación ---
+const ITEMS_PER_PAGE = 10;
+
+// Función para dividir un array en páginas
+function paginateArray(array, page, itemsPerPage = ITEMS_PER_PAGE) {
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return array.slice(startIndex, endIndex);
+}
+
+// Función para calcular el número total de páginas
+function getTotalPages(totalItems, itemsPerPage = ITEMS_PER_PAGE) {
+    return Math.ceil(totalItems / itemsPerPage);
+}
+
+// Función para generar controles de paginación
+function generatePaginationControls(currentPage, totalPages, containerId, onPageChange) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (totalPages <= 1) return;
+    
+    const paginationContainer = document.createElement('div');
+    paginationContainer.className = 'd-flex justify-content-between align-items-center mt-3';
+    
+    // Información de página
+    const pageInfo = document.createElement('div');
+    pageInfo.className = 'text-muted';
+    pageInfo.innerHTML = `Página ${currentPage} de ${totalPages}`;
+    
+    // Controles de navegación
+    const navContainer = document.createElement('div');
+    navContainer.className = 'd-flex gap-2';
+    
+    // Botón anterior
+    const prevButton = document.createElement('button');
+    prevButton.className = `btn btn-outline-primary btn-sm ${currentPage === 1 ? 'disabled' : ''}`;
+    prevButton.innerHTML = '<i class="bi bi-chevron-left"></i> Anterior';
+    prevButton.onclick = () => {
+        if (currentPage > 1) {
+            onPageChange(currentPage - 1);
+        }
+    };
+    
+    // Botones de página
+    const pageButtonsContainer = document.createElement('div');
+    pageButtonsContainer.className = 'd-flex gap-1';
+    
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.className = `btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-primary'}`;
+        pageButton.textContent = i;
+        pageButton.onclick = () => onPageChange(i);
+        pageButtonsContainer.appendChild(pageButton);
+    }
+    
+    // Botón siguiente
+    const nextButton = document.createElement('button');
+    nextButton.className = `btn btn-outline-primary btn-sm ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextButton.innerHTML = 'Siguiente <i class="bi bi-chevron-right"></i>';
+    nextButton.onclick = () => {
+        if (currentPage < totalPages) {
+            onPageChange(currentPage + 1);
+        }
+    };
+    
+    navContainer.appendChild(prevButton);
+    navContainer.appendChild(pageButtonsContainer);
+    navContainer.appendChild(nextButton);
+    
+    paginationContainer.appendChild(pageInfo);
+    paginationContainer.appendChild(navContainer);
+    container.appendChild(paginationContainer);
+}
+
+// Función para agregar numeración a las filas de una tabla
+function addRowNumbers(tableBody, startNumber = 1) {
+    const rows = tableBody.querySelectorAll('tr');
+    rows.forEach((row, index) => {
+        // Insertar celda de numeración al inicio
+        const numberCell = document.createElement('td');
+        numberCell.className = 'text-center fw-bold';
+        numberCell.style.width = '50px';
+        numberCell.textContent = startNumber + index;
+        row.insertBefore(numberCell, row.firstChild);
+    });
+}
+
+// Función para agregar encabezado de numeración a una tabla
+function addNumberHeader(tableHeader) {
+    const headerRow = tableHeader.querySelector('tr');
+    if (headerRow) {
+        const numberHeader = document.createElement('th');
+        numberHeader.className = 'text-center';
+        numberHeader.style.width = '50px';
+        numberHeader.innerHTML = '<i class="bi bi-hash"></i>';
+        headerRow.insertBefore(numberHeader, headerRow.firstChild);
+    }
+}
 
 // Initialize an admin user if none exists
 if (users.length === 0) {
@@ -117,23 +226,23 @@ function showAdminDashboard() {
         document.getElementById('nav-logout').classList.remove('d-none');
         document.getElementById('nav-admin-dashboard').classList.remove('d-none');
         document.getElementById('nav-employee-dashboard').classList.add('d-none');
-        renderUserList();
-        renderAdminServicesList();
+        renderUserList(1);
+        renderAdminServicesList(services, 1);
         populateAssignServiceDropdown();
         populateAssignTechnicianDropdown();
         populateTechnicianDropdowns();
-        renderAssignedServicesList();
-        renderReportsList();
-        renderAdminNotifications();
+        renderAssignedServicesList(1);
+        renderReportsList(1);
+        renderAdminNotifications(1);
         updateNotificationBadges(); // Update badges for admin
         
         // Establecer fechas por defecto (último mes)
         setDefaultDateFilters();
         
-        // Reinicializar navegación táctil para tablas
-        setTimeout(() => {
-            initializeTableNavigation();
-        }, 100);
+        // ELIMINAR la reinicialización de navegación táctil
+        // setTimeout(() => {
+        //     initializeTableNavigation();
+        // }, 100);
     } else {
         showAlert('Acceso denegado. Solo administradores.');
         showLogin();
@@ -160,14 +269,15 @@ function showEmployeeDashboard() {
         document.getElementById('nav-logout').classList.remove('d-none');
         document.getElementById('nav-admin-dashboard').classList.add('d-none');
         document.getElementById('nav-employee-dashboard').classList.remove('d-none');
-        renderEmployeeAssignedServices();
-        renderEmployeeNotifications();
+        renderEmployeeAssignedServices(1);
+        renderEmployeeNotifications(1);
+        renderEmployeeReportReplies(1);
         updateNotificationBadges(); // Update badges for employee
         
-        // Reinicializar navegación táctil para tablas
-        setTimeout(() => {
-            initializeTableNavigation();
-        }, 100);
+        // ELIMINAR la reinicialización de navegación táctil
+        // setTimeout(() => {
+        //     initializeTableNavigation();
+        // }, 100);
     } else {
         showAlert('Acceso denegado. Solo empleados.');
         showLogin();
@@ -177,7 +287,7 @@ function showEmployeeDashboard() {
 function logout() {
     currentUser = null;
     showLogin();
-    showAlert('Sesión cerrada.');
+    //showAlert('Sesión cerrada.');
 }
 
 // --- Login Logic ---
@@ -204,21 +314,86 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
 
 // --- User Management (Admin) ---
 
-function renderUserList() {
+// Variables de paginación para usuarios
+let currentUserPage = 1;
+
+// Variables de paginación para servicios del admin
+let currentAdminServicesPage = 1;
+let currentAdminServicesData = [];
+
+// Variables de paginación para servicios asignados
+let currentAssignedServicesPage = 1;
+
+// Variables de paginación para servicios del empleado
+let currentEmployeeServicesPage = 1;
+
+// Variables de paginación para notificaciones
+let currentAdminNotificationsPage = 1;
+let currentEmployeeNotificationsPage = 1;
+
+// Variables de paginación para respuestas de reportes del empleado
+let currentEmployeeReportRepliesPage = 1;
+
+// Variables de paginación para reportes
+let currentReportsPage = 1;
+
+function renderUserList(page = 1) {
+    currentUserPage = page;
     const userListElement = document.getElementById('user-list');
+    const userTable = userListElement.closest('table');
+    const userTableHeader = userTable.querySelector('thead');
+    
+    // Agregar encabezado de numeración si no existe
+    if (!userTableHeader.querySelector('th:first-child').innerHTML.includes('bi-hash')) {
+        addNumberHeader(userTableHeader);
+    }
+    
     userListElement.innerHTML = '';
-    users.forEach(user => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${user.username}</td>
-            <td>${user.role === 'admin' ? 'Administrador' : 'Técnico'}</td>
-            <td>
-                <button class="btn btn-warning btn-sm" onclick="editUser('${user.id}')">Editar</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.id}')">Eliminar</button>
+    
+    const totalPages = getTotalPages(users.length);
+    const paginatedUsers = paginateArray(users, page);
+    
+    if (paginatedUsers.length === 0) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.innerHTML = `
+            <td colspan="4" class="text-center text-muted py-4">
+                <i class="bi bi-people" style="font-size: 2rem;"></i>
+                <br><br>
+                <strong>No hay usuarios registrados</strong>
             </td>
         `;
-        userListElement.appendChild(row);
-    });
+        userListElement.appendChild(noResultsRow);
+    } else {
+        paginatedUsers.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${user.username}</td>
+                <td>${user.role === 'admin' ? 'Administrador' : 'Técnico'}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editUser('${user.id}')">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.id}')">Eliminar</button>
+                </td>
+            `;
+            userListElement.appendChild(row);
+        });
+        
+        // Agregar numeración a las filas
+        addRowNumbers(userListElement, (page - 1) * ITEMS_PER_PAGE + 1);
+    }
+    
+    // Generar controles de paginación
+    const paginationContainer = userTable.closest('.card-body');
+    const existingPagination = paginationContainer.querySelector('.pagination-container');
+    if (existingPagination) {
+        existingPagination.remove();
+    }
+    
+    const paginationDiv = document.createElement('div');
+    paginationDiv.id = 'user-pagination';
+    paginationDiv.className = 'pagination-container';
+    paginationContainer.appendChild(paginationDiv);
+    
+    generatePaginationControls(page, totalPages, 'user-pagination', renderUserList);
 }
 
 document.getElementById('user-form').addEventListener('submit', (e) => {
@@ -243,7 +418,7 @@ document.getElementById('user-form').addEventListener('submit', (e) => {
         users.push({ id: generateId(), username, password, role });
     }
     saveUsers();
-    renderUserList();
+    renderUserList(1);
     populateTechnicianDropdowns();
     populateAssignTechnicianDropdown();
     const modal = bootstrap.Modal.getInstance(document.getElementById('createUserModal'));
@@ -268,23 +443,23 @@ function editUser(id) {
 function deleteUser(id) {
     showConfirm('¿Estás seguro de que quieres eliminar este usuario?', (result) => {
         if (result) {
-            users = users.filter(u => u.id !== id);
-            saveUsers();
-            renderUserList();
-            populateTechnicianDropdowns();
-            populateAssignTechnicianDropdown();
-            // Desasignar servicios si el técnico eliminado tenía alguno asignado
-            services.forEach(service => {
-                if (service.technicianId === id) {
-                    service.technicianId = null;
-                    service.status = 'Pendiente'; // Reset status
-                }
-            });
-            saveServices();
-            renderAdminServicesList();
-            renderAssignedServicesList();
-            renderEmployeeAssignedServices(); // Refresh for other employees
-            showAlert('Usuario eliminado exitosamente.');
+                    users = users.filter(u => u.id !== id);
+        saveUsers();
+        renderUserList(1);
+        populateTechnicianDropdowns();
+        populateAssignTechnicianDropdown();
+        // Desasignar servicios si el técnico eliminado tenía alguno asignado
+        services.forEach(service => {
+            if (service.technicianId === id) {
+                service.technicianId = null;
+                service.status = 'Pendiente'; // Reset status
+            }
+        });
+        saveServices();
+        renderAdminServicesList(services, 1);
+        renderAssignedServicesList(1);
+        renderEmployeeAssignedServices(1); // Refresh for other employees
+            //showAlert('Usuario eliminado exitosamente.');
         }
     });
 }
@@ -306,14 +481,28 @@ function populateTechnicianDropdowns() {
 }
 
 
-function renderAdminServicesList(filteredServices = services) {
+function renderAdminServicesList(filteredServices = services, page = 1) {
+    currentAdminServicesPage = page;
+    currentAdminServicesData = filteredServices;
+    
     const servicesListElement = document.getElementById('services-list-admin');
+    const servicesTable = servicesListElement.closest('table');
+    const servicesTableHeader = servicesTable.querySelector('thead');
+    
+    // Agregar encabezado de numeración si no existe
+    if (!servicesTableHeader.querySelector('th:first-child').innerHTML.includes('bi-hash')) {
+        addNumberHeader(servicesTableHeader);
+    }
+    
     servicesListElement.innerHTML = '';
     
-    if (filteredServices.length === 0) {
+    const totalPages = getTotalPages(filteredServices.length);
+    const paginatedServices = paginateArray(filteredServices, page);
+    
+    if (paginatedServices.length === 0) {
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
-            <td colspan="7" class="text-center text-muted py-4">
+            <td colspan="8" class="text-center text-muted py-4">
                 <i class="bi bi-search" style="font-size: 2rem;"></i>
                 <br><br>
                 <strong>No se encontraron servicios</strong>
@@ -323,7 +512,7 @@ function renderAdminServicesList(filteredServices = services) {
         `;
         servicesListElement.appendChild(noResultsRow);
     } else {
-        filteredServices.forEach(service => {
+        paginatedServices.forEach(service => {
             const row = document.createElement('tr');
             const canEdit = !['Finalizado', 'Cancelado'].includes(service.status);
             const editButton = canEdit ?
@@ -348,7 +537,26 @@ function renderAdminServicesList(filteredServices = services) {
             `;
             servicesListElement.appendChild(row);
         });
+        
+        // Agregar numeración a las filas
+        addRowNumbers(servicesListElement, (page - 1) * ITEMS_PER_PAGE + 1);
     }
+    
+    // Generar controles de paginación
+    const paginationContainer = servicesTable.closest('.card-body');
+    const existingPagination = paginationContainer.querySelector('.pagination-container');
+    if (existingPagination) {
+        existingPagination.remove();
+    }
+    
+    const paginationDiv = document.createElement('div');
+    paginationDiv.id = 'admin-services-pagination';
+    paginationDiv.className = 'pagination-container';
+    paginationContainer.appendChild(paginationDiv);
+    
+    generatePaginationControls(page, totalPages, 'admin-services-pagination', (newPage) => {
+        renderAdminServicesList(currentAdminServicesData, newPage);
+    });
     
     // Actualizar estadísticas cuando se renderiza la lista
     updateServicesStatistics(filteredServices);
@@ -402,11 +610,13 @@ function updateServicesStatistics(servicesToCount = services) {
     const completed = servicesToCount.filter(s => s.status === 'Finalizado').length;
     const inProgress = servicesToCount.filter(s => s.status === 'En proceso').length;
     const pending = servicesToCount.filter(s => s.status === 'Pendiente').length;
+    const cancelled = servicesToCount.filter(s => s.status === 'Cancelado').length;
 
     document.getElementById('total-services-count').textContent = total;
     document.getElementById('completed-services-count').textContent = completed;
     document.getElementById('in-progress-services-count').textContent = inProgress;
     document.getElementById('pending-services-count').textContent = pending;
+    document.getElementById('cancelled-services-count').textContent = cancelled;
 }
 
 document.getElementById('service-form').addEventListener('submit', (e) => {
@@ -522,49 +732,84 @@ function saveServiceData(serviceId, date, safeType, location, clientName, client
     }
 
 
-    // Record finalization/cancellation time and location
-    if ((status === 'Finalizado' || status === 'Cancelado') && currentUser.role === 'employee') {
-        const options = {
-            enableHighAccuracy: true,  // Solicitar la mejor precisión disponible
-            timeout: 10000,           // Timeout de 10 segundos
-            maximumAge: 0             // No usar ubicación en caché, obtener ubicación fresca
-        };
-
-        navigator.geolocation.getCurrentPosition((position) => {
-            console.log('Ubicación de finalización (modal) obtenida:', position.coords);
-            
-            finalizationOrCancellationTime = new Date().toISOString();
-            finalizationOrCancellationLocation = {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                accuracy: position.coords.accuracy // Agregar precisión para debugging
+            // Record finalization/cancellation time and location
+        if ((status === 'Finalizado' || status === 'Cancelado') && currentUser.role === 'employee') {
+            const options = {
+                enableHighAccuracy: true,  // Solicitar la mejor precisión disponible
+                timeout: 20000,           // Timeout de 20 segundos
+                maximumAge: 0             // No usar ubicación en caché, obtener ubicación fresca
             };
-            // Proceed to save once location is obtained
-            finalizeServiceSave();
-        }, (error) => {
-            console.error('Error al obtener ubicación de finalización (modal):', error);
-            let errorMessage = 'No se pudo obtener la ubicación para la finalización/cancelación. ';
-            
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    errorMessage += 'Información de ubicación no disponible.';
-                    break;
-                case error.TIMEOUT:
-                    errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
-                    break;
-                default:
-                    errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
+
+            // Mostrar mensaje de carga
+            showAlert('Obteniendo ubicación precisa para finalizar/cancelar servicio... Por favor espera.');
+
+            // Función para obtener ubicación con múltiples intentos si es necesario
+            function getPreciseFinalizationLocation(attempts = 0) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    console.log('Ubicación de finalización obtenida (intento ' + (attempts + 1) + '):', position.coords);
+                    
+                    // Verificar si la precisión es aceptable (menos de 10 metros)
+                    if (position.coords.accuracy <= 10) {
+                        saveFinalizationLocation(position.coords);
+                    } else if (attempts < 2) {
+                        // Si la precisión no es buena, intentar de nuevo
+                        console.log('Precisión insuficiente (' + position.coords.accuracy + 'm), reintentando...');
+                        setTimeout(() => getPreciseFinalizationLocation(attempts + 1), 2000);
+                    } else {
+                        // Si después de 3 intentos no se obtiene buena precisión, usar la mejor disponible
+                        console.log('Usando mejor precisión disponible: ' + position.coords.accuracy + 'm');
+                        saveFinalizationLocation(position.coords);
+                    }
+                }, (error) => {
+                    console.error('Error al obtener ubicación de finalización (intento ' + (attempts + 1) + '):', error);
+                    let errorMessage = 'No se pudo obtener la ubicación para la finalización/cancelación. ';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage += 'Información de ubicación no disponible. Verifica que el GPS esté activado.';
+                            break;
+                        case error.TIMEOUT:
+                            if (attempts < 2) {
+                                // Reintentar en caso de timeout
+                                console.log('Timeout, reintentando...');
+                                setTimeout(() => getPreciseFinalizationLocation(attempts + 1), 3000);
+                                return;
+                            }
+                            errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
+                            break;
+                        default:
+                            errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
+                    }
+                    
+                    showAlert(errorMessage);
+                    return; // Stop if location cannot be obtained
+                }, options);
             }
-            
-            showAlert(errorMessage);
-            return; // Stop if location cannot be obtained
-        }, options);
-    } else {
-        finalizeServiceSave(); // Save directly if not finalization/cancellation by employee
-    }
+
+            function saveFinalizationLocation(coords) {
+                const timestamp = new Date().toISOString();
+                finalizationOrCancellationTime = timestamp;
+                finalizationOrCancellationLocation = {
+                    latitude: coords.latitude,
+                    longitude: coords.longitude,
+                    accuracy: coords.accuracy,
+                    timestamp: timestamp,
+                    altitude: coords.altitude || null,
+                    heading: coords.heading || null,
+                    speed: coords.speed || null
+                };
+                // Proceed to save once location is obtained
+                finalizeServiceSave();
+            }
+
+            // Iniciar el proceso de obtención de ubicación
+            getPreciseFinalizationLocation();
+        } else {
+            finalizeServiceSave(); // Save directly if not finalization/cancellation by employee
+        }
 
     function finalizeServiceSave() {
         const newService = {
@@ -601,7 +846,7 @@ function saveServiceData(serviceId, date, safeType, location, clientName, client
             services.push(newService);
         }
         saveServices();
-        renderAdminServicesList();
+        renderAdminServicesList(services, 1);
         populateAssignServiceDropdown();
         
         // Cerrar el modal después de guardar exitosamente
@@ -618,9 +863,9 @@ function saveServiceData(serviceId, date, safeType, location, clientName, client
         document.getElementById('service-photo').value = '';
 
         if (currentUser.role === 'employee') {
-            renderEmployeeAssignedServices();
+            renderEmployeeAssignedServices(1);
         }
-        showAlert('Servicio guardado exitosamente.');
+        //showAlert('Servicio guardado exitosamente.');
     }
 }
 
@@ -772,11 +1017,11 @@ function deleteService(id) {
 
             services = services.filter(s => s.id !== id);
             saveServices();
-            renderAdminServicesList();
+            renderAdminServicesList(services, 1);
             populateAssignServiceDropdown();
-            renderAssignedServicesList();
-            renderEmployeeAssignedServices();
-            showAlert('Servicio eliminado exitosamente.'); // Confirmation for admin
+            renderAssignedServicesList(1);
+            renderEmployeeAssignedServices(1);
+            //showAlert('Servicio eliminado exitosamente.'); // Confirmation for admin
         }
     });
 }
@@ -795,9 +1040,9 @@ function viewServiceDetails(id) {
             <p><strong>Estado:</strong> ${service.status}</p>
             ${service.cancellationReason ? `<p><strong>Motivo de Cancelación:</strong> ${service.cancellationReason}</p>` : ''}
             ${service.startTime ? `<p><strong>Hora de Inicio:</strong> ${new Date(service.startTime).toLocaleString()}</p>` : ''}
-            ${service.startLocation ? `<p><strong>Ubicación de Inicio:</strong> Lat: ${service.startLocation.latitude.toFixed(6)}, Lon: ${service.startLocation.longitude.toFixed(6)}${service.startLocation.accuracy ? ` (Precisión: ±${Math.round(service.startLocation.accuracy)}m)` : ''}</p>` : ''}
+            ${service.startLocation ? `<p><strong>Ubicación de Inicio:</strong> Lat: ${service.startLocation.latitude.toFixed(8)}, Lon: ${service.startLocation.longitude.toFixed(8)}${service.startLocation.accuracy ? ` (Precisión: ±${Math.round(service.startLocation.accuracy)}m)` : ''}${service.startLocation.altitude ? ` | Altitud: ${service.startLocation.altitude.toFixed(1)}m` : ''}${service.startLocation.speed ? ` | Velocidad: ${service.startLocation.speed.toFixed(1)}m/s` : ''}${service.startLocation.heading ? ` | Dirección: ${service.startLocation.heading.toFixed(1)}°` : ''}</p>` : ''}
             ${service.finalizationOrCancellationTime ? `<p><strong>Fecha/Hora de Finalización/Cancelación:</strong> ${new Date(service.finalizationOrCancellationTime).toLocaleString()}</p>` : ''}
-            ${service.finalizationOrCancellationLocation ? `<p><strong>Ubicación de Finalización/Cancelación:</strong> Lat: ${service.finalizationOrCancellationLocation.latitude.toFixed(6)}, Lon: ${service.finalizationOrCancellationLocation.longitude.toFixed(6)}${service.finalizationOrCancellationLocation.accuracy ? ` (Precisión: ±${Math.round(service.finalizationOrCancellationLocation.accuracy)}m)` : ''}</p>` : ''}
+            ${service.finalizationOrCancellationLocation ? `<p><strong>Ubicación de Finalización/Cancelación:</strong> Lat: ${service.finalizationOrCancellationLocation.latitude.toFixed(8)}, Lon: ${service.finalizationOrCancellationLocation.longitude.toFixed(8)}${service.finalizationOrCancellationLocation.accuracy ? ` (Precisión: ±${Math.round(service.finalizationOrCancellationLocation.accuracy)}m)` : ''}${service.finalizationOrCancellationLocation.altitude ? ` | Altitud: ${service.finalizationOrCancellationLocation.altitude.toFixed(1)}m` : ''}${service.finalizationOrCancellationLocation.speed ? ` | Velocidad: ${service.finalizationOrCancellationLocation.speed.toFixed(1)}m/s` : ''}${service.finalizationOrCancellationLocation.heading ? ` | Dirección: ${service.finalizationOrCancellationLocation.heading.toFixed(1)}°` : ''}</p>` : ''}
             ${service.photo ? `<p><strong>Evidencia Fotográfica:</strong><br><img src="${service.photo}" class="service-photo-evidence" alt="Evidencia"></p>` : ''}
             ${service.clientSignature ? `<p><strong>Firma del Cliente:</strong><br><img src="${service.clientSignature}" class="img-fluid" alt="Firma del Cliente"></p>` : ''}
             ${service.technicianSignature ? `<p><strong>Firma del Técnico:</strong><br><img src="${service.technicianSignature}" class="img-fluid" alt="Firma del Técnico"></p>` : ''}
@@ -864,8 +1109,8 @@ function assignServiceToTechnician() {
         assignMessage.textContent = 'Servicio asignado exitosamente.';
         assignMessage.className = 'text-success mt-3';
         sendNotification(technicianId, `¡Nuevo servicio asignado! ID: ${serviceId}. Cliente: ${services[serviceIndex].clientName}. Ubicación: ${services[serviceIndex].location}.`);
-        renderAdminServicesList();
-        renderAssignedServicesList();
+        renderAdminServicesList(services, 1);
+        renderAssignedServicesList(1);
         populateAssignServiceDropdown();
         document.getElementById('assign-service-id').value = '';
         document.getElementById('assign-technician').value = '';
@@ -883,28 +1128,71 @@ function assignServiceToTechnician() {
     }
 }
 
-function renderAssignedServicesList() {
+function renderAssignedServicesList(page = 1) {
+    currentAssignedServicesPage = page;
     const assignedListElement = document.getElementById('assigned-services-list');
+    const assignedTable = assignedListElement.closest('table');
+    const assignedTableHeader = assignedTable.querySelector('thead');
+    
+    // Agregar encabezado de numeración si no existe
+    if (!assignedTableHeader.querySelector('th:first-child').innerHTML.includes('bi-hash')) {
+        addNumberHeader(assignedTableHeader);
+    }
+    
     assignedListElement.innerHTML = '';
-    services.filter(s => s.technicianId).forEach(service => {
-        const row = document.createElement('tr');
-        const canUnassign = !['Finalizado', 'Cancelado'].includes(service.status);
-        const unassignButton = canUnassign ?
-            `<button class="btn btn-secondary btn-sm" onclick="unassignService('${service.id}')">Desasignar</button>` :
-            `<button class="btn btn-secondary btn-sm" disabled title="No se puede desasignar servicio finalizado/cancelado">Desasignar</button>`;
-
-        row.innerHTML = `
-            <td>${service.id}</td>
-            <td>${service.clientName}</td>
-            <td>${getTechnicianNameById(service.technicianId)}</td>
-            <td>${service.status}</td>
-            <td>
-                <button class="btn btn-info btn-sm" onclick="viewServiceDetails('${service.id}')">Ver</button>
-                ${unassignButton}
+    
+    const assignedServices = services.filter(s => s.technicianId);
+    const totalPages = getTotalPages(assignedServices.length);
+    const paginatedServices = paginateArray(assignedServices, page);
+    
+    if (paginatedServices.length === 0) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.innerHTML = `
+            <td colspan="6" class="text-center text-muted py-4">
+                <i class="bi bi-list-check" style="font-size: 2rem;"></i>
+                <br><br>
+                <strong>No hay servicios asignados</strong>
             </td>
         `;
-        assignedListElement.appendChild(row);
-    });
+        assignedListElement.appendChild(noResultsRow);
+    } else {
+        paginatedServices.forEach(service => {
+            const row = document.createElement('tr');
+            const canUnassign = !['Finalizado', 'Cancelado'].includes(service.status);
+            const unassignButton = canUnassign ?
+                `<button class="btn btn-secondary btn-sm" onclick="unassignService('${service.id}')">Desasignar</button>` :
+                `<button class="btn btn-secondary btn-sm" disabled title="No se puede desasignar servicio finalizado/cancelado">Desasignar</button>`;
+
+            row.innerHTML = `
+                <td>${service.id}</td>
+                <td>${service.clientName}</td>
+                <td>${getTechnicianNameById(service.technicianId)}</td>
+                <td>${service.status}</td>
+                <td>
+                    <button class="btn btn-info btn-sm" onclick="viewServiceDetails('${service.id}')">Ver</button>
+                    ${unassignButton}
+                </td>
+            `;
+            assignedListElement.appendChild(row);
+        });
+        
+        // Agregar numeración a las filas
+        addRowNumbers(assignedListElement, (page - 1) * ITEMS_PER_PAGE + 1);
+    }
+    
+    // Generar controles de paginación
+    const paginationContainer = assignedTable.closest('.card-body');
+    const existingPagination = paginationContainer.querySelector('.pagination-container');
+    if (existingPagination) {
+        existingPagination.remove();
+    }
+    
+    const paginationDiv = document.createElement('div');
+    paginationDiv.id = 'assigned-services-pagination';
+    paginationDiv.className = 'pagination-container';
+    paginationContainer.appendChild(paginationDiv);
+    
+    generatePaginationControls(page, totalPages, 'assigned-services-pagination', renderAssignedServicesList);
 }
 
 function unassignService(serviceId) {
@@ -921,15 +1209,15 @@ function unassignService(serviceId) {
                 service.technicianId = null;
                 service.status = 'Pendiente';
                 saveServices();
-                renderAdminServicesList();
-                renderAssignedServicesList();
+                renderAdminServicesList(services, 1);
+                renderAssignedServicesList(1);
                 populateAssignServiceDropdown();
                 // Solo notificar al técnico, no al admin
                 if (oldTechnicianId) {
                     sendNotification(oldTechnicianId, `El servicio ID: ${serviceId} (Cliente: ${service.clientName}, Tipo: ${service.safeType}) ha sido DESASIGNADO por el administrador. Ya no está asignado a ti.`);
                 }
-                renderEmployeeAssignedServices();
-                showAlert('Servicio desasignado exitosamente.');
+                renderEmployeeAssignedServices(1);
+                //showAlert('Servicio desasignado exitosamente.');
             }
         }
     });
@@ -955,50 +1243,94 @@ document.getElementById('novelty-form').addEventListener('submit', (e) => {
     };
     reports.push(newReport);
     saveReports();
-    renderReportsList();
-    sendNotification('admin', `¡Nueva novedad reportada! ID Servicio: ${newReport.serviceId} por ${newReport.reporterName}.`);
+    renderReportsList(1);
+    // Los reportes se muestran solo en la sección "Reportes/Novedades" del admin
+    // No se envían notificaciones para mantener la separación entre notificaciones y reportes
     updateNotificationBadges();
 
     const modal = bootstrap.Modal.getInstance(document.getElementById('reportNoveltyModal'));
     modal.hide();
     document.getElementById('novelty-form').reset();
-    showAlert('Novedad reportada con éxito.');
+    //showAlert('Novedad reportada con éxito.');
 });
 
-function renderReportsList() {
+function renderReportsList(page = 1) {
+    currentReportsPage = page;
     const reportsListElement = document.getElementById('reports-list');
+    const reportsContainer = reportsListElement.closest('.card-body');
     reportsListElement.innerHTML = '';
-    const sortedReports = reports.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-    if (sortedReports.length === 0) {
-        reportsListElement.innerHTML = '<p>No hay reportes de novedades.</p>';
-        return;
-    }
-    sortedReports.forEach(report => {
-        const reportDiv = document.createElement('div');
-        // Add a class to indicate unread for admin, for visual cue if desired in the list itself
-        reportDiv.className = `alert alert-warning ${!report.readForAdmin ? 'border-primary' : ''}`; // Example visual cue
-
-        let repliesHtml = '';
-        if (report.replies && report.replies.length > 0) {
-            repliesHtml = '<h6 class="mt-2">Respuestas:</h6><ul class="list-group">';
-            report.replies.forEach(reply => {
-                repliesHtml += `<li class="list-group-item list-group-item-light"><strong>Admin (${new Date(reply.timestamp).toLocaleString()}):</strong> ${reply.message}</li>`;
-            });
-            repliesHtml += '</ul>';
-        }
-
-        reportDiv.innerHTML = `
-            <strong>ID Reporte:</strong> ${report.id}<br>
-            <strong>Fecha:</strong> ${report.date}<br>
-            <strong>ID Servicio:</strong> ${report.serviceId}<br>
-            <strong>Reportado por:</strong> ${report.reporterName}<br>
-            <strong>Descripción:</strong> ${report.description}
-            ${repliesHtml}
-            <button class="btn btn-sm btn-primary mt-2" onclick="openReplyReportModal('${report.id}')">Responder</button>
-        `;
-        reportsListElement.appendChild(reportDiv);
+    
+    // Ordenar reportes: primero los no leídos por admin, luego por fecha (más recientes primero)
+    const sortedReports = reports.sort((a, b) => {
+        // Si uno no ha sido leído por admin y el otro sí, el no leído va primero
+        if (!a.readForAdmin && b.readForAdmin) return -1;
+        if (a.readForAdmin && !b.readForAdmin) return 1;
+        
+        // Si ambos tienen el mismo estado de lectura, ordenar por fecha (más reciente primero)
+        return new Date(b.date) - new Date(a.date);
     });
+
+    const totalPages = getTotalPages(sortedReports.length);
+    const paginatedReports = paginateArray(sortedReports, page);
+
+    if (paginatedReports.length === 0) {
+        reportsListElement.innerHTML = '<p>No hay reportes de novedades.</p>';
+    } else {
+        paginatedReports.forEach((report, index) => {
+            const globalIndex = (page - 1) * ITEMS_PER_PAGE + index + 1;
+            const reportDiv = document.createElement('div');
+            // Agregar clases visuales para reportes no leídos
+            const isUnread = !report.readForAdmin;
+            reportDiv.className = `alert ${isUnread ? 'alert-danger border-danger' : 'alert-warning'}`;
+            
+            // Agregar indicador visual para reportes nuevos
+            const unreadIndicator = isUnread ? '<span class="badge bg-danger ms-2">NUEVO</span>' : '';
+
+            let repliesHtml = '';
+            if (report.replies && report.replies.length > 0) {
+                repliesHtml = '<h6 class="mt-2">Respuestas:</h6><ul class="list-group">';
+                report.replies.forEach(reply => {
+                    repliesHtml += `<li class="list-group-item list-group-item-light"><strong>Admin (${new Date(reply.timestamp).toLocaleString()}):</strong> ${reply.message}</li>`;
+                });
+                repliesHtml += '</ul>';
+            }
+
+            reportDiv.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-secondary me-2">${globalIndex}</span>
+                        <div>
+                            <strong>ID Reporte:</strong> ${report.id}
+                            <strong>Fecha:</strong> ${report.date}
+                            <strong>ID Servicio:</strong> ${report.serviceId}
+                            <strong>Reportado por:</strong> ${report.reporterName}
+                        </div>
+                        ${unreadIndicator}
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <strong>Descripción:</strong> ${report.description}
+                </div>
+                ${repliesHtml}
+                <button class="btn btn-sm btn-primary mt-2" onclick="openReplyReportModal('${report.id}')">Responder</button>
+            `;
+            reportsListElement.appendChild(reportDiv);
+        });
+    }
+    
+    // Generar controles de paginación
+    const existingPagination = reportsContainer.querySelector('.pagination-container');
+    if (existingPagination) {
+        existingPagination.remove();
+    }
+    
+    const paginationDiv = document.createElement('div');
+    paginationDiv.id = 'reports-pagination';
+    paginationDiv.className = 'pagination-container';
+    reportsContainer.appendChild(paginationDiv);
+    
+    generatePaginationControls(page, totalPages, 'reports-pagination', renderReportsList);
+    
     updateNotificationBadges();
 }
 
@@ -1030,14 +1362,14 @@ document.getElementById('reply-report-form').addEventListener('submit', (e) => {
         // Mark the report as "read" for the admin once they reply
         report.readForAdmin = true;
         saveReports();
-        renderReportsList();
+        renderReportsList(1);
         sendNotification(report.reporterId, `¡El administrador ha respondido a tu reporte ID ${report.id}: "${replyMessage}"`);
         updateNotificationBadges(); // Crucial for updating the badge
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('replyReportModal'));
         modal.hide();
         document.getElementById('reply-report-form').reset();
-        showAlert('Respuesta enviada.');
+        //showAlert('Respuesta enviada.');
     } else {
         showAlert('Error: Reporte no encontrado.');
     }
@@ -1046,49 +1378,86 @@ document.getElementById('reply-report-form').addEventListener('submit', (e) => {
 
 // --- Employee Dashboard ---
 
-function renderEmployeeAssignedServices() {
+function renderEmployeeAssignedServices(page = 1) {
+    currentEmployeeServicesPage = page;
     const employeeServicesList = document.getElementById('employee-assigned-services-list');
+    const employeeTable = employeeServicesList.closest('table');
+    const employeeTableHeader = employeeTable.querySelector('thead');
+    
+    // Agregar encabezado de numeración si no existe
+    if (!employeeTableHeader.querySelector('th:first-child').innerHTML.includes('bi-hash')) {
+        addNumberHeader(employeeTableHeader);
+    }
+    
     employeeServicesList.innerHTML = '';
     const assignedToMe = services.filter(s => s.technicianId === currentUser.id);
+    
+    const totalPages = getTotalPages(assignedToMe.length);
+    const paginatedServices = paginateArray(assignedToMe, page);
 
-    if (assignedToMe.length === 0) {
-        employeeServicesList.innerHTML = '<tr><td colspan="6">No tienes servicios asignados.</td></tr>';
-        return;
-    }
-
-    assignedToMe.forEach(service => {
-        const row = document.createElement('tr');
-        const isStatusFixed = ['Finalizado', 'Cancelado'].includes(service.status);
-        const dropdownDisabled = isStatusFixed ? 'disabled' : '';
-        const dropdownTitle = isStatusFixed ? 'No se puede cambiar el estado de un servicio finalizado/cancelado' : '';
-
-        const showStartButton = service.status === 'Pendiente';
-
-        row.innerHTML = `
-            <td>${service.id}</td>
-            <td>${service.clientName}</td>
-            <td>${service.safeType}</td>
-            <td>${service.location}</td>
-            <td>${service.status}</td>
-            <td>
-                <button class="btn btn-info btn-sm" onclick="viewServiceDetails('${service.id}')">Ver</button>
-                <div class="dropdown d-inline-block ms-2">
-                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton${service.id}" data-bs-toggle="dropdown" aria-expanded="false" ${dropdownDisabled} title="${dropdownTitle}">
-                        Cambiar Estado
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${service.id}">
-                        <li><a class="dropdown-item ${isStatusFixed || service.status === 'Pendiente' ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed} && '${service.status}' !== 'Pendiente') handleEmployeeServiceStatusChange('${service.id}', 'Pendiente')">Pendiente</a></li>
-                        <li><a class="dropdown-item ${isStatusFixed || service.status === 'En proceso' ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed} && '${service.status}' !== 'En proceso') handleEmployeeServiceStatusChange('${service.id}', 'En proceso')">En proceso</a></li>
-                        <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Finalizado')">Finalizado</a></li>
-                        <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Cancelado')">Cancelado</a></li>
-                    </ul>
-                </div>
-                ${showStartButton ? `<button class="btn btn-success btn-sm ms-2" onclick="startService('${service.id}')">Iniciar Servicio</button>` : ''}
-                <button class="btn btn-danger btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#reportNoveltyModal" onclick="prefillNoveltyServiceId('${service.id}')">Reportar Novedad</button>
+    if (paginatedServices.length === 0) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.innerHTML = `
+            <td colspan="7" class="text-center text-muted py-4">
+                <i class="bi bi-person-check" style="font-size: 2rem;"></i>
+                <br><br>
+                <strong>No tienes servicios asignados</strong>
             </td>
         `;
-        employeeServicesList.appendChild(row);
-    });
+        employeeServicesList.appendChild(noResultsRow);
+    } else {
+        paginatedServices.forEach(service => {
+            const row = document.createElement('tr');
+            const isStatusFixed = ['Finalizado', 'Cancelado'].includes(service.status);
+            const dropdownDisabled = isStatusFixed ? 'disabled' : '';
+            const dropdownTitle = isStatusFixed ? 'No se puede cambiar el estado de un servicio finalizado/cancelado' : '';
+
+            const showStartButton = service.status === 'Pendiente';
+
+            row.innerHTML = `
+                <td>${service.id}</td>
+                <td>${service.clientName}</td>
+                <td>${service.safeType}</td>
+                <td>${service.location}</td>
+                <td>${service.status}</td>
+                <td>
+                    <button class="btn btn-info btn-sm" onclick="viewServiceDetails('${service.id}')">Ver</button>
+                    <div class="dropdown d-inline-block ms-2">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton${service.id}" data-bs-toggle="dropdown" aria-expanded="false" ${dropdownDisabled} title="${dropdownTitle}">
+                            Cambiar Estado
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${service.id}">
+                            <li><a class="dropdown-item ${isStatusFixed || service.status === 'Pendiente' ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed} && '${service.status}' !== 'Pendiente') handleEmployeeServiceStatusChange('${service.id}', 'Pendiente')">Pendiente</a></li>
+                            <li><a class="dropdown-item ${isStatusFixed || service.status === 'En proceso' ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed} && '${service.status}' !== 'En proceso') handleEmployeeServiceStatusChange('${service.id}', 'En proceso')">En proceso</a></li>
+                            <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Finalizado')">Finalizado</a></li>
+                            <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Cancelado')">Cancelado</a></li>
+                        </ul>
+                    </div>
+                    ${showStartButton ? `<button class="btn btn-success btn-sm ms-2" onclick="startService('${service.id}')">Iniciar Servicio</button>` : ''}
+                    <button class="btn btn-danger btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#reportNoveltyModal" onclick="prefillNoveltyServiceId('${service.id}')">Reportar Novedad</button>
+                </td>
+            `;
+            employeeServicesList.appendChild(row);
+        });
+        
+        // Agregar numeración a las filas
+        addRowNumbers(employeeServicesList, (page - 1) * ITEMS_PER_PAGE + 1);
+    }
+    
+    // Generar controles de paginación
+    const paginationContainer = employeeTable.closest('.card-body');
+    const existingPagination = paginationContainer.querySelector('.pagination-container');
+    if (existingPagination) {
+        existingPagination.remove();
+    }
+    
+    const paginationDiv = document.createElement('div');
+    paginationDiv.id = 'employee-services-pagination';
+    paginationDiv.className = 'pagination-container';
+    paginationContainer.appendChild(paginationDiv);
+    
+    generatePaginationControls(page, totalPages, 'employee-services-pagination', renderEmployeeAssignedServices);
+    
     updateNotificationBadges();
 }
 
@@ -1211,51 +1580,86 @@ function changeServiceStatus(id, newStatus, cancellationReason = null) {
         if ((newStatus === 'Finalizado' || newStatus === 'Cancelado') && currentUser.role === 'employee') {
             const options = {
                 enableHighAccuracy: true,  // Solicitar la mejor precisión disponible
-                timeout: 10000,           // Timeout de 10 segundos
+                timeout: 20000,           // Timeout de 20 segundos
                 maximumAge: 0             // No usar ubicación en caché, obtener ubicación fresca
             };
 
-            navigator.geolocation.getCurrentPosition((position) => {
-                console.log('Ubicación de finalización obtenida:', position.coords);
-                
-                oldService.finalizationOrCancellationTime = new Date().toISOString();
+            // Mostrar mensaje de carga
+            showAlert('Obteniendo ubicación precisa para finalizar/cancelar servicio... Por favor espera.');
+
+            // Función para obtener ubicación con múltiples intentos si es necesario
+            function getPreciseStatusChangeLocation(attempts = 0) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    console.log('Ubicación de cambio de estado obtenida (intento ' + (attempts + 1) + '):', position.coords);
+                    
+                    // Verificar si la precisión es aceptable (menos de 10 metros)
+                    if (position.coords.accuracy <= 10) {
+                        saveStatusChangeLocation(position.coords);
+                    } else if (attempts < 2) {
+                        // Si la precisión no es buena, intentar de nuevo
+                        console.log('Precisión insuficiente (' + position.coords.accuracy + 'm), reintentando...');
+                        setTimeout(() => getPreciseStatusChangeLocation(attempts + 1), 2000);
+                    } else {
+                        // Si después de 3 intentos no se obtiene buena precisión, usar la mejor disponible
+                        console.log('Usando mejor precisión disponible: ' + position.coords.accuracy + 'm');
+                        saveStatusChangeLocation(position.coords);
+                    }
+                }, (error) => {
+                    console.error('Error al obtener ubicación de cambio de estado (intento ' + (attempts + 1) + '):', error);
+                    let errorMessage = 'No se pudo obtener la ubicación para la finalización/cancelación. ';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage += 'Información de ubicación no disponible. Verifica que el GPS esté activado.';
+                            break;
+                        case error.TIMEOUT:
+                            if (attempts < 2) {
+                                // Reintentar en caso de timeout
+                                console.log('Timeout, reintentando...');
+                                setTimeout(() => getPreciseStatusChangeLocation(attempts + 1), 3000);
+                                return;
+                            }
+                            errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
+                            break;
+                        default:
+                            errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
+                    }
+                    
+                    showAlert(errorMessage);
+                    return; // Stop if location cannot be obtained
+                }, options);
+            }
+
+            function saveStatusChangeLocation(coords) {
+                const timestamp = new Date().toISOString();
+                oldService.finalizationOrCancellationTime = timestamp;
                 oldService.finalizationOrCancellationLocation = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    accuracy: position.coords.accuracy // Agregar precisión para debugging
+                    latitude: coords.latitude,
+                    longitude: coords.longitude,
+                    accuracy: coords.accuracy,
+                    timestamp: timestamp,
+                    altitude: coords.altitude || null,
+                    heading: coords.heading || null,
+                    speed: coords.speed || null
                 };
                 saveAndNotify();
-            }, (error) => {
-                console.error('Error al obtener ubicación de finalización:', error);
-                let errorMessage = 'No se pudo obtener la ubicación para la finalización/cancelación. ';
-                
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        errorMessage += 'Información de ubicación no disponible.';
-                        break;
-                    case error.TIMEOUT:
-                        errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
-                        break;
-                    default:
-                        errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
-                }
-                
-                showAlert(errorMessage);
-                return; // Stop if location cannot be obtained
-            }, options);
+            }
+
+            // Iniciar el proceso de obtención de ubicación
+            getPreciseStatusChangeLocation();
         } else {
             saveAndNotify();
         }
 
         function saveAndNotify() {
             saveServices();
-            renderEmployeeAssignedServices();
-            renderAdminServicesList();
+            renderEmployeeAssignedServices(1);
+            renderAdminServicesList(services, 1);
             sendNotification('admin', `El servicio ID: ${id} ha cambiado de estado de "${oldStatus}" a "${newStatus}" por el técnico ${currentUser.username}. ${newStatus === 'Cancelado' ? `Motivo: ${cancellationReason}` : ''}`);
-            showAlert(`Estado del servicio ID ${id} cambiado a "${newStatus}".`);
+            //showAlert(`Estado del servicio ID ${id} cambiado a "${newStatus}".`);
         }
     }
 }
@@ -1265,57 +1669,94 @@ function startService(serviceId) {
         // Configuración mejorada para obtener la ubicación más precisa
         const options = {
             enableHighAccuracy: true,  // Solicitar la mejor precisión disponible
-            timeout: 10000,           // Timeout de 10 segundos
+            timeout: 20000,           // Timeout de 20 segundos para dar más tiempo
             maximumAge: 0             // No usar ubicación en caché, obtener ubicación fresca
         };
 
-        navigator.geolocation.getCurrentPosition((position) => {
-            console.log('Ubicación obtenida:', position.coords);
-            
-            const serviceIndex = services.findIndex(s => s.id === serviceId);
-            if (serviceIndex !== -1) {
-                if (['Finalizado', 'Cancelado', 'En proceso'].includes(services[serviceIndex].status)) {
-                    showAlert('Este servicio ya está en proceso, finalizado o cancelado.');
-                    return;
+        // Mostrar mensaje de carga
+        showAlert('Obteniendo ubicación precisa... Por favor espera.');
+
+        // Función para obtener ubicación con múltiples intentos si es necesario
+        function getPreciseLocation(attempts = 0) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                console.log('Ubicación obtenida (intento ' + (attempts + 1) + '):', position.coords);
+                
+                // Verificar si la precisión es aceptable (menos de 10 metros)
+                if (position.coords.accuracy <= 10) {
+                    saveServiceLocation(serviceId, position.coords);
+                } else if (attempts < 2) {
+                    // Si la precisión no es buena, intentar de nuevo
+                    console.log('Precisión insuficiente (' + position.coords.accuracy + 'm), reintentando...');
+                    setTimeout(() => getPreciseLocation(attempts + 1), 2000);
+                } else {
+                    // Si después de 3 intentos no se obtiene buena precisión, usar la mejor disponible
+                    console.log('Usando mejor precisión disponible: ' + position.coords.accuracy + 'm');
+                    saveServiceLocation(serviceId, position.coords);
                 }
+            }, (error) => {
+                console.error('Error al obtener la ubicación (intento ' + (attempts + 1) + '):', error);
+                let errorMessage = 'No se pudo obtener la ubicación. ';
+                
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage += 'Información de ubicación no disponible. Verifica que el GPS esté activado.';
+                        break;
+                    case error.TIMEOUT:
+                        if (attempts < 2) {
+                            // Reintentar en caso de timeout
+                            console.log('Timeout, reintentando...');
+                            setTimeout(() => getPreciseLocation(attempts + 1), 3000);
+                            return;
+                        }
+                        errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
+                        break;
+                    default:
+                        errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
+                }
+                
+                showAlert(errorMessage);
+            }, options);
+        }
 
-                services[serviceIndex].startTime = new Date().toISOString();
-                services[serviceIndex].startLocation = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    accuracy: position.coords.accuracy // Agregar precisión para debugging
-                };
-                services[serviceIndex].status = 'En proceso';
-                saveServices();
-                renderEmployeeAssignedServices();
-                renderAdminServicesList();
-
-                const message = `El técnico ${currentUser.username} ha iniciado el servicio ID: ${serviceId} a las ${new Date().toLocaleString()} en la ubicación: Lat ${position.coords.latitude.toFixed(6)}, Lon ${position.coords.longitude.toFixed(6)} (Precisión: ±${Math.round(position.coords.accuracy)}m).`;
-                sendNotification('admin', message);
-                showAlert(`Servicio iniciado exitosamente. Ubicación: Lat ${position.coords.latitude.toFixed(6)}, Lon ${position.coords.longitude.toFixed(6)}`);
-            }
-        }, (error) => {
-            console.error('Error al obtener la ubicación:', error);
-            let errorMessage = 'No se pudo obtener la ubicación. ';
-            
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    errorMessage += 'Información de ubicación no disponible.';
-                    break;
-                case error.TIMEOUT:
-                    errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
-                    break;
-                default:
-                    errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
-            }
-            
-            showAlert(errorMessage);
-        }, options);
+        // Iniciar el proceso de obtención de ubicación
+        getPreciseLocation();
     } else {
         showAlert('Tu navegador no soporta la geolocalización.');
+    }
+}
+
+function saveServiceLocation(serviceId, coords) {
+    const serviceIndex = services.findIndex(s => s.id === serviceId);
+    if (serviceIndex !== -1) {
+        if (['Finalizado', 'Cancelado', 'En proceso'].includes(services[serviceIndex].status)) {
+            showAlert('Este servicio ya está en proceso, finalizado o cancelado.');
+            return;
+        }
+
+        // Agregar timestamp único para diferenciar ubicaciones en el mismo lugar
+        const timestamp = new Date().toISOString();
+        
+        services[serviceIndex].startTime = timestamp;
+        services[serviceIndex].startLocation = {
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            accuracy: coords.accuracy,
+            timestamp: timestamp,
+            altitude: coords.altitude || null,
+            heading: coords.heading || null,
+            speed: coords.speed || null
+        };
+        services[serviceIndex].status = 'En proceso';
+        saveServices();
+        renderEmployeeAssignedServices(1);
+        renderAdminServicesList(services, 1);
+
+        const message = `El técnico ${currentUser.username} ha iniciado el servicio ID: ${serviceId} a las ${new Date().toLocaleString()} en la ubicación: Lat ${coords.latitude.toFixed(8)}, Lon ${coords.longitude.toFixed(8)} (Precisión: ±${Math.round(coords.accuracy)}m).`;
+        sendNotification('admin', message);
+        showAlert(`Servicio iniciado exitosamente. Ubicación: Lat ${coords.latitude.toFixed(8)}, Lon ${coords.longitude.toFixed(8)} (Precisión: ±${Math.round(coords.accuracy)}m)`);
     }
 }
 
@@ -1364,81 +1805,169 @@ function sendNotification(targetRoleOrUserId, message) {
     }
 }
 
-function renderAdminNotifications() {
+function renderAdminNotifications(page = 1) {
+    currentAdminNotificationsPage = page;
     const notificationsList = document.getElementById('admin-notifications-list');
+    const notificationsContainer = notificationsList.closest('.card-body');
+    
     notificationsList.innerHTML = '';
     const adminNotifications = notifications.filter(n => {
         const targetUser = users.find(u => u.id === n.userId);
         return targetUser && targetUser.role === 'admin';
     }).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-    if (adminNotifications.length === 0) {
-        notificationsList.innerHTML = '<p>No hay notificaciones para administradores.</p>';
-        return;
-    }
+    const totalPages = getTotalPages(adminNotifications.length);
+    const paginatedNotifications = paginateArray(adminNotifications, page);
 
-    adminNotifications.forEach(n => {
-        const notificationDiv = document.createElement('div');
-        notificationDiv.className = `alert ${n.read ? 'alert-light' : 'alert-info'} d-flex justify-content-between align-items-center`;
-        notificationDiv.innerHTML = `
-            <div>
-                <strong>${new Date(n.timestamp).toLocaleString()}:</strong> ${n.message}
-            </div>
-            ${!n.read ? `<button class="btn btn-sm btn-outline-primary" onclick="markNotificationAsRead('${n.id}')">Marcar como leído</button>` : ''}
-        `;
-        notificationsList.appendChild(notificationDiv);
-    });
+    if (paginatedNotifications.length === 0) {
+        notificationsList.innerHTML = '<p>No hay notificaciones para administradores.</p>';
+    } else {
+        paginatedNotifications.forEach((n, index) => {
+            const notificationDiv = document.createElement('div');
+            notificationDiv.className = `alert ${n.read ? 'alert-light' : 'alert-info'} d-flex justify-content-between align-items-center`;
+            notificationDiv.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-secondary me-2">${(page - 1) * ITEMS_PER_PAGE + index + 1}</span>
+                    <div>
+                        <strong>${new Date(n.timestamp).toLocaleString()}:</strong> ${n.message}
+                    </div>
+                </div>
+                ${!n.read ? `<button class="btn btn-sm btn-outline-primary" onclick="markNotificationAsRead('${n.id}')">Marcar como leído</button>` : ''}
+            `;
+            notificationsList.appendChild(notificationDiv);
+        });
+    }
+    
+    // Generar controles de paginación
+    const existingPagination = notificationsContainer.querySelector('.pagination-container');
+    if (existingPagination) {
+        existingPagination.remove();
+    }
+    
+    const paginationDiv = document.createElement('div');
+    paginationDiv.id = 'admin-notifications-pagination';
+    paginationDiv.className = 'pagination-container';
+    notificationsContainer.appendChild(paginationDiv);
+    
+    generatePaginationControls(page, totalPages, 'admin-notifications-pagination', renderAdminNotifications);
+    
     updateNotificationBadges();
 }
 
-function renderEmployeeNotifications() {
+function renderEmployeeNotifications(page = 1) {
+    currentEmployeeNotificationsPage = page;
     const notificationsList = document.getElementById('employee-notifications-list');
+    const notificationsContainer = notificationsList.closest('.card-body');
     notificationsList.innerHTML = '';
     if (!currentUser) return;
 
     const employeeNotifications = notifications.filter(n => n.userId === currentUser.id)
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
+    // Solo mostrar notificaciones regulares (excluyendo respuestas de reportes)
+    const regularNotifications = employeeNotifications.filter(n => !n.message.includes('ha respondido a tu reporte'));
+
+    const totalPages = getTotalPages(regularNotifications.length);
+    const paginatedNotifications = paginateArray(regularNotifications, page);
+
+    if (paginatedNotifications.length === 0) {
+        notificationsList.innerHTML = '<p>No hay notificaciones para ti.</p>';
+    } else {
+        paginatedNotifications.forEach((n, index) => {
+            const globalIndex = (page - 1) * ITEMS_PER_PAGE + index + 1;
+            
+            const notificationDiv = document.createElement('div');
+            notificationDiv.className = `alert ${n.read ? 'alert-light' : 'alert-info'} d-flex justify-content-between align-items-center`;
+            notificationDiv.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-secondary me-2">${globalIndex}</span>
+                    <div>
+                        <strong>${new Date(n.timestamp).toLocaleString()}:</strong> ${n.message}
+                    </div>
+                </div>
+                ${!n.read ? `<button class="btn btn-sm btn-outline-primary" onclick="markNotificationAsRead('${n.id}')">Marcar como leído</button>` : ''}
+            `;
+            notificationsList.appendChild(notificationDiv);
+        });
+    }
+    
+    // Generar controles de paginación
+    const existingPagination = notificationsContainer.querySelector('.pagination-container');
+    if (existingPagination) {
+        existingPagination.remove();
+    }
+    
+    const paginationDiv = document.createElement('div');
+    paginationDiv.id = 'employee-notifications-pagination';
+    paginationDiv.className = 'pagination-container';
+    notificationsContainer.appendChild(paginationDiv);
+    
+    generatePaginationControls(page, totalPages, 'employee-notifications-pagination', renderEmployeeNotifications);
+    
+    updateNotificationBadges();
+}
+
+function renderEmployeeReportReplies(page = 1) {
+    currentEmployeeReportRepliesPage = page;
+    const reportRepliesList = document.getElementById('employee-report-replies-list');
+    const reportRepliesContainer = reportRepliesList.closest('.card-body');
+    reportRepliesList.innerHTML = '';
+    if (!currentUser) return;
+
     const employeeReportsWithReplies = reports.filter(r => r.reporterId === currentUser.id && r.replies.length > 0);
 
-    if (employeeNotifications.length === 0 && employeeReportsWithReplies.length === 0) {
-        notificationsList.innerHTML = '<p>No hay notificaciones para ti.</p>';
-        return;
-    }
+    // Obtener todas las respuestas no leídas
+    let allReplies = [];
+    let replyCounter = 0;
 
-    // Display regular notifications (excluding report reply notifications)
-    employeeNotifications.forEach(n => {
-        // Skip notifications that are about report replies to avoid duplication
-        if (n.message.includes('ha respondido a tu reporte')) {
-            return;
-        }
-        
-        const notificationDiv = document.createElement('div');
-        notificationDiv.className = `alert ${n.read ? 'alert-light' : 'alert-info'} d-flex justify-content-between align-items-center`;
-        notificationDiv.innerHTML = `
-            <div>
-                <strong>${new Date(n.timestamp).toLocaleString()}:</strong> ${n.message}
-            </div>
-            ${!n.read ? `<button class="btn btn-sm btn-outline-primary" onclick="markNotificationAsRead('${n.id}')">Marcar como leído</button>` : ''}
-        `;
-        notificationsList.appendChild(notificationDiv);
-    });
-
-    // Display report replies
     employeeReportsWithReplies.forEach(report => {
         report.replies.filter(reply => !reply.readForTechnician).forEach(reply => {
-            const replyDiv = document.createElement('div');
-            replyDiv.className = `alert alert-success d-flex justify-content-between align-items-center`;
-            replyDiv.innerHTML = `
-                <div>
-                    <strong>Respuesta a Reporte ID ${report.id} (${new Date(reply.timestamp).toLocaleString()}):</strong> ${reply.message}
-                </div>
-                <button class="btn btn-sm btn-outline-success" onclick="markReportReplyAsRead('${report.id}', '${reply.timestamp}')">Marcar como leído</button>
-            `;
-            notificationsList.appendChild(replyDiv);
+            allReplies.push({
+                report: report,
+                reply: reply,
+                index: replyCounter++
+            });
         });
     });
 
+    const totalPages = getTotalPages(allReplies.length);
+    const paginatedReplies = paginateArray(allReplies, page);
+
+    if (paginatedReplies.length === 0) {
+        reportRepliesList.innerHTML = '<p>No hay respuestas nuevas a tus reportes.</p>';
+    } else {
+        paginatedReplies.forEach((item, index) => {
+            const globalIndex = (page - 1) * ITEMS_PER_PAGE + index + 1;
+            const { report, reply } = item;
+            
+            const replyDiv = document.createElement('div');
+            replyDiv.className = `alert alert-success d-flex justify-content-between align-items-center`;
+            replyDiv.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-success me-2">${globalIndex}</span>
+                    <div>
+                        <strong>Respuesta a Reporte ID ${report.id} (${new Date(reply.timestamp).toLocaleString()}):</strong> ${reply.message}
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-outline-success" onclick="markReportReplyAsRead('${report.id}', '${reply.timestamp}')">Marcar como leído</button>
+            `;
+            reportRepliesList.appendChild(replyDiv);
+        });
+    }
+    
+    // Generar controles de paginación
+    const existingPagination = reportRepliesContainer.querySelector('.pagination-container');
+    if (existingPagination) {
+        existingPagination.remove();
+    }
+    
+    const paginationDiv = document.createElement('div');
+    paginationDiv.id = 'employee-report-replies-pagination';
+    paginationDiv.className = 'pagination-container';
+    reportRepliesContainer.appendChild(paginationDiv);
+    
+    generatePaginationControls(page, totalPages, 'employee-report-replies-pagination', renderEmployeeReportReplies);
+    
     updateNotificationBadges();
 }
 
@@ -1449,9 +1978,9 @@ function markNotificationAsRead(id) {
         saveNotifications();
         updateNotificationBadges();
         if (currentUser && currentUser.role === 'admin') {
-            renderAdminNotifications();
+            renderAdminNotifications(1);
         } else if (currentUser && currentUser.role === 'employee') {
-            renderEmployeeNotifications();
+            renderEmployeeNotifications(1);
         }
     }
 }
@@ -1464,7 +1993,8 @@ function markReportReplyAsRead(reportId, replyTimestamp) {
             reports[reportIndex].replies[replyIndex].readForTechnician = true;
             saveReports();
             updateNotificationBadges();
-            renderEmployeeNotifications();
+            renderEmployeeNotifications(1);
+            renderEmployeeReportReplies(1);
         }
     }
 }
@@ -1501,12 +2031,21 @@ function updateNotificationBadges() {
         ).length;
         const unreadReportRepliesCount = reports.filter(r => r.reporterId === currentUser.id && r.replies.some(reply => !reply.readForTechnician)).length;
 
-        const totalUnreadEmployeeItems = unreadEmployeeNotificationsCount + unreadReportRepliesCount;
-
-        if (totalUnreadEmployeeItems > 0) {
-            employeeNotificationsTab.innerHTML = `Notificaciones <span class="badge bg-danger ms-1">${totalUnreadEmployeeItems}</span>`;
+        // Actualizar badge de notificaciones
+        if (unreadEmployeeNotificationsCount > 0) {
+            employeeNotificationsTab.innerHTML = `Notificaciones <span class="badge bg-danger ms-1">${unreadEmployeeNotificationsCount}</span>`;
         } else {
             employeeNotificationsTab.innerHTML = `Notificaciones`;
+        }
+
+        // Actualizar badge de respuestas de reportes
+        const employeeReportRepliesTab = document.getElementById('employee-report-replies-tab');
+        if (employeeReportRepliesTab) {
+            if (unreadReportRepliesCount > 0) {
+                employeeReportRepliesTab.innerHTML = `Respuestas de Reportes <span class="badge bg-success ms-1">${unreadReportRepliesCount}</span>`;
+            } else {
+                employeeReportRepliesTab.innerHTML = `Respuestas de Reportes`;
+            }
         }
     }
 }
@@ -1575,13 +2114,19 @@ function exportServicesToExcel() {
             'Estado': service.status,
             'Motivo de Cancelación': service.cancellationReason || 'N/A',
             'Hora de Inicio': service.startTime ? new Date(service.startTime).toLocaleString() : 'N/A',
-            'Ubicación de Inicio (Lat)': service.startLocation ? service.startLocation.latitude.toFixed(6) : 'N/A',
-            'Ubicación de Inicio (Lon)': service.startLocation ? service.startLocation.longitude.toFixed(6) : 'N/A',
+            'Ubicación de Inicio (Lat)': service.startLocation ? service.startLocation.latitude.toFixed(8) : 'N/A',
+            'Ubicación de Inicio (Lon)': service.startLocation ? service.startLocation.longitude.toFixed(8) : 'N/A',
             'Precisión de Inicio (m)': service.startLocation && service.startLocation.accuracy ? Math.round(service.startLocation.accuracy) : 'N/A',
+            'Altitud de Inicio (m)': service.startLocation && service.startLocation.altitude ? service.startLocation.altitude.toFixed(1) : 'N/A',
+            'Velocidad de Inicio (m/s)': service.startLocation && service.startLocation.speed ? service.startLocation.speed.toFixed(1) : 'N/A',
+            'Dirección de Inicio (°)': service.startLocation && service.startLocation.heading ? service.startLocation.heading.toFixed(1) : 'N/A',
             'Hora de Finalización/Cancelación': service.finalizationOrCancellationTime ? new Date(service.finalizationOrCancellationTime).toLocaleString() : 'N/A',
-            'Ubicación de Finalización/Cancelación (Lat)': service.finalizationOrCancellationLocation ? service.finalizationOrCancellationLocation.latitude.toFixed(6) : 'N/A',
-            'Ubicación de Finalización/Cancelación (Lon)': service.finalizationOrCancellationLocation ? service.finalizationOrCancellationLocation.longitude.toFixed(6) : 'N/A',
-            'Precisión de Finalización (m)': service.finalizationOrCancellationLocation && service.finalizationOrCancellationLocation.accuracy ? Math.round(service.finalizationOrCancellationLocation.accuracy) : 'N/A'
+            'Ubicación de Finalización/Cancelación (Lat)': service.finalizationOrCancellationLocation ? service.finalizationOrCancellationLocation.latitude.toFixed(8) : 'N/A',
+            'Ubicación de Finalización/Cancelación (Lon)': service.finalizationOrCancellationLocation ? service.finalizationOrCancellationLocation.longitude.toFixed(8) : 'N/A',
+            'Precisión de Finalización (m)': service.finalizationOrCancellationLocation && service.finalizationOrCancellationLocation.accuracy ? Math.round(service.finalizationOrCancellationLocation.accuracy) : 'N/A',
+            'Altitud de Finalización (m)': service.finalizationOrCancellationLocation && service.finalizationOrCancellationLocation.altitude ? service.finalizationOrCancellationLocation.altitude.toFixed(1) : 'N/A',
+            'Velocidad de Finalización (m/s)': service.finalizationOrCancellationLocation && service.finalizationOrCancellationLocation.speed ? service.finalizationOrCancellationLocation.speed.toFixed(1) : 'N/A',
+            'Dirección de Finalización (°)': service.finalizationOrCancellationLocation && service.finalizationOrCancellationLocation.heading ? service.finalizationOrCancellationLocation.heading.toFixed(1) : 'N/A'
         };
     });
     
@@ -1652,8 +2197,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar tema
     initializeTheme();
     
-    // Inicializar navegación táctil para tablas
-    initializeTableNavigation();
+    // ELIMINAR la inicialización de navegación táctil personalizada
+    // initializeTableNavigation();
     
     showLogin();
 
@@ -1792,14 +2337,14 @@ function testGeolocation() {
 
     const options = {
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 15000,
         maximumAge: 0
     };
 
     console.log('Opciones de geolocalización:', options);
 
     // Mostrar mensaje de carga simple
-    showAlert('Obteniendo ubicación actual... Por favor espera.');
+    //showAlert('Obteniendo ubicación actual... Por favor espera.');
 
     navigator.geolocation.getCurrentPosition((position) => {
         console.log('Geolocalización exitosa:', position);
@@ -1893,7 +2438,7 @@ function toggleTheme() {
     
     // Mostrar notificación del cambio de tema
     const themeName = currentTheme === 'dark' ? 'oscuro' : 'claro';
-    showAlert(`Tema cambiado a modo ${themeName}`);
+    //showAlert(`Tema cambiado a modo ${themeName}`);
 }
 
 function applyTheme() {
@@ -1964,53 +2509,7 @@ function forceCloseModals() {
 }
 
 // --- Funciones de Navegación Táctil para Tablas ---
-function initializeTableNavigation() {
-    const tableResponsives = document.querySelectorAll('.table-responsive');
-    
-    tableResponsives.forEach(tableResponsive => {
-        // Gestos táctiles para navegación
-        let startX = 0;
-        let startY = 0;
-        let isScrolling = false;
-        
-        tableResponsive.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            isScrolling = false;
-        });
-        
-        tableResponsive.addEventListener('touchmove', (e) => {
-            if (!isScrolling) {
-                const deltaX = Math.abs(e.touches[0].clientX - startX);
-                const deltaY = Math.abs(e.touches[0].clientY - startY);
-                
-                if (deltaX > deltaY && deltaX > 10) {
-                    isScrolling = true;
-                }
-            }
-        });
-        
-        tableResponsive.addEventListener('touchend', (e) => {
-            if (isScrolling) {
-                const deltaX = e.changedTouches[0].clientX - startX;
-                const threshold = 50; // Umbral mínimo para considerar un swipe
-                
-                if (Math.abs(deltaX) > threshold) {
-                    if (deltaX > 0) {
-                        // Swipe hacia la derecha - scroll izquierda
-                        tableResponsive.scrollBy({
-                            left: -200,
-                            behavior: 'smooth'
-                        });
-                    } else {
-                        // Swipe hacia la izquierda - scroll derecha
-                        tableResponsive.scrollBy({
-                            left: 200,
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-            }
-        });
-    });
-}
+// ELIMINAR ESTA FUNCIÓN COMPLETAMENTE - Usar comportamiento por defecto
+// function initializeTableNavigation() {
+//     // Esta función se elimina para usar el comportamiento por defecto de las tablas
+// }
