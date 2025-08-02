@@ -407,12 +407,6 @@ body {
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-md);
     overflow: hidden;
-    transition: all var(--transition-normal);
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
 }
 
 .card-header {
@@ -437,7 +431,6 @@ body {
     border-radius: var(--radius-xl);
     padding: var(--space-6);
     text-align: center;
-    transition: all var(--transition-normal);
     position: relative;
     overflow: hidden;
 }
@@ -450,17 +443,6 @@ body {
     right: 0;
     height: 4px;
     background: var(--accent-color);
-    transform: scaleX(0);
-    transition: transform var(--transition-normal);
-}
-
-.stats-card:hover::before {
-    transform: scaleX(1);
-}
-
-.stats-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
 }
 
 .stats-card .card-title {
@@ -567,13 +549,7 @@ body {
 }
 
 .table tbody tr {
-    transition: all var(--transition-fast);
     border-bottom: 1px solid var(--border-light);
-}
-
-.table tbody tr:hover {
-    background: var(--bg-tertiary);
-    transform: scale(1.01);
 }
 
 .table tbody tr:last-child {
@@ -625,6 +601,81 @@ body {
     display: flex;
     gap: var(--space-3);
     justify-content: flex-end;
+}
+
+/* Deshabilitar animaciones de modales */
+.modal.fade .modal-dialog {
+    transition: none;
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+}
+
+.modal.fade .modal-dialog {
+    transform: none;
+}
+
+/* Deshabilitar completamente las animaciones de Bootstrap */
+.modal.fade {
+    transition: none;
+}
+
+.modal.fade .modal-dialog {
+    transition: none;
+    transform: none;
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+}
+
+/* Deshabilitar backdrop animations */
+.modal-backdrop {
+    transition: none;
+}
+
+.modal-backdrop.fade {
+    transition: none;
+}
+
+.modal-backdrop.show {
+    transition: none;
+}
+
+/* Prevenir movimiento horizontal al abrir/cerrar modales */
+body {
+    overflow-x: hidden !important;
+}
+
+/* Prevenir que Bootstrap modifique el overflow del body */
+body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+}
+
+/* Asegurar que no haya scroll horizontal */
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Prevenir cualquier transformación o movimiento en el body */
+body {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Aplicar las mismas reglas en modo oscuro */
+[data-theme="dark"] body {
+    overflow-x: hidden !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+[data-theme="dark"] body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
 }
 
 /* ===== BADGES MINIMALISTAS ===== */
@@ -974,19 +1025,11 @@ input[type="number"] {
     align-items: center;
     justify-content: center;
     font-weight: 500;
-    transition: all var(--transition-fast);
-}
-
-.pagination-container .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
 }
 
 .pagination-container .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
 }
 
 .pagination-container .text-muted {
@@ -1172,7 +1215,7 @@ input[type="number"] {
 
 /* Ajustes para elementos de alerta */
 .alert {
-    color: var(--text-primary) !important;
+    color: var(--text-primary);
 }
 
 /* Asegurar que los badges tengan contraste */
@@ -1200,12 +1243,6 @@ input[type="number"] {
     font-size: 0.875rem;
     padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
-}
-
-.table .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
 }
 
 /* Estados de botones en tablas */
@@ -1363,9 +1400,7 @@ input[type="number"] {
     background-color: #2d3748 !important;
 }
 
-[data-theme="dark"] .table tbody tr:hover {
-    background-color: #4a5568 !important;
-}
+/* Eliminado efecto hover en modo oscuro para consistencia */
 
 [data-theme="dark"] .table tbody tr {
     border-bottom-color: #4a5568 !important;
@@ -1447,79 +1482,287 @@ input[type="number"] {
 
 /* Texto negro en reportes/novedades y notificaciones en modo oscuro */
 [data-theme="dark"] #reports-list .alert,
-[data-theme="dark"] #admin-notifications-list .alert,
-[data-theme="dark"] #employee-notifications-list .alert {
+[data-theme="dark"] #reports-list .alert-danger,
+[data-theme="dark"] #reports-list .alert-success,
+[data-theme="dark"] #reports-list .alert-warning,
+[data-theme="dark"] #reports-list .alert-info,
+[data-theme="dark"] #reports-list .list-group-item,
+[data-theme="dark"] #reports-list .list-group-item-light {
     color: #000000 !important;
+}
+
+[data-theme="dark"] #reports-list .alert {
     background-color: #ffffff !important;
     border-color: #e2e8f0 !important;
 }
 
-[data-theme="dark"] #reports-list .alert-danger,
-[data-theme="dark"] #admin-notifications-list .alert-danger,
-[data-theme="dark"] #employee-notifications-list .alert-danger {
-    color: #000000 !important;
+[data-theme="dark"] #reports-list .alert-danger {
     background-color: #fed7d7 !important;
     border-color: #feb2b2 !important;
 }
 
-[data-theme="dark"] #reports-list .alert-success,
-[data-theme="dark"] #admin-notifications-list .alert-success,
-[data-theme="dark"] #employee-notifications-list .alert-success {
-    color: #000000 !important;
+[data-theme="dark"] #reports-list .alert-success {
     background-color: #c6f6d5 !important;
     border-color: #9ae6b4 !important;
 }
 
-[data-theme="dark"] #reports-list .alert-warning,
-[data-theme="dark"] #admin-notifications-list .alert-warning,
-[data-theme="dark"] #employee-notifications-list .alert-warning {
-    color: #000000 !important;
+[data-theme="dark"] #reports-list .alert-warning {
     background-color: #fef5e7 !important;
     border-color: #fbd38d !important;
 }
 
-[data-theme="dark"] #reports-list .alert-info,
-[data-theme="dark"] #admin-notifications-list .alert-info,
-[data-theme="dark"] #employee-notifications-list .alert-info {
-    color: #000000 !important;
+[data-theme="dark"] #reports-list .alert-info {
     background-color: #bee3f8 !important;
     border-color: #90cdf4 !important;
 }
 
-/* Texto blanco en respuestas de reportes del técnico en modo oscuro */
+[data-theme="dark"] #admin-notifications-list .alert,
+[data-theme="dark"] #admin-notifications-list .alert-danger,
+[data-theme="dark"] #admin-notifications-list .alert-success,
+[data-theme="dark"] #admin-notifications-list .alert-warning,
+[data-theme="dark"] #admin-notifications-list .alert-info {
+    color: #000000 !important;
+}
+
+[data-theme="dark"] #admin-notifications-list .alert {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] #admin-notifications-list .alert-danger {
+    background-color: #fed7d7 !important;
+    border-color: #feb2b2 !important;
+}
+
+[data-theme="dark"] #admin-notifications-list .alert-success {
+    background-color: #c6f6d5 !important;
+    border-color: #9ae6b4 !important;
+}
+
+[data-theme="dark"] #admin-notifications-list .alert-warning {
+    background-color: #fef5e7 !important;
+    border-color: #fbd38d !important;
+}
+
+[data-theme="dark"] #admin-notifications-list .alert-info {
+    background-color: #bee3f8 !important;
+    border-color: #90cdf4 !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert,
+[data-theme="dark"] #employee-notifications-list .alert-danger,
+[data-theme="dark"] #employee-notifications-list .alert-success,
+[data-theme="dark"] #employee-notifications-list .alert-warning,
+[data-theme="dark"] #employee-notifications-list .alert-info {
+    color: #000000 !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert-danger {
+    background-color: #fed7d7 !important;
+    border-color: #feb2b2 !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert-success {
+    background-color: #c6f6d5 !important;
+    border-color: #9ae6b4 !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert-warning {
+    background-color: #fef5e7 !important;
+    border-color: #fbd38d !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert-info {
+    background-color: #bee3f8 !important;
+    border-color: #90cdf4 !important;
+}
+
+/* Texto negro en respuestas de reportes del técnico en modo oscuro */
+[data-theme="dark"] #employee-report-replies-list .alert,
+[data-theme="dark"] #employee-report-replies-list .alert-danger,
+[data-theme="dark"] #employee-report-replies-list .alert-success,
+[data-theme="dark"] #employee-report-replies-list .alert-warning,
+[data-theme="dark"] #employee-report-replies-list .alert-info {
+    color: #000000 !important;
+}
+
 [data-theme="dark"] #employee-report-replies-list .alert {
-    color: #ffffff !important;
     background-color: #2d3748 !important;
     border-color: #4a5568 !important;
 }
 
 [data-theme="dark"] #employee-report-replies-list .alert-danger {
-    color: #ffffff !important;
     background-color: #742a2a !important;
     border-color: #c53030 !important;
 }
 
 [data-theme="dark"] #employee-report-replies-list .alert-success {
-    color: #ffffff !important;
     background-color: #22543d !important;
     border-color: #38a169 !important;
 }
 
 [data-theme="dark"] #employee-report-replies-list .alert-warning {
-    color: #ffffff !important;
     background-color: #744210 !important;
     border-color: #d69e2e !important;
 }
 
 [data-theme="dark"] #employee-report-replies-list .alert-info {
-    color: #ffffff !important;
     background-color: #2a4365 !important;
     border-color: #3182ce !important;
 }
 
-/* Texto blanco para mensajes de "no hay datos" en respuestas de reportes del técnico */
+/* Texto negro para mensajes de "no hay datos" en respuestas de reportes del técnico */
 [data-theme="dark"] #employee-report-replies-list p,
 [data-theme="dark"] #employee-report-replies-list div,
 [data-theme="dark"] #employee-report-replies-list span {
+    color: #000000 !important;
+}
+
+/* Excepción: texto blanco para el mensaje "No hay respuestas nuevas a tus reportes" */
+[data-theme="dark"] #employee-report-replies-list .no-replies-message {
     color: #ffffff !important;
+}
+
+/* ===== NAVEGACIÓN POR DEFECTO EN TABLAS ===== */
+.table {
+    /* Restaurar comportamiento por defecto del navegador */
+    tabindex: 0;
+}
+
+.table tbody tr {
+    /* Permitir navegación con teclado */
+    tabindex: 0;
+}
+
+.table tbody td {
+    /* Permitir navegación con teclado */
+    tabindex: 0;
+}
+
+/* Restaurar navegación por defecto */
+.table:focus,
+.table tbody tr:focus,
+.table tbody td:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* Navegación con teclado estándar */
+.table:focus-within {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* Asegurar que las tablas usen navegación por defecto del navegador */
+.table-responsive {
+    /* Permitir scroll nativo */
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+/* Quitar cualquier comportamiento personalizado de las tablas */
+.table tbody tr {
+    /* Sin efectos hover */
+    background: transparent;
+}
+
+.table tbody tr:nth-child(even) {
+    background: var(--bg-secondary);
+}
+
+.table tbody tr:nth-child(odd) {
+    background: var(--bg-card);
+}
+
+/* Asegurar que los enlaces y botones en las tablas sean navegables */
+.table a,
+.table button {
+    /* Permitir navegación con teclado */
+    tabindex: 0;
+}
+
+.table a:focus,
+.table button:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* ===== BOTÓN SCROLL TO TOP ===== */
+.scroll-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--accent-color);
+    color: var(--text-light);
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scroll-to-top-btn:hover {
+    background-color: var(--accent-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.scroll-to-top-btn:active {
+    transform: translateY(0);
+}
+
+.scroll-to-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top-btn i {
+    font-size: 1.2rem;
+}
+
+/* Modo oscuro para el botón scroll to top */
+[data-theme="dark"] .scroll-to-top-btn {
+    background-color: var(--accent-color);
+    color: var(--text-light);
+    box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .scroll-to-top-btn:hover {
+    background-color: var(--accent-light);
+    box-shadow: var(--shadow-xl);
+}
+
+/* Responsive para el botón scroll to top */
+@media (max-width: 768px) {
+    .scroll-to-top-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+    }
+    
+    .scroll-to-top-btn i {
+        font-size: 1rem;
+    }
+    
+    /* Adaptar fotos de evidencia para móvil */
+    .service-photo-evidence {
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+        margin: var(--space-3) 0;
+    }
 }

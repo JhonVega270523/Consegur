@@ -140,6 +140,20 @@ if (users.length === 0) {
     saveUsers();
 }
 
+// Event listener para cerrar el menú hamburguesa cuando se hace clic en enlaces de navegación
+document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            const navbarCollapse = document.getElementById('navbarNav');
+            if (navbarCollapse.classList.contains('show')) {
+                const bsCollapse = new bootstrap.Collapse(navbarCollapse, {toggle: false});
+                bsCollapse.hide();
+            }
+        });
+    });
+});
+
 // Function to generate unique IDs
 function generateId() {
     return '_' + Math.random().toString(36).substr(2, 9);
@@ -268,6 +282,13 @@ function showAdminDashboard() {
     if (currentUser && currentUser.role === 'admin') {
         console.log('Ocultando login y mostrando admin dashboard');
         
+        // Cerrar el menú hamburguesa si está abierto
+        const navbarCollapse = document.getElementById('navbarNav');
+        if (navbarCollapse.classList.contains('show')) {
+            const bsCollapse = new bootstrap.Collapse(navbarCollapse, {toggle: false});
+            bsCollapse.hide();
+        }
+        
         // Ocultar login con múltiples métodos para asegurar que se oculte
         const loginSection = document.getElementById('login-section');
         loginSection.classList.add('d-none');
@@ -334,6 +355,13 @@ function showEmployeeDashboard() {
     if (currentUser && currentUser.role === 'employee') {
         console.log('Ocultando login y mostrando employee dashboard');
         
+        // Cerrar el menú hamburguesa si está abierto
+        const navbarCollapse = document.getElementById('navbarNav');
+        if (navbarCollapse.classList.contains('show')) {
+            const bsCollapse = new bootstrap.Collapse(navbarCollapse, {toggle: false});
+            bsCollapse.hide();
+        }
+        
         // Ocultar login con múltiples métodos para asegurar que se oculte
         const loginSection = document.getElementById('login-section');
         loginSection.classList.add('d-none');
@@ -378,6 +406,14 @@ function showEmployeeDashboard() {
 
 function logout() {
     currentUser = null;
+    
+    // Cerrar el menú hamburguesa si está abierto
+    const navbarCollapse = document.getElementById('navbarNav');
+    if (navbarCollapse.classList.contains('show')) {
+        const bsCollapse = new bootstrap.Collapse(navbarCollapse, {toggle: false});
+        bsCollapse.hide();
+    }
+    
     showLogin();
     //showAlert('Sesión cerrada.');
 }
@@ -395,6 +431,14 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
         currentUser = user;
         loginError.textContent = '';
         console.log('Login exitoso:', currentUser);
+        
+        // Cerrar el menú hamburguesa si está abierto
+        const navbarCollapse = document.getElementById('navbarNav');
+        if (navbarCollapse.classList.contains('show')) {
+            const bsCollapse = new bootstrap.Collapse(navbarCollapse, {toggle: false});
+            bsCollapse.hide();
+        }
+        
         if (currentUser.role === 'admin') {
             console.log('Mostrando dashboard de administrador');
             showAdminDashboard();
@@ -2030,7 +2074,7 @@ function renderEmployeeReportReplies(page = 1) {
     const paginatedReplies = paginateArray(allReplies, page);
 
     if (paginatedReplies.length === 0) {
-        reportRepliesList.innerHTML = '<p>No hay respuestas nuevas a tus reportes.</p>';
+        reportRepliesList.innerHTML = '<p class="no-replies-message">No hay respuestas nuevas a tus reportes.</p>';
     } else {
         paginatedReplies.forEach((item, index) => {
             const globalIndex = (page - 1) * ITEMS_PER_PAGE + index + 1;
@@ -2292,6 +2336,9 @@ document.getElementById('service-photo').addEventListener('change', function(eve
 document.addEventListener('DOMContentLoaded', () => {
     // Inicializar tema
     initializeTheme();
+    
+    // Inicializar scroll to top
+    initializeScrollToTop();
     
     // ELIMINAR la inicialización de navegación táctil personalizada
     // initializeTableNavigation();
@@ -2609,3 +2656,36 @@ function forceCloseModals() {
 // function initializeTableNavigation() {
 //     // Esta función se elimina para usar el comportamiento por defecto de las tablas
 // }
+
+// --- Funcionalidad Scroll to Top ---
+function initializeScrollToTop() {
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+    
+    if (!scrollToTopBtn) return;
+    
+    // Función para mostrar/ocultar el botón
+    function toggleScrollButton() {
+        if (window.pageYOffset > 300) {
+            scrollToTopBtn.classList.add('show');
+        } else {
+            scrollToTopBtn.classList.remove('show');
+        }
+    }
+    
+    // Función para hacer scroll hacia arriba
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+    
+    // Event listeners
+    window.addEventListener('scroll', toggleScrollButton);
+    scrollToTopBtn.addEventListener('click', scrollToTop);
+    
+    // También mostrar el botón si la página ya está scrolleada al cargar
+    if (window.pageYOffset > 300) {
+        scrollToTopBtn.classList.add('show');
+    }
+}
