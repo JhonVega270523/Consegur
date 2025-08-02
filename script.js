@@ -216,41 +216,6 @@ function showConfirm(message, callback) {
 
 // --- UI Display Functions ---
 
-// Función para actualizar la visibilidad de los elementos de navegación
-function updateNavigationVisibility() {
-    const navLogin = document.getElementById('nav-login');
-    const navLoginMobile = document.getElementById('nav-login-mobile');
-    const navLogout = document.getElementById('nav-logout');
-    const navLogoutMobile = document.getElementById('nav-logout-mobile');
-    const navAdminDashboard = document.getElementById('nav-admin-dashboard');
-    const navEmployeeDashboard = document.getElementById('nav-employee-dashboard');
-    
-    if (currentUser) {
-        // Usuario autenticado - mostrar "Cerrar Sesión" y ocultar "Iniciar Sesión"
-        if (navLogin) navLogin.classList.add('d-none');
-        if (navLoginMobile) navLoginMobile.classList.add('d-none');
-        if (navLogout) navLogout.classList.remove('d-none');
-        if (navLogoutMobile) navLogoutMobile.classList.remove('d-none');
-        
-        // Mostrar enlace al dashboard correspondiente
-        if (currentUser.role === 'admin') {
-            if (navAdminDashboard) navAdminDashboard.classList.remove('d-none');
-            if (navEmployeeDashboard) navEmployeeDashboard.classList.add('d-none');
-        } else {
-            if (navEmployeeDashboard) navEmployeeDashboard.classList.remove('d-none');
-            if (navAdminDashboard) navAdminDashboard.classList.add('d-none');
-        }
-    } else {
-        // Usuario no autenticado - mostrar "Iniciar Sesión" y ocultar "Cerrar Sesión"
-        if (navLogin) navLogin.classList.remove('d-none');
-        if (navLoginMobile) navLoginMobile.classList.remove('d-none');
-        if (navLogout) navLogout.classList.add('d-none');
-        if (navLogoutMobile) navLogoutMobile.classList.add('d-none');
-        if (navAdminDashboard) navAdminDashboard.classList.add('d-none');
-        if (navEmployeeDashboard) navEmployeeDashboard.classList.add('d-none');
-    }
-}
-
 function showLogin() {
     console.log('showLogin() ejecutándose');
     
@@ -283,10 +248,13 @@ function showLogin() {
     employeeSection.style.top = '-9999px';
     employeeSection.style.left = '-9999px';
     
-    currentUser = null;
+    // Actualizar navegación
+    document.getElementById('nav-login').classList.remove('d-none');
+    document.getElementById('nav-logout').classList.add('d-none');
+    document.getElementById('nav-admin-dashboard').classList.add('d-none');
+    document.getElementById('nav-employee-dashboard').classList.add('d-none');
     
-    // Actualizar navegación usando la nueva función
-    updateNavigationVisibility();
+    currentUser = null;
     // Clear login fields on showing login
     document.getElementById('username').value = '';
     document.getElementById('password').value = '';
@@ -323,8 +291,11 @@ function showAdminDashboard() {
         // Ocultar employee dashboard
         document.getElementById('employee-dashboard-section').classList.add('d-none');
         
-        // Actualizar navegación usando la nueva función
-        updateNavigationVisibility();
+        // Actualizar navegación
+        document.getElementById('nav-login').classList.add('d-none');
+        document.getElementById('nav-logout').classList.remove('d-none');
+        document.getElementById('nav-admin-dashboard').classList.remove('d-none');
+        document.getElementById('nav-employee-dashboard').classList.add('d-none');
         
         // Renderizar contenido
         renderUserList(1);
@@ -386,8 +357,11 @@ function showEmployeeDashboard() {
         employeeSection.style.top = 'auto';
         employeeSection.style.left = 'auto';
         
-        // Actualizar navegación usando la nueva función
-        updateNavigationVisibility();
+        // Actualizar navegación
+        document.getElementById('nav-login').classList.add('d-none');
+        document.getElementById('nav-logout').classList.remove('d-none');
+        document.getElementById('nav-admin-dashboard').classList.add('d-none');
+        document.getElementById('nav-employee-dashboard').classList.remove('d-none');
         
         // Renderizar contenido
         renderEmployeeAssignedServices(1);
@@ -404,7 +378,6 @@ function showEmployeeDashboard() {
 
 function logout() {
     currentUser = null;
-    updateNavigationVisibility();
     showLogin();
     //showAlert('Sesión cerrada.');
 }
@@ -2317,10 +2290,14 @@ document.getElementById('service-photo').addEventListener('change', function(eve
 
 // Initial setup on page load
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar la aplicación completa
-    initializeApp();
+    // Inicializar tema
+    initializeTheme();
     
-    // Configurar eventos específicos de modales
+    // ELIMINAR la inicialización de navegación táctil personalizada
+    // initializeTableNavigation();
+    
+    showLogin();
+
     const createUserModalElement = document.getElementById('createUserModal');
     if (createUserModalElement) {
         createUserModalElement.addEventListener('hidden.bs.modal', () => {
@@ -2404,6 +2381,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fallback or warning if SignaturePad is not loaded
         console.warn('SignaturePad library not loaded. Signature functionality will be limited.');
     }
+
 
     window.addEventListener('resize', () => {
         // Debounce or throttle this if performance issues arise on resize
@@ -2631,333 +2609,3 @@ function forceCloseModals() {
 // function initializeTableNavigation() {
 //     // Esta función se elimina para usar el comportamiento por defecto de las tablas
 // }
-
-// ===== FUNCIONALIDAD SCROLL TO TOP =====
-function initScrollToTop() {
-    const scrollBtn = document.getElementById('scroll-to-top');
-    
-    if (!scrollBtn) return;
-    
-    // Mostrar/ocultar botón basado en scroll
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 300) {
-            scrollBtn.classList.add('show');
-        } else {
-            scrollBtn.classList.remove('show');
-        }
-    });
-    
-    // Funcionalidad del botón
-    scrollBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-}
-
-// ===== MEJORAS PARA NAVEGACIÓN MÓVIL =====
-function initMobileNavigation() {
-    // Mejorar botones en móvil
-    function enhanceMobileButtons() {
-        const buttons = document.querySelectorAll('.table .btn');
-        
-        buttons.forEach(btn => {
-            // Aumentar área táctil
-            btn.style.minHeight = '44px';
-            btn.style.minWidth = '44px';
-            
-            // Agregar feedback táctil mejorado
-            btn.addEventListener('touchstart', () => {
-                btn.style.transform = 'scale(0.95)';
-                btn.style.transition = 'transform 0.1s ease';
-            });
-            
-            btn.addEventListener('touchend', () => {
-                btn.style.transform = '';
-                btn.style.transition = 'transform 0.2s ease';
-            });
-        });
-    }
-    
-    // Inicializar mejoras de botones
-    enhanceMobileButtons();
-    
-    // Mejorar navegación de tabs
-    function enhanceTabNavigation() {
-        const tabButtons = document.querySelectorAll('.nav-tabs .nav-link');
-        
-        tabButtons.forEach(button => {
-            button.addEventListener('touchstart', () => {
-                button.style.transform = 'scale(0.98)';
-                button.style.transition = 'transform 0.1s ease';
-            });
-            
-            button.addEventListener('touchend', () => {
-                button.style.transform = '';
-                button.style.transition = 'transform 0.2s ease';
-            });
-        });
-    }
-    
-    // Inicializar mejoras de tabs
-    enhanceTabNavigation();
-}
-
-// ===== FUNCIÓN DE INICIALIZACIÓN MEJORADA =====
-function initializeApp() {
-    // Inicializar tema
-    initializeTheme();
-    
-    // Inicializar signature pads
-    initializeSignaturePads();
-    
-    // Inicializar scroll to top
-    initScrollToTop();
-    
-    // Inicializar navegación móvil
-    initMobileNavigation();
-    
-    // Mostrar login por defecto
-    showLogin();
-    
-    // Actualizar visibilidad de navegación inicial
-    updateNavigationVisibility();
-    
-    // Configurar event listeners
-    setupEventListeners();
-    
-    console.log('Aplicación inicializada correctamente');
-}
-
-// ===== CONFIGURACIÓN DE EVENT LISTENERS =====
-function setupEventListeners() {
-    // Login form
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-    }
-    
-    // User form
-    const userForm = document.getElementById('user-form');
-    if (userForm) {
-        userForm.addEventListener('submit', handleUserSubmit);
-    }
-    
-    // Service form
-    const serviceForm = document.getElementById('service-form');
-    if (serviceForm) {
-        serviceForm.addEventListener('submit', handleServiceSubmit);
-    }
-    
-    // Novelty form
-    const noveltyForm = document.getElementById('novelty-form');
-    if (noveltyForm) {
-        noveltyForm.addEventListener('submit', handleNoveltySubmit);
-    }
-    
-    // Reply report form
-    const replyReportForm = document.getElementById('reply-report-form');
-    if (replyReportForm) {
-        replyReportForm.addEventListener('submit', handleReplyReportSubmit);
-    }
-    
-    // Service status change
-    const serviceStatusSelect = document.getElementById('service-status');
-    if (serviceStatusSelect) {
-        serviceStatusSelect.addEventListener('change', function() {
-            togglePhotoAndSignatureSections(this.value);
-        });
-    }
-    
-    // Photo preview
-    const servicePhoto = document.getElementById('service-photo');
-    if (servicePhoto) {
-        servicePhoto.addEventListener('change', handlePhotoChange);
-    }
-    
-    // Confirm cancel reason
-    const confirmCancelBtn = document.getElementById('confirmCancelReasonBtn');
-    if (confirmCancelBtn) {
-        confirmCancelBtn.addEventListener('click', handleConfirmCancel);
-    }
-    
-    // Custom confirm button
-    const customConfirmBtn = document.getElementById('customConfirmBtn');
-    if (customConfirmBtn) {
-        customConfirmBtn.addEventListener('click', handleCustomConfirm);
-    }
-}
-
-// ===== MANEJADORES DE FORMULARIOS =====
-function handleLogin(e) {
-    e.preventDefault();
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    
-    const user = users.find(u => u.username === username && u.password === password);
-    
-    if (user) {
-        currentUser = user;
-        if (user.role === 'admin') {
-            showAdminDashboard();
-        } else {
-            showEmployeeDashboard();
-        }
-        document.getElementById('login-error').textContent = '';
-    } else {
-        document.getElementById('login-error').textContent = 'Usuario o contraseña incorrectos';
-    }
-}
-
-function handleUserSubmit(e) {
-    e.preventDefault();
-    const userId = document.getElementById('edit-user-id').value;
-    const username = document.getElementById('user-username').value;
-    const password = document.getElementById('user-password').value;
-    const role = document.getElementById('user-role').value;
-    
-    if (userId) {
-        // Editar usuario existente
-        const userIndex = users.findIndex(u => u.id === userId);
-        if (userIndex !== -1) {
-            users[userIndex] = { ...users[userIndex], username, password, role };
-        }
-    } else {
-        // Crear nuevo usuario
-        users.push({
-            id: generateId(),
-            username,
-            password,
-            role
-        });
-    }
-    
-    saveUsers();
-    renderUserList();
-    bootstrap.Modal.getInstance(document.getElementById('createUserModal')).hide();
-    showAlert('Usuario guardado exitosamente');
-}
-
-function handleServiceSubmit(e) {
-    e.preventDefault();
-    const serviceId = document.getElementById('edit-service-id').value;
-    const date = document.getElementById('service-date').value;
-    const safeType = document.getElementById('service-safe-type').value;
-    const location = document.getElementById('service-location').value;
-    const clientName = document.getElementById('service-client-name').value;
-    const clientPhone = document.getElementById('service-client-phone').value;
-    const status = document.getElementById('service-status').value;
-    const technician = document.getElementById('service-technician').value;
-    
-    // Obtener foto si existe
-    const photoInput = document.getElementById('service-photo');
-    let photoData = null;
-    if (photoInput.files.length > 0) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            photoData = e.target.result;
-            saveServiceData(serviceId, date, safeType, location, clientName, clientPhone, status, photoData);
-        };
-        reader.readAsDataURL(photoInput.files[0]);
-    } else {
-        saveServiceData(serviceId, date, safeType, location, clientName, clientPhone, status, photoData);
-    }
-}
-
-function handleNoveltySubmit(e) {
-    e.preventDefault();
-    const serviceId = document.getElementById('novelty-service-id').value;
-    const description = document.getElementById('novelty-description').value;
-    
-    const report = {
-        id: generateId(),
-        serviceId: serviceId || null,
-        description,
-        reportedBy: currentUser.id,
-        reportedByRole: currentUser.role,
-        timestamp: new Date().toISOString(),
-        status: 'pending',
-        replies: []
-    };
-    
-    reports.push(report);
-    saveReports();
-    
-    // Notificar a administradores
-    sendNotification('admin', `Nuevo reporte de novedad: ${description.substring(0, 50)}...`);
-    
-    bootstrap.Modal.getInstance(document.getElementById('reportNoveltyModal')).hide();
-    showAlert('Reporte enviado exitosamente');
-    
-    // Actualizar listas
-    if (currentUser.role === 'admin') {
-        renderReportsList();
-    } else {
-        renderEmployeeReportReplies();
-    }
-}
-
-function handleReplyReportSubmit(e) {
-    e.preventDefault();
-    const reportId = document.getElementById('reply-report-id').value;
-    const message = document.getElementById('reply-report-message').value;
-    
-    const report = reports.find(r => r.id === reportId);
-    if (report) {
-        report.replies.push({
-            message,
-            repliedBy: currentUser.id,
-            repliedByRole: currentUser.role,
-            timestamp: new Date().toISOString()
-        });
-        
-        saveReports();
-        
-        // Notificar al usuario que reportó
-        sendNotification(report.reportedBy, `Respuesta a tu reporte: ${message.substring(0, 50)}...`);
-        
-        bootstrap.Modal.getInstance(document.getElementById('replyReportModal')).hide();
-        showAlert('Respuesta enviada exitosamente');
-        
-        renderReportsList();
-    }
-}
-
-function handlePhotoChange(e) {
-    const file = e.target.files[0];
-    const preview = document.getElementById('service-photo-preview');
-    
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.classList.remove('d-none');
-        };
-        reader.readAsDataURL(file);
-    } else {
-        preview.classList.add('d-none');
-    }
-}
-
-function handleConfirmCancel() {
-    const reason = document.getElementById('cancel-reason-input').value;
-    if (reason.trim()) {
-        const serviceId = window.pendingCancelServiceId;
-        changeServiceStatus(serviceId, 'Cancelado', reason);
-        bootstrap.Modal.getInstance(document.getElementById('cancelReasonModal')).hide();
-        document.getElementById('cancel-reason-input').value = '';
-        window.pendingCancelServiceId = null;
-    } else {
-        showAlert('Por favor ingresa un motivo para la cancelación');
-    }
-}
-
-function handleCustomConfirm() {
-    if (window.customConfirmCallback) {
-        window.customConfirmCallback();
-        window.customConfirmCallback = null;
-    }
-    bootstrap.Modal.getInstance(document.getElementById('customConfirmModal')).hide();
-}
-
