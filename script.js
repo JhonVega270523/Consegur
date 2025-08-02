@@ -6,6 +6,20 @@ let reports = JSON.parse(localStorage.getItem('reports')) || [];
 let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
 let currentTheme = localStorage.getItem('theme') || 'light'; // Tema actual
 
+// Crear usuario administrador por defecto si no hay usuarios
+if (users.length === 0) {
+    users = [
+        {
+            id: generateId(),
+            username: 'admin',
+            password: 'admin',
+            role: 'admin'
+        }
+    ];
+    localStorage.setItem('users', JSON.stringify(users));
+    console.log('Usuario administrador por defecto creado:', users[0]);
+}
+
 // SignaturePad instances
 let signaturePadClient = null;
 let signaturePadTechnician = null;
@@ -203,29 +217,87 @@ function showConfirm(message, callback) {
 // --- UI Display Functions ---
 
 function showLogin() {
-    document.getElementById('login-section').classList.remove('d-none');
-    document.getElementById('admin-dashboard-section').classList.add('d-none');
-    document.getElementById('employee-dashboard-section').classList.add('d-none');
+    console.log('showLogin() ejecutándose');
+    
+    // Mostrar login con múltiples métodos para asegurar que se muestre
+    const loginSection = document.getElementById('login-section');
+    loginSection.classList.remove('d-none');
+    loginSection.style.display = 'block';
+    loginSection.style.visibility = 'visible';
+    loginSection.style.opacity = '1';
+    loginSection.style.position = 'relative';
+    loginSection.style.top = 'auto';
+    loginSection.style.left = 'auto';
+    
+    // Ocultar dashboards
+    const adminSection = document.getElementById('admin-dashboard-section');
+    adminSection.classList.add('d-none');
+    adminSection.style.display = 'none';
+    adminSection.style.visibility = 'hidden';
+    adminSection.style.opacity = '0';
+    adminSection.style.position = 'absolute';
+    adminSection.style.top = '-9999px';
+    adminSection.style.left = '-9999px';
+    
+    const employeeSection = document.getElementById('employee-dashboard-section');
+    employeeSection.classList.add('d-none');
+    employeeSection.style.display = 'none';
+    employeeSection.style.visibility = 'hidden';
+    employeeSection.style.opacity = '0';
+    employeeSection.style.position = 'absolute';
+    employeeSection.style.top = '-9999px';
+    employeeSection.style.left = '-9999px';
+    
+    // Actualizar navegación
     document.getElementById('nav-login').classList.remove('d-none');
     document.getElementById('nav-logout').classList.add('d-none');
     document.getElementById('nav-admin-dashboard').classList.add('d-none');
     document.getElementById('nav-employee-dashboard').classList.add('d-none');
+    
     currentUser = null;
     // Clear login fields on showing login
     document.getElementById('username').value = '';
     document.getElementById('password').value = '';
     updateNotificationBadges(); // Clear badges on logout
+    
+    console.log('Login mostrado correctamente');
 }
 
 function showAdminDashboard() {
+    console.log('showAdminDashboard() ejecutándose');
     if (currentUser && currentUser.role === 'admin') {
-        document.getElementById('login-section').classList.add('d-none');
-        document.getElementById('admin-dashboard-section').classList.remove('d-none');
+        console.log('Ocultando login y mostrando admin dashboard');
+        
+        // Ocultar login con múltiples métodos para asegurar que se oculte
+        const loginSection = document.getElementById('login-section');
+        loginSection.classList.add('d-none');
+        loginSection.style.display = 'none';
+        loginSection.style.visibility = 'hidden';
+        loginSection.style.opacity = '0';
+        loginSection.style.position = 'absolute';
+        loginSection.style.top = '-9999px';
+        loginSection.style.left = '-9999px';
+        
+        // Mostrar admin dashboard
+        const adminSection = document.getElementById('admin-dashboard-section');
+        adminSection.classList.remove('d-none');
+        adminSection.style.display = 'block';
+        adminSection.style.visibility = 'visible';
+        adminSection.style.opacity = '1';
+        adminSection.style.position = 'relative';
+        adminSection.style.top = 'auto';
+        adminSection.style.left = 'auto';
+        
+        // Ocultar employee dashboard
         document.getElementById('employee-dashboard-section').classList.add('d-none');
+        
+        // Actualizar navegación
         document.getElementById('nav-login').classList.add('d-none');
         document.getElementById('nav-logout').classList.remove('d-none');
         document.getElementById('nav-admin-dashboard').classList.remove('d-none');
         document.getElementById('nav-employee-dashboard').classList.add('d-none');
+        
+        // Renderizar contenido
         renderUserList(1);
         renderAdminServicesList(services, 1);
         populateAssignServiceDropdown();
@@ -239,10 +311,7 @@ function showAdminDashboard() {
         // Establecer fechas por defecto (último mes)
         setDefaultDateFilters();
         
-        // ELIMINAR la reinicialización de navegación táctil
-        // setTimeout(() => {
-        //     initializeTableNavigation();
-        // }, 100);
+        console.log('Admin dashboard mostrado correctamente');
     } else {
         showAlert('Acceso denegado. Solo administradores.');
         showLogin();
@@ -261,23 +330,46 @@ function setDefaultDateFilters() {
 }
 
 function showEmployeeDashboard() {
+    console.log('showEmployeeDashboard() ejecutándose');
     if (currentUser && currentUser.role === 'employee') {
-        document.getElementById('login-section').classList.add('d-none');
+        console.log('Ocultando login y mostrando employee dashboard');
+        
+        // Ocultar login con múltiples métodos para asegurar que se oculte
+        const loginSection = document.getElementById('login-section');
+        loginSection.classList.add('d-none');
+        loginSection.style.display = 'none';
+        loginSection.style.visibility = 'hidden';
+        loginSection.style.opacity = '0';
+        loginSection.style.position = 'absolute';
+        loginSection.style.top = '-9999px';
+        loginSection.style.left = '-9999px';
+        
+        // Ocultar admin dashboard
         document.getElementById('admin-dashboard-section').classList.add('d-none');
-        document.getElementById('employee-dashboard-section').classList.remove('d-none');
+        
+        // Mostrar employee dashboard
+        const employeeSection = document.getElementById('employee-dashboard-section');
+        employeeSection.classList.remove('d-none');
+        employeeSection.style.display = 'block';
+        employeeSection.style.visibility = 'visible';
+        employeeSection.style.opacity = '1';
+        employeeSection.style.position = 'relative';
+        employeeSection.style.top = 'auto';
+        employeeSection.style.left = 'auto';
+        
+        // Actualizar navegación
         document.getElementById('nav-login').classList.add('d-none');
         document.getElementById('nav-logout').classList.remove('d-none');
         document.getElementById('nav-admin-dashboard').classList.add('d-none');
         document.getElementById('nav-employee-dashboard').classList.remove('d-none');
+        
+        // Renderizar contenido
         renderEmployeeAssignedServices(1);
         renderEmployeeNotifications(1);
         renderEmployeeReportReplies(1);
         updateNotificationBadges(); // Update badges for employee
         
-        // ELIMINAR la reinicialización de navegación táctil
-        // setTimeout(() => {
-        //     initializeTableNavigation();
-        // }, 100);
+        console.log('Employee dashboard mostrado correctamente');
     } else {
         showAlert('Acceso denegado. Solo empleados.');
         showLogin();
@@ -302,13 +394,17 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
     if (user) {
         currentUser = user;
         loginError.textContent = '';
+        console.log('Login exitoso:', currentUser);
         if (currentUser.role === 'admin') {
+            console.log('Mostrando dashboard de administrador');
             showAdminDashboard();
         } else if (currentUser.role === 'employee') {
+            console.log('Mostrando dashboard de empleado');
             showEmployeeDashboard();
         }
     } else {
         loginError.textContent = 'Usuario o contraseña incorrectos.';
+        console.log('Login fallido');
     }
 });
 

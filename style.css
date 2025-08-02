@@ -1,919 +1,972 @@
+/* ===== DISEÑO MINIMALISTA MODERNO ===== */
+
+/* Variables CSS para el nuevo diseño */
+:root {
+    /* Paleta de colores minimalista */
+    --primary-color: #2d3748;
+    --primary-light: #4a5568;
+    --primary-dark: #1a202c;
+    --accent-color: #3182ce;
+    --accent-light: #63b3ed;
+    --accent-dark: #2c5282;
+    
+    /* Colores de estado */
+    --success-color: #38a169;
+    --warning-color: #d69e2e;
+    --danger-color: #e53e3e;
+    --info-color: #3182ce;
+    
+    /* Fondos */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f7fafc;
+    --bg-tertiary: #edf2f7;
+    --bg-card: #ffffff;
+    --bg-overlay: rgba(0, 0, 0, 0.5);
+    
+    /* Textos */
+    --text-primary: #1a202c;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --text-light: #ffffff;
+    --text-inverse: #2d3748;
+    
+    /* Bordes */
+    --border-color: #e2e8f0;
+    --border-light: #f7fafc;
+    --border-dark: #cbd5e0;
+    
+    /* Sombras */
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    
+    /* Radios */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-full: 9999px;
+    
+    /* Transiciones */
+    --transition-fast: 0.15s ease-in-out;
+    --transition-normal: 0.3s ease-in-out;
+    --transition-slow: 0.5s ease-in-out;
+    
+    /* Espaciado */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+}
+
+/* Modo oscuro */
+[data-theme="dark"] {
+    --bg-primary: #1a202c;
+    --bg-secondary: #2d3748;
+    --bg-tertiary: #4a5568;
+    --bg-card: #2d3748;
+    --bg-overlay: rgba(0, 0, 0, 0.7);
+    
+    --text-primary: #ffffff;
+    --text-secondary: #e2e8f0;
+    --text-muted: #cbd5e0;
+    --text-light: #1a202c;
+    --text-inverse: #ffffff;
+    
+    --border-color: #4a5568;
+    --border-light: #2d3748;
+    --border-dark: #718096;
+    
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== ESTILOS BASE ===== */
+* {
+    box-sizing: border-box;
+}
+
 body {
-    background-color: #f8f9fa;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    transition: all var(--transition-normal);
+    font-size: 14px;
+}
+
+/* ===== NAVBAR MINIMALISTA ===== */
+.navbar {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-4) 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
 }
 
 .navbar-brand {
-    font-weight: bold;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #ffffff !important;
+    text-decoration: none;
+    letter-spacing: -0.025em;
 }
 
+.navbar-nav .nav-link {
+    color: #ffffff !important;
+    font-weight: 500;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    position: relative;
+    text-decoration: none;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+    background: var(--bg-tertiary);
+    transform: translateY(-1px);
+}
+
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--accent-color);
+    transform: translateX(-50%);
+    transition: width var(--transition-normal);
+}
+
+.navbar-nav .nav-link:hover::after {
+    width: 80%;
+}
+
+/* Botón de tema minimalista */
+#theme-toggle {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+#theme-toggle:hover {
+    background: var(--accent-color);
+    color: var(--text-light);
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+#theme-toggle i {
+    font-size: 1.1rem;
+    transition: transform var(--transition-normal);
+}
+
+#theme-toggle:hover i {
+    transform: rotate(180deg);
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+}
+
+.mt-4 {
+    margin-top: var(--space-8);
+}
+
+/* ===== SECCIÓN DE LOGIN ORIGINAL ===== */
 #login-section {
     max-width: 400px;
     margin: 50px auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 1000;
 }
 
-/* Specific styles for signature pad */
+/* Reglas únicas y limpias para ocultar dashboards */
+#admin-dashboard-section.d-none,
+#employee-dashboard-section.d-none {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+}
+
+/* Cuando el login está visible, ocultar completamente el contenido del dashboard */
+#login-section:not(.d-none) ~ #admin-dashboard-section,
+#login-section:not(.d-none) ~ #employee-dashboard-section {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Regla adicional para asegurar que el login se oculte completamente cuando no debe estar visible */
+#login-section.d-none {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+}
+
+#login-section .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+#login-section .card-header {
+    background: var(--bg-secondary);
+    padding: var(--space-4);
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#login-section .card-header h4 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+
+#login-section .card-body {
+    padding: var(--space-4);
+}
+
+/* ===== FORMULARIOS MINIMALISTAS ===== */
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.form-control, .form-select {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all var(--transition-normal);
+    outline: none;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+/* ===== BOTONES MINIMALISTAS ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) var(--space-6);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    min-height: 44px;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left var(--transition-slow);
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    color: var(--text-light);
+}
+
+.btn-primary:hover {
+    background: var(--accent-dark);
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: var(--text-light);
+}
+
+.btn-warning {
+    background: var(--warning-color);
+    color: var(--text-inverse);
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: var(--text-light);
+}
+
+.btn-info {
+    background: var(--info-color);
+    color: var(--text-light);
+}
+
+.btn-outline-secondary {
+    background: transparent;
+    border: 2px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-outline-secondary:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+}
+
+.btn-sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: 0.75rem;
+    min-height: 32px;
+}
+
+.btn-lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: 1rem;
+    min-height: 52px;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+/* ===== CARDS MINIMALISTAS ===== */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+    background: var(--bg-secondary);
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-body {
+    padding: var(--space-6);
+}
+
+/* ===== TARJETAS DE ESTADÍSTICAS MINIMALISTAS ===== */
+.stats-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    text-align: center;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transition: transform var(--transition-normal);
+}
+
+.stats-card:hover::before {
+    transform: scaleX(1);
+}
+
+.stats-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.stats-card .card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+}
+
+.stats-card .card-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1;
+}
+
+/* Variantes de colores para estadísticas */
+.stats-card.bg-primary::before {
+    background: var(--accent-color);
+}
+
+.stats-card.bg-success::before {
+    background: var(--success-color);
+}
+
+.stats-card.bg-warning::before {
+    background: var(--warning-color);
+}
+
+.stats-card.bg-info::before {
+    background: var(--info-color);
+}
+
+.stats-card.bg-danger::before {
+    background: var(--danger-color);
+}
+
+/* ===== TABS MINIMALISTAS ===== */
+.nav-tabs {
+    border-bottom: 2px solid var(--border-color);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: var(--space-2);
+    margin-bottom: 0;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-6);
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all var(--transition-normal);
+    position: relative;
+    background: transparent;
+    margin-right: var(--space-2);
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--text-primary);
+    background: var(--bg-card);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--accent-color);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+}
+
+.nav-tabs .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent-color);
+    border-radius: var(--radius-full);
+}
+
+/* ===== TABLAS MINIMALISTAS ===== */
+.table {
+    width: 100%;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border-collapse: collapse;
+}
+
+.table thead th {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    padding: var(--space-4);
+    border-bottom: 2px solid var(--border-color);
+    text-align: left;
+}
+
+.table tbody tr {
+    transition: all var(--transition-fast);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.table tbody tr:hover {
+    background: var(--bg-tertiary);
+    transform: scale(1.01);
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table tbody td {
+    padding: var(--space-4);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.table-responsive {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ===== MODALES MINIMALISTAS ===== */
+.modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: var(--bg-secondary);
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.modal-body {
+    padding: var(--space-6);
+}
+
+.modal-footer {
+    background: var(--bg-secondary);
+    padding: var(--space-6);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+}
+
+/* ===== BADGES MINIMALISTAS ===== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    min-width: 20px;
+    height: 20px;
+}
+
+.badge.bg-danger {
+    background: var(--danger-color);
+    color: var(--text-light);
+}
+
+.badge.bg-success {
+    background: var(--success-color);
+    color: var(--text-light);
+}
+
+/* ===== ESTADOS DE SERVICIOS ===== */
+.status-badge {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-pendiente {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.status-en-proceso {
+    background: rgba(214, 158, 46, 0.1);
+    color: var(--warning-color);
+}
+
+.status-finalizado {
+    background: rgba(56, 161, 105, 0.1);
+    color: var(--success-color);
+}
+
+.status-cancelado {
+    background: rgba(229, 62, 62, 0.1);
+    color: var(--danger-color);
+}
+
+/* ===== ALERTAS MINIMALISTAS ===== */
+.alert {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    margin-bottom: var(--space-4);
+    position: relative;
+    overflow: hidden;
+}
+
+.alert::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent-color);
+}
+
+.alert-success::before {
+    background: var(--success-color);
+}
+
+.alert-danger::before {
+    background: var(--danger-color);
+}
+
+.alert-warning::before {
+    background: var(--warning-color);
+}
+
+.alert-info::before {
+    background: var(--info-color);
+}
+
+.alert-danger.border-danger {
+    border-color: var(--danger-color);
+    background: rgba(229, 62, 62, 0.05);
+}
+
+/* ===== UTILIDADES ===== */
+.text-center {
+    text-align: center;
+}
+
+.text-danger {
+    color: var(--danger-color);
+}
+
+.text-success {
+    color: var(--success-color);
+}
+
+.text-warning {
+    color: var(--warning-color);
+}
+
+.text-info {
+    color: var(--info-color);
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+.mb-3 {
+    margin-bottom: var(--space-6);
+}
+
+.mb-4 {
+    margin-bottom: var(--space-8);
+}
+
+.mt-2 {
+    margin-top: var(--space-4);
+}
+
+.mt-3 {
+    margin-top: var(--space-6);
+}
+
+.me-2 {
+    margin-right: var(--space-4);
+}
+
+.ms-2 {
+    margin-left: var(--space-4);
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.d-block {
+    display: block !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 var(--space-3);
+    }
+    
+    .card-header {
+        padding: var(--space-4);
+    }
+    
+    .card-body {
+        padding: var(--space-4);
+    }
+    
+    .stats-card {
+        padding: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+    
+    .stats-card .card-number {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: var(--space-3) var(--space-4);
+        font-size: 0.875rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: var(--space-3);
+    }
+    
+    .modal-dialog {
+        margin: var(--space-4);
+    }
+    
+    .nav-tabs .nav-link {
+        padding: var(--space-2) var(--space-4);
+        font-size: 0.875rem;
+    }
+}
+
+/* ===== ANIMACIONES SUAVES ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.slide-in {
+    animation: slideIn 0.6s ease-out;
+}
+
+/* ===== SCROLLBAR PERSONALIZADO ===== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ===== ESTILOS DE COMPATIBILIDAD ===== */
+
+/* Signature pad */
 #signature-pad {
-    background-color: #fff;
+    background-color: var(--bg-primary);
     cursor: crosshair;
 }
 
 .signature-pad-container {
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 100%;
-            height: 200px; /* Altura fija para el lienzo de firma */
-            background-color: #fff;
-            overflow: hidden; /* Asegura que el lienzo no se desborde */
-        }
-        .signature-pad {
-            width: 100%;
-            height: 100%;
-        }
-        .img-fluid {
-            max-width: 100%;
-            height: auto;
-        }
-        /* Estilos para ocultar los spin buttons de number input */
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
-
-    .service-photo-evidence {
-        max-width: 400px; /* Tamaño máximo para la imagen */
-        height: auto;    /* Mantiene la proporción original */
-        display: block;  /* Asegura que ocupe su propio espacio */
-        margin: 10px 0;  /* Añade un pequeño margen para separación */
-        border: 1px solid #ddd; /* Opcional: para un mejor aspecto visual */
-        border-radius: 5px;
-    }
-
-    /* Estilos para las tarjetas de estadísticas */
-    .card.bg-primary, .card.bg-success, .card.bg-warning, .card.bg-info {
-        transition: transform 0.2s ease-in-out;
-    }
-
-    .card.bg-primary:hover, .card.bg-success:hover, .card.bg-warning:hover, .card.bg-info:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    /* Estilos para los filtros */
-    .input-group .btn {
-        border-left: none;
-    }
-
-    .input-group .form-control {
-        border-right: none;
-    }
-
-    .input-group .form-control:focus {
-        border-right: none;
-        box-shadow: none;
-    }
-
-    .input-group .btn:focus {
-        box-shadow: none;
-    }
-
-    /* Variables CSS para temas */
-    :root {
-        --bg-primary: #f8f9fa;
-        --bg-secondary: #ffffff;
-        --text-primary: #000000;
-        --text-secondary: #6c757d;
-        --border-color: #dee2e6;
-        --card-bg: #ffffff;
-        --navbar-bg: #343a40;
-        --navbar-text: #ffffff;
-        --table-stripe: #f8f9fa;
-        --shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    /* Modo Dark */
-    [data-theme="dark"] {
-        --bg-primary: #1a1a1a;
-        --bg-secondary: #2d2d2d;
-        --text-primary: #ffffff;
-        --text-secondary: #b0b0b0;
-        --border-color: #404040;
-        --card-bg: #2d2d2d;
-        --navbar-bg: #000000;
-        --navbar-text: #ffffff;
-        --table-stripe: #3a3a3a;
-        --shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-
-    /* Aplicar variables CSS */
-    body {
-        background-color: var(--bg-primary);
-        color: var(--text-primary);
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    /* Reglas específicas para texto con contraste correcto */
-    h1, h2, h3, h4, h5, h6 {
-        color: var(--text-primary) !important;
-        font-weight: 600;
-    }
-
-    p, span, div, label {
-        color: var(--text-primary);
-    }
-
-    /* Títulos de módulos y secciones */
-    .card-header {
-        background-color: var(--card-bg) !important;
-        color: var(--text-primary) !important;
-        border-bottom-color: var(--border-color) !important;
-        font-weight: 600;
-    }
-
-    .card-header h4, .card-header h5, .card-header h6 {
-        color: var(--text-primary) !important;
-        margin: 0;
-        font-weight: 600;
-    }
-
-    /* Títulos principales de secciones */
-    .container h2 {
-        color: var(--text-primary) !important;
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        font-size: 2rem;
-        border-bottom: 2px solid var(--border-color);
-        padding-bottom: 0.5rem;
-    }
-
-    /* Títulos de secciones secundarias */
-    .section-title {
-        color: var(--text-primary) !important;
-        font-weight: 600;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        padding: 0.5rem 0;
-        border-left: 4px solid var(--border-color);
-        padding-left: 1rem;
-    }
-
-    /* Títulos de módulos específicos */
-    .module-title {
-        color: var(--text-primary) !important;
-        font-weight: 600;
-        font-size: 1.25rem;
-        margin-bottom: 0.75rem;
-    }
-
-    /* Asegurar contraste en modo light */
-    :root {
-        color: #000000;
-    }
-
-    /* Asegurar contraste en modo dark */
-    [data-theme="dark"] {
-        color: #ffffff;
-    }
-
-    .navbar-dark {
-        background-color: var(--navbar-bg) !important;
-    }
-
-    .card {
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-        box-shadow: var(--shadow);
-        transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    /* Estilos uniformes para tablas */
-    .table {
-        color: var(--text-primary);
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-    }
-
-    .table th {
-        background-color: var(--card-bg) !important;
-        color: var(--text-primary) !important;
-        border-bottom-color: var(--border-color) !important;
-        font-weight: 600;
-        padding: 0.75rem;
-    }
-
-    .table td {
-        background-color: var(--card-bg) !important;
-        color: var(--text-primary) !important;
-        border-color: var(--border-color) !important;
-        padding: 0.75rem;
-        vertical-align: middle;
-    }
-
-    /* Eliminar el efecto striped para uniformidad */
-    .table-striped > tbody > tr:nth-of-type(odd) > td {
-        background-color: var(--card-bg) !important;
-    }
-
-    .table-striped > tbody > tr:nth-of-type(even) > td {
-        background-color: var(--card-bg) !important;
-    }
-
-    /* Hover uniforme para todas las filas */
-    .table-hover > tbody > tr:hover > td {
-        background-color: var(--table-stripe) !important;
-        color: var(--text-primary) !important;
-    }
-
-    /* Bordes de tabla consistentes */
-    .table-bordered {
-        border-color: var(--border-color) !important;
-    }
-
-    .table-bordered th,
-    .table-bordered td {
-        border-color: var(--border-color) !important;
-    }
-
-    .form-control, .form-select {
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-        color: var(--text-primary);
-        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-        background-color: var(--card-bg);
-        border-color: #86b7fe;
-        color: var(--text-primary);
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    }
-
-    .modal-content {
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-        color: var(--text-primary);
-    }
-
-    .modal-header {
-        border-bottom-color: var(--border-color);
-    }
-
-    .modal-footer {
-        border-top-color: var(--border-color);
-    }
-
-    .alert {
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-        color: var(--text-primary);
-    }
-
-    .list-group-item {
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-        color: var(--text-primary);
-    }
-
-    .dropdown-menu {
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-    }
-
-    .dropdown-item {
-        color: var(--text-primary);
-    }
-
-    .dropdown-item:hover {
-        background-color: var(--table-stripe);
-        color: var(--text-primary);
-    }
-
-    /* Estilos específicos para el botón de tema */
-    #theme-toggle {
-        transition: all 0.3s ease;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-    }
-
-    #theme-toggle:hover {
-        transform: scale(1.1);
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    }
-
-    #theme-toggle:active {
-        transform: scale(0.95);
-    }
-
-    /* Transiciones suaves para todos los elementos */
-    * {
-        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-    }
-
-    /* Regla general para asegurar contraste de texto */
-    * {
-        color: inherit;
-    }
-
-    /* Asegurar que el texto heredado tenga el contraste correcto */
-    body * {
-        color: var(--text-primary);
-    }
-
-    /* Excepciones para elementos que deben mantener su color específico */
-    .btn-primary, .btn-success, .btn-info, .btn-danger, .btn-warning,
-    .badge.bg-primary, .badge.bg-success, .badge.bg-info, .badge.bg-danger, .badge.bg-warning,
-    .alert-success, .alert-danger, .alert-warning, .alert-info {
-        color: inherit;
-    }
-
-    /* Estados de servicios en tablas */
-    .table .status-pendiente {
-        color: #6c757d;
-        font-weight: 500;
-    }
-
-    .table .status-en-proceso {
-        color: #ffc107;
-        font-weight: 600;
-    }
-
-    .table .status-finalizado {
-        color: #198754;
-        font-weight: 600;
-    }
-
-    .table .status-cancelado {
-        color: #dc3545;
-        font-weight: 600;
-    }
-
-    /* Estados en modo dark */
-    [data-theme="dark"] .table .status-pendiente {
-        color: #adb5bd;
-    }
-
-    [data-theme="dark"] .table .status-en-proceso {
-        color: #ffc107;
-    }
-
-    [data-theme="dark"] .table .status-finalizado {
-        color: #20c997;
-    }
-
-    [data-theme="dark"] .table .status-cancelado {
-        color: #ff6b6b;
-    }
-
-    /* Consistencia en elementos de tabla */
-    .table .text-center {
-        text-align: center !important;
-    }
-
-    .table .text-end {
-        text-align: right !important;
-    }
-
-    .table .text-start {
-        text-align: left !important;
-    }
-
-    /* Espaciado uniforme en tablas */
-    .table-responsive {
-        border-radius: 0.375rem;
-        overflow: hidden;
-        box-shadow: var(--shadow);
-    }
-
-    /* Navegación táctil para tablas en móviles */
-    .table-responsive {
-        -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
-        scrollbar-width: thin;
-        scrollbar-color: var(--border-color) transparent;
-    }
-
-    /* Estilos para scrollbar en webkit */
-    .table-responsive::-webkit-scrollbar {
-        height: 6px;
-    }
-
-    .table-responsive::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .table-responsive::-webkit-scrollbar-thumb {
-        background-color: var(--border-color);
-        border-radius: 3px;
-    }
-
-    .table-responsive::-webkit-scrollbar-thumb:hover {
-        background-color: var(--text-secondary);
-    }
-
-    /* Mejoras para tablas en móviles */
-    @media (max-width: 768px) {
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-            /* Permitir scroll natural */
-            touch-action: pan-x pan-y;
-        }
-
-        .table {
-            min-width: 600px; /* Ancho mínimo para asegurar legibilidad */
-        }
-
-        .table th,
-        .table td {
-            white-space: nowrap;
-            padding: 0.5rem 0.75rem;
-        }
-
-        /* Botones más grandes para móviles */
-        .table .btn {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.875rem;
-            margin: 0.125rem;
-        }
-
-        /* Mejorar la experiencia de scroll en móviles */
-        .table-responsive {
-            scrollbar-width: thin;
-            scrollbar-color: var(--border-color) transparent;
-        }
-
-        .table-responsive::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .table-responsive::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .table-responsive::-webkit-scrollbar-thumb {
-            background-color: var(--border-color);
-            border-radius: 4px;
-        }
-
-        .table-responsive::-webkit-scrollbar-thumb:hover {
-            background-color: var(--text-secondary);
-        }
-    }
-
-    /* Ajustes para elementos específicos en modo dark */
-    [data-theme="dark"] .text-muted {
-        color: var(--text-secondary) !important;
-    }
-
-    [data-theme="dark"] .border {
-        border-color: var(--border-color) !important;
-    }
-
-    /* Asegurar contraste en elementos específicos */
-    .card-title, .card-text {
-        color: var(--text-primary) !important;
-    }
-
-    .table th, .table td {
-        color: var(--text-primary) !important;
-    }
-
-    .nav-link {
-        color: var(--text-primary) !important;
-    }
-
-    .nav-link:hover {
-        color: var(--text-primary) !important;
-    }
-
-    .nav-link.active {
-        color: var(--text-primary) !important;
-    }
-
-    /* Ajustes específicos para modo light */
-    :root .text-dark {
-        color: #000000 !important;
-    }
-
-    :root .text-light {
-        color: #ffffff !important;
-    }
-
-    /* Ajustes específicos para modo dark */
-    [data-theme="dark"] .text-dark {
-        color: #ffffff !important;
-    }
-
-    [data-theme="dark"] .text-light {
-        color: #000000 !important;
-    }
-
-    [data-theme="dark"] .signature-pad-container {
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-    }
-
-    [data-theme="dark"] .signature-pad {
-        background-color: var(--card-bg);
-    }
-
-    /* Ajustes específicos para tarjetas de estadísticas en modo dark */
-    [data-theme="dark"] .card.bg-primary {
-        background-color: #0d6efd !important;
-        color: #ffffff !important;
-    }
-
-    [data-theme="dark"] .card.bg-success {
-        background-color: #198754 !important;
-        color: #ffffff !important;
-    }
-
-    [data-theme="dark"] .card.bg-warning {
-        background-color: #ffc107 !important;
-        color: #000000 !important;
-    }
-
-    [data-theme="dark"] .card.bg-info {
-        background-color: #0dcaf0 !important;
-        color: #ffffff !important;
-    }
-
-    [data-theme="dark"] .card.bg-danger {
-        background-color: #dc3545 !important;
-        color: #ffffff !important;
-    }
-
-    /* Asegurar contraste en tarjetas de estadísticas en modo light */
-    .card.bg-primary {
-        color: #ffffff !important;
-    }
-
-    .card.bg-success {
-        color: #ffffff !important;
-    }
-
-    .card.bg-warning {
-        color: #000000 !important;
-    }
-
-    .card.bg-info {
-        color: #ffffff !important;
-    }
-
-    .card.bg-danger {
-        color: #ffffff !important;
-    }
-
-    /* Ajustes para botones en modo dark */
-    [data-theme="dark"] .btn-outline-light {
-        border-color: #ffffff;
-        color: #ffffff;
-    }
-
-    [data-theme="dark"] .btn-outline-light:hover {
-        background-color: #ffffff;
-        color: #000000;
-    }
-
-    /* Ajustes para tabs en modo dark */
-    [data-theme="dark"] .nav-tabs .nav-link {
-        color: var(--text-secondary);
-        border-color: var(--border-color);
-    }
-
-    [data-theme="dark"] .nav-tabs .nav-link.active {
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-        color: var(--text-primary);
-    }
-
-    [data-theme="dark"] .nav-tabs .nav-link:hover {
-        border-color: var(--border-color);
-        color: var(--text-primary);
-    }
-
-    /* Estilos uniformes para tabs en ambos modos */
-    .nav-tabs {
-        border-bottom-color: var(--border-color);
-    }
-
-    .nav-tabs .nav-link {
-        color: var(--text-secondary) !important;
-        border-color: var(--border-color) !important;
-        background-color: transparent;
-        font-weight: 500;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .nav-tabs .nav-link:hover {
-        color: var(--text-primary) !important;
-        border-color: var(--border-color) !important;
-        background-color: var(--table-stripe);
-    }
-
-    .nav-tabs .nav-link.active {
-        color: var(--text-primary) !important;
-        background-color: var(--card-bg) !important;
-        border-color: var(--border-color) !important;
-        border-bottom-color: var(--card-bg) !important;
-        font-weight: 600;
-    }
-
-    /* Contenido de tabs */
-    .tab-content {
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-    }
-
-    .tab-pane {
-        background-color: var(--card-bg);
-        color: var(--text-primary);
-    }
-
-    /* Ajustes para badges en modo dark */
-    [data-theme="dark"] .badge.bg-danger {
-        background-color: #dc3545 !important;
-    }
-
-    /* Ajustes para tooltips en modo dark */
-    [data-theme="dark"] .tooltip .tooltip-inner {
-        background-color: var(--card-bg);
-        color: var(--text-primary);
-        border: 1px solid var(--border-color);
-    }
-
-    [data-theme="dark"] .tooltip .tooltip-arrow::before {
-        border-top-color: var(--card-bg);
-    }
-
-    /* Ajustes adicionales para contraste */
-    .btn {
-        color: var(--text-primary);
-    }
-
-    .btn-outline-primary {
-        color: #0d6efd;
-        border-color: #0d6efd;
-    }
-
-    .btn-outline-primary:hover {
-        color: #ffffff;
-        background-color: #0d6efd;
-    }
-
-    .btn-outline-secondary {
-        color: #6c757d;
-        border-color: #6c757d;
-    }
-
-    .btn-outline-secondary:hover {
-        color: #ffffff;
-        background-color: #6c757d;
-    }
-
-    .btn-outline-success {
-        color: #198754;
-        border-color: #198754;
-    }
-
-    .btn-outline-success:hover {
-        color: #ffffff;
-        background-color: #198754;
-    }
-
-    .btn-outline-danger {
-        color: #dc3545;
-        border-color: #dc3545;
-    }
-
-    .btn-outline-danger:hover {
-        color: #ffffff;
-        background-color: #dc3545;
-    }
-
-    .btn-outline-warning {
-        color: #ffc107;
-        border-color: #ffc107;
-    }
-
-    .btn-outline-warning:hover {
-        color: #000000;
-        background-color: #ffc107;
-    }
-
-    .btn-outline-info {
-        color: #0dcaf0;
-        border-color: #0dcaf0;
-    }
-
-    .btn-outline-info:hover {
-        color: #000000;
-        background-color: #0dcaf0;
-    }
-
-    /* Asegurar que los badges tengan contraste */
-    .badge {
-        color: #ffffff;
-    }
-
-    .badge.bg-light {
-        color: #000000;
-    }
-
-    /* Ajustes para elementos de formulario */
-    .form-label {
-        color: var(--text-primary) !important;
-        font-weight: 500;
-    }
-
-    .form-text {
-        color: var(--text-secondary) !important;
-    }
-
-    /* Botones en tablas con estilo uniforme */
-    .table .btn {
-        margin: 0.125rem;
-        font-size: 0.875rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.375rem;
-        transition: all 0.2s ease;
-    }
-
-    .table .btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    /* Estados de botones en tablas */
-    .table .btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    /* Dropdowns en tablas */
-    .table .dropdown-menu {
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-        box-shadow: var(--shadow);
-    }
-
-    .table .dropdown-item {
-        color: var(--text-primary);
-        padding: 0.5rem 1rem;
-    }
-
-    .table .dropdown-item:hover {
-        background-color: var(--table-stripe);
-        color: var(--text-primary);
-    }
-
-    .table .dropdown-item:active {
-        background-color: var(--border-color);
-        color: var(--text-primary);
-    }
-
-    /* Ajustes para elementos de navegación */
-    .navbar-brand {
-        color: var(--navbar-text) !important;
-    }
-
-    .navbar-nav .nav-link {
-        color: var(--navbar-text) !important;
-    }
-
-    .navbar-nav .nav-link:hover {
-        color: var(--navbar-text) !important;
-        opacity: 0.8;
-    }
-
-    /* Ajustes para elementos de lista */
-    .list-group-item {
-        color: var(--text-primary) !important;
-    }
-
-    .list-group-item-action:hover {
-        background-color: var(--table-stripe);
-        color: var(--text-primary) !important;
-    }
-
-    /* Ajustes para elementos de alerta */
-    .alert {
-        color: var(--text-primary) !important;
-    }
-
-    .alert-success {
-        background-color: #d1e7dd;
-        border-color: #badbcc;
-        color: #0f5132;
-    }
-
-    .alert-danger {
-        background-color: #f8d7da;
-        border-color: #f5c2c7;
-        color: #842029;
-    }
-
-    .alert-warning {
-        background-color: #fff3cd;
-        border-color: #ffecb5;
-        color: #664d03;
-    }
-
-    .alert-info {
-        background-color: #cff4fc;
-        border-color: #b6effb;
-        color: #055160;
-    }
-
-    /* Ajustes para modo dark en alertas */
-    [data-theme="dark"] .alert-success {
-        background-color: #0f5132;
-        border-color: #badbcc;
-        color: #d1e7dd;
-    }
-
-    [data-theme="dark"] .alert-danger {
-        background-color: #842029;
-        border-color: #f5c2c7;
-        color: #f8d7da;
-    }
-
-    [data-theme="dark"] .alert-warning {
-        background-color: #664d03;
-        border-color: #ffecb5;
-        color: #fff3cd;
-    }
-
-    [data-theme="dark"] .alert-info {
-        background-color: #055160;
-        border-color: #b6effb;
-        color: #cff4fc;
-    }
-
-    /* Estilos para reportes nuevos */
-    .alert-danger.border-danger {
-        border-width: 2px !important;
-        box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
-    }
-
-    [data-theme="dark"] .alert-danger.border-danger {
-        box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
-    }
-
-    /* Animación para reportes nuevos */
-    .alert-danger.border-danger {
-        animation: pulse-new 2s infinite;
-    }
-
-    @keyframes pulse-new {
-        0% {
-            box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
-        }
-        50% {
-            box-shadow: 0 0 20px rgba(220, 53, 69, 0.6);
-        }
-        100% {
-            box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
-        }
-    }
-
-    /* Animación para reportes nuevos en modo dark */
-    [data-theme="dark"] .alert-danger.border-danger {
-        animation: pulse-new-dark 2s infinite;
-    }
-
-    @keyframes pulse-new-dark {
-        0% {
-            box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
-        }
-        50% {
-            box-shadow: 0 0 20px rgba(220, 53, 69, 0.8);
-        }
-        100% {
-            box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
-        }
-    }
-
-/* --- Estilos para Paginación y Numeración --- */
-
-/* Contenedor de paginación */
-.pagination-container {
-    margin-top: 1rem;
-    padding: 0.5rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    width: 100%;
+    height: 200px;
+    background-color: var(--bg-primary);
+    overflow: hidden;
 }
 
-/* Botones de paginación */
+.signature-pad {
+    width: 100%;
+    height: 100%;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Ocultar spin buttons */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Fotos de evidencia */
+.service-photo-evidence {
+    max-width: 400px;
+    height: auto;
+    display: block;
+    margin: var(--space-4) 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: transform var(--transition-normal);
+}
+
+.service-photo-evidence:hover {
+    transform: scale(1.02);
+}
+
+/* Input groups */
+.input-group .btn {
+    border-left: none;
+}
+
+.input-group .form-control {
+    border-right: none;
+}
+
+.input-group .form-control:focus {
+    border-right: none;
+    box-shadow: none;
+}
+
+.input-group .btn:focus {
+    box-shadow: none;
+}
+
+/* Paginación */
+.pagination-container {
+    margin-top: var(--space-4);
+    padding: var(--space-2) 0;
+}
+
 .pagination-container .btn {
     min-width: 40px;
     height: 40px;
@@ -921,12 +974,12 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
 }
 
 .pagination-container .btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .pagination-container .btn:disabled {
@@ -936,9 +989,8 @@ body {
     box-shadow: none;
 }
 
-/* Información de página */
 .pagination-container .text-muted {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     font-weight: 500;
 }
 
@@ -946,165 +998,54 @@ body {
 .table td:first-child {
     font-weight: 600;
     color: var(--text-secondary);
-    background-color: var(--table-stripe) !important;
+    background-color: var(--bg-tertiary) !important;
     border-right: 2px solid var(--border-color);
 }
 
-/* Encabezado de numeración */
 .table th:first-child {
-    background-color: var(--primary-color) !important;
-    color: white !important;
+    background-color: var(--accent-color) !important;
+    color: var(--text-light) !important;
     font-weight: 600;
     border-right: 2px solid var(--border-color);
 }
 
-/* Badges de numeración para notificaciones y reportes */
-.badge.bg-secondary {
-    background-color: var(--text-secondary) !important;
-    color: var(--card-bg) !important;
-    font-weight: 600;
-    min-width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Responsive para paginación */
-@media (max-width: 768px) {
-    .pagination-container {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .pagination-container .d-flex {
-        justify-content: center;
-    }
-    
-    .pagination-container .btn {
-        min-width: 36px;
-        height: 36px;
-        font-size: 0.875rem;
-    }
-}
-
-/* Animación para cambios de página */
-.table tbody tr {
-    transition: opacity 0.3s ease;
-}
-
-.table tbody tr.fade-out {
-    opacity: 0;
-}
-
-.table tbody tr.fade-in {
-    opacity: 1;
-}
-
-/* Estilos para modo oscuro */
-[data-theme="dark"] .pagination-container .btn {
-    border-color: var(--border-color);
-}
-
-[data-theme="dark"] .pagination-container .btn:hover {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-}
-
-[data-theme="dark"] .table td:first-child {
-    background-color: var(--table-stripe) !important;
-    border-right-color: var(--border-color);
-}
-
-[data-theme="dark"] .table th:first-child {
-    background-color: var(--primary-color) !important;
-    border-right-color: var(--border-color);
-}
-
-/* --- Estilos para Badges de Pestañas --- */
-
-/* Badge rojo para reportes del admin */
-#admin-reports-tab .badge.bg-danger {
-    background-color: #dc3545 !important;
-    color: white !important;
-    font-weight: 700;
-    font-size: 0.75rem;
-    min-width: 20px;
-    height: 20px;
-    border-radius: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 0.5rem;
-    animation: badge-pulse-red 2s infinite;
-}
-
-/* Badge rojo para notificaciones del admin */
-#admin-notifications-tab .badge.bg-danger {
-    background-color: #dc3545 !important;
-    color: white !important;
-    font-weight: 700;
-    font-size: 0.75rem;
-    min-width: 20px;
-    height: 20px;
-    border-radius: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 0.5rem;
-    animation: badge-pulse-red 2s infinite;
-}
-
-/* Badge rojo para notificaciones del técnico */
-#employee-notifications-tab .badge.bg-danger {
-    background-color: #dc3545 !important;
-    color: white !important;
-    font-weight: 700;
-    font-size: 0.75rem;
-    min-width: 20px;
-    height: 20px;
-    border-radius: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 0.5rem;
-    animation: badge-pulse-red 2s infinite;
-}
-
-/* Animación para badges rojos */
+/* Animaciones para badges */
 @keyframes badge-pulse-red {
     0% { 
         transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+        box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7);
     }
     50% { 
         transform: scale(1.1);
-        box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.3);
+        box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.3);
     }
     100% { 
         transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+        box-shadow: 0 0 0 0 rgba(229, 62, 62, 0);
     }
 }
 
-/* --- Estilos para Respuestas de Reportes --- */
-
-/* Badge verde para respuestas de reportes */
-.badge.bg-success {
-    background-color: #198754 !important;
-    color: white !important;
-    font-weight: 600;
-    min-width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+@keyframes badge-pulse-green {
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.7);
+    }
+    50% { 
+        transform: scale(1.1);
+        box-shadow: 0 0 0 4px rgba(56, 161, 105, 0.3);
+    }
+    100% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(56, 161, 105, 0);
+    }
 }
 
-/* Estilo específico para el badge de respuestas de reportes en la pestaña */
-#employee-report-replies-tab .badge.bg-success {
-    background-color: #198754 !important;
-    color: white !important;
+/* Badges específicos para pestañas */
+#admin-reports-tab .badge.bg-danger,
+#admin-notifications-tab .badge.bg-danger,
+#employee-notifications-tab .badge.bg-danger {
+    background-color: var(--danger-color) !important;
+    color: var(--text-light) !important;
     font-weight: 700;
     font-size: 0.75rem;
     min-width: 20px;
@@ -1113,64 +1054,472 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: 0.5rem;
+    margin-left: var(--space-2);
+    animation: badge-pulse-red 2s infinite;
+}
+
+#employee-report-replies-tab .badge.bg-success {
+    background-color: var(--success-color) !important;
+    color: var(--text-light) !important;
+    font-weight: 700;
+    font-size: 0.75rem;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: var(--space-2);
     animation: badge-pulse-green 2s infinite;
 }
 
-/* Animación para el badge de respuestas de reportes */
-@keyframes badge-pulse-green {
-    0% { 
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+/* Animación para alertas de reportes */
+.alert-danger.border-danger {
+    border-width: 2px !important;
+    box-shadow: 0 0 10px rgba(229, 62, 62, 0.3);
+    animation: pulse-new 2s infinite;
+}
+
+[data-theme="dark"] .alert-danger.border-danger {
+    box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+    animation: pulse-new-dark 2s infinite;
+}
+
+@keyframes pulse-new {
+    0% {
+        box-shadow: 0 0 10px rgba(229, 62, 62, 0.3);
     }
-    50% { 
-        transform: scale(1.1);
-        box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.3);
+    50% {
+        box-shadow: 0 0 20px rgba(229, 62, 62, 0.6);
     }
-    100% { 
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(25, 135, 84, 0);
+    100% {
+        box-shadow: 0 0 10px rgba(229, 62, 62, 0.3);
     }
 }
 
-/* Estilo especial para alertas de respuestas de reportes */
+@keyframes pulse-new-dark {
+    0% {
+        box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(229, 62, 62, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+    }
+}
+
+/* Estilos para respuestas de reportes */
 .alert.alert-success {
-    border-left: 4px solid #198754;
-    background-color: rgba(25, 135, 84, 0.1);
+    border-left: 4px solid var(--success-color);
+    background-color: rgba(56, 161, 105, 0.05);
 }
 
 [data-theme="dark"] .alert.alert-success {
-    background-color: rgba(25, 135, 84, 0.2);
-    border-color: #198754;
-}
-
-/* Hover effect para botones de respuestas */
-.btn-outline-success:hover {
-    background-color: #198754;
-    border-color: #198754;
-    color: white;
+    background-color: rgba(56, 161, 105, 0.1);
+    border-color: var(--success-color);
 }
 
 /* Animación para nuevas respuestas */
 @keyframes new-reply-pulse {
-    0% { box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(25, 135, 84, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(56, 161, 105, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(56, 161, 105, 0); }
 }
 
 .alert.alert-success:not(.read) {
     animation: new-reply-pulse 2s infinite;
 }
 
-/* Responsive para la nueva pestaña */
-@media (max-width: 768px) {
-    #employee-report-replies-tab {
-        font-size: 0.875rem;
-    }
-    
-    #employee-report-replies-tab .badge {
-        font-size: 0.75rem;
-        min-width: 20px;
-        height: 20px;
-    }
+/* Transiciones suaves */
+* {
+    transition: background-color var(--transition-normal), 
+                color var(--transition-normal), 
+                border-color var(--transition-normal);
+}
+
+/* Asegurar contraste */
+.card-title, .card-text {
+    color: var(--text-primary) !important;
+}
+
+.table th, .table td {
+    color: var(--text-primary) !important;
+}
+
+/* Ajustes para elementos de navegación */
+.navbar-brand {
+    color: #ffffff !important;
+}
+
+.navbar-nav .nav-link {
+    color: #ffffff !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* Ajustes para elementos de lista */
+.list-group-item {
+    color: var(--text-primary) !important;
+}
+
+.list-group-item-action:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary) !important;
+}
+
+/* Ajustes para elementos de alerta */
+.alert {
+    color: var(--text-primary) !important;
+}
+
+/* Asegurar que los badges tengan contraste */
+.badge {
+    color: var(--text-light);
+}
+
+.badge.bg-light {
+    color: var(--text-inverse);
+}
+
+/* Ajustes para elementos de formulario */
+.form-label {
+    color: var(--text-primary) !important;
+    font-weight: 500;
+}
+
+.form-text {
+    color: var(--text-secondary) !important;
+}
+
+/* Botones en tablas */
+.table .btn {
+    margin: var(--space-1);
+    font-size: 0.875rem;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.table .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Estados de botones en tablas */
+.table .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Dropdowns en tablas */
+.table .dropdown-menu {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-md);
+}
+
+.table .dropdown-item {
+    color: var(--text-primary);
+    padding: var(--space-2) var(--space-4);
+}
+
+.table .dropdown-item:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.table .dropdown-item:active {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* ===== MEJORAS ESPECÍFICAS PARA MODO OSCURO ===== */
+
+/* Asegurar visibilidad de texto en modo oscuro */
+[data-theme="dark"] .text-muted {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: #a0aec0 !important;
+}
+
+[data-theme="dark"] .table tbody td {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .table thead th {
+    color: #ffffff !important;
+    background-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .card-header {
+    color: #ffffff !important;
+    background-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .modal-title {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .modal-header {
+    background-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .nav-tabs {
+    background-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link:hover {
+    color: #ffffff !important;
+    background-color: #2d3748 !important;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active {
+    color: #63b3ed !important;
+    background-color: #2d3748 !important;
+}
+
+[data-theme="dark"] .navbar-nav .nav-link {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar-brand {
+    color: #ffffff !important;
+}
+
+/* Mejorar contraste de badges en modo oscuro */
+[data-theme="dark"] .badge.bg-light {
+    background-color: #4a5568 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .badge.bg-secondary {
+    background-color: #718096 !important;
+    color: #ffffff !important;
+}
+
+/* Mejorar visibilidad de estados de servicios en modo oscuro */
+[data-theme="dark"] .status-pendiente {
+    background-color: #4a5568 !important;
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .status-en-proceso {
+    background-color: rgba(214, 158, 46, 0.2) !important;
+    color: #f6e05e !important;
+}
+
+[data-theme="dark"] .status-finalizado {
+    background-color: rgba(56, 161, 105, 0.2) !important;
+    color: #68d391 !important;
+}
+
+[data-theme="dark"] .status-cancelado {
+    background-color: rgba(229, 62, 62, 0.2) !important;
+    color: #fc8181 !important;
+}
+
+/* Mejorar visibilidad de formularios en modo oscuro */
+[data-theme="dark"] .form-control {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .form-control:focus {
+    background-color: #2d3748 !important;
+    border-color: #63b3ed !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2) !important;
+}
+
+[data-theme="dark"] .form-select {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .form-select:focus {
+    background-color: #2d3748 !important;
+    border-color: #63b3ed !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2) !important;
+}
+
+/* Mejorar visibilidad de tablas en modo oscuro */
+[data-theme="dark"] .table {
+    background-color: #2d3748 !important;
+}
+
+[data-theme="dark"] .table tbody tr:hover {
+    background-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .table tbody tr {
+    border-bottom-color: #4a5568 !important;
+}
+
+/* Aplicar características de primera fila y columna a todas las celdas en modo oscuro */
+[data-theme="dark"] .table tbody td {
+    background-color: #4a5568 !important;
+    color: #ffffff !important;
+    border-right-color: #718096 !important;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .table thead th {
+    background-color: #3182ce !important;
+    color: #ffffff !important;
+    border-right-color: #3182ce !important;
+    font-weight: 600;
+}
+
+/* Mejorar visibilidad de cards en modo oscuro */
+[data-theme="dark"] .card {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .card:hover {
+    background-color: #2d3748 !important;
+}
+
+/* Mejorar visibilidad de modales en modo oscuro */
+[data-theme="dark"] .modal-content {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .modal-footer {
+    background-color: #4a5568 !important;
+    border-top-color: #4a5568 !important;
+}
+
+/* Mejorar visibilidad de dropdowns en modo oscuro */
+[data-theme="dark"] .dropdown-menu {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: #4a5568 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-item:active {
+    background-color: #718096 !important;
+    color: #ffffff !important;
+}
+
+/* Mejorar visibilidad de paginación en modo oscuro */
+[data-theme="dark"] .pagination-container .text-muted {
+    color: #e2e8f0 !important;
+}
+
+/* Asegurar que los números de fila sean visibles en modo oscuro */
+[data-theme="dark"] .table td:first-child {
+    background-color: #4a5568 !important;
+    color: #ffffff !important;
+    border-right-color: #718096 !important;
+}
+
+[data-theme="dark"] .table th:first-child {
+    background-color: #3182ce !important;
+    color: #ffffff !important;
+    border-right-color: #3182ce !important;
+}
+
+/* Texto negro en reportes/novedades y notificaciones en modo oscuro */
+[data-theme="dark"] #reports-list .alert,
+[data-theme="dark"] #admin-notifications-list .alert,
+[data-theme="dark"] #employee-notifications-list .alert {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] #reports-list .alert-danger,
+[data-theme="dark"] #admin-notifications-list .alert-danger,
+[data-theme="dark"] #employee-notifications-list .alert-danger {
+    color: #000000 !important;
+    background-color: #fed7d7 !important;
+    border-color: #feb2b2 !important;
+}
+
+[data-theme="dark"] #reports-list .alert-success,
+[data-theme="dark"] #admin-notifications-list .alert-success,
+[data-theme="dark"] #employee-notifications-list .alert-success {
+    color: #000000 !important;
+    background-color: #c6f6d5 !important;
+    border-color: #9ae6b4 !important;
+}
+
+[data-theme="dark"] #reports-list .alert-warning,
+[data-theme="dark"] #admin-notifications-list .alert-warning,
+[data-theme="dark"] #employee-notifications-list .alert-warning {
+    color: #000000 !important;
+    background-color: #fef5e7 !important;
+    border-color: #fbd38d !important;
+}
+
+[data-theme="dark"] #reports-list .alert-info,
+[data-theme="dark"] #admin-notifications-list .alert-info,
+[data-theme="dark"] #employee-notifications-list .alert-info {
+    color: #000000 !important;
+    background-color: #bee3f8 !important;
+    border-color: #90cdf4 !important;
+}
+
+/* Texto blanco en respuestas de reportes del técnico en modo oscuro */
+[data-theme="dark"] #employee-report-replies-list .alert {
+    color: #ffffff !important;
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] #employee-report-replies-list .alert-danger {
+    color: #ffffff !important;
+    background-color: #742a2a !important;
+    border-color: #c53030 !important;
+}
+
+[data-theme="dark"] #employee-report-replies-list .alert-success {
+    color: #ffffff !important;
+    background-color: #22543d !important;
+    border-color: #38a169 !important;
+}
+
+[data-theme="dark"] #employee-report-replies-list .alert-warning {
+    color: #ffffff !important;
+    background-color: #744210 !important;
+    border-color: #d69e2e !important;
+}
+
+[data-theme="dark"] #employee-report-replies-list .alert-info {
+    color: #ffffff !important;
+    background-color: #2a4365 !important;
+    border-color: #3182ce !important;
+}
+
+/* Texto blanco para mensajes de "no hay datos" en respuestas de reportes del técnico */
+[data-theme="dark"] #employee-report-replies-list p,
+[data-theme="dark"] #employee-report-replies-list div,
+[data-theme="dark"] #employee-report-replies-list span {
+    color: #ffffff !important;
 }
