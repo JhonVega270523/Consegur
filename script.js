@@ -2658,90 +2658,6 @@ function initScrollToTop() {
 
 // ===== MEJORAS PARA NAVEGACIÓN MÓVIL =====
 function initMobileNavigation() {
-    // Detectar si hay overflow en tablas
-    function checkTableOverflow() {
-        const tableResponsives = document.querySelectorAll('.table-responsive');
-        
-        tableResponsives.forEach(container => {
-            const table = container.querySelector('.table');
-            if (table && container.scrollWidth > container.clientWidth) {
-                container.classList.add('has-overflow');
-                // Agregar indicador visual de scroll
-                if (!container.querySelector('.scroll-indicator')) {
-                    const indicator = document.createElement('div');
-                    indicator.className = 'scroll-indicator';
-                    indicator.innerHTML = '<i class="bi bi-arrow-left-right"></i>';
-                    container.appendChild(indicator);
-                }
-            } else {
-                container.classList.remove('has-overflow');
-                const indicator = container.querySelector('.scroll-indicator');
-                if (indicator) indicator.remove();
-            }
-        });
-    }
-    
-    // Verificar overflow al cargar y al cambiar tamaño de ventana
-    window.addEventListener('resize', checkTableOverflow);
-    window.addEventListener('load', checkTableOverflow);
-    
-    // Mejorar navegación táctil en tablas (consistente con navegación de títulos)
-    function initTouchScroll() {
-        const tableResponsives = document.querySelectorAll('.table-responsive');
-        
-        tableResponsives.forEach(container => {
-            let isScrolling = false;
-            let startX = 0;
-            let scrollLeft = 0;
-            let startTime = 0;
-            
-            container.addEventListener('touchstart', (e) => {
-                isScrolling = true;
-                startX = e.touches[0].pageX - container.offsetLeft;
-                scrollLeft = container.scrollLeft;
-                startTime = Date.now();
-                
-                // Agregar clase para feedback visual
-                container.classList.add('scrolling');
-            });
-            
-            container.addEventListener('touchmove', (e) => {
-                if (!isScrolling) return;
-                e.preventDefault();
-                const x = e.touches[0].pageX - container.offsetLeft;
-                const walk = (x - startX) * 1.5; // Sensibilidad mejorada
-                container.scrollLeft = scrollLeft - walk;
-            });
-            
-            container.addEventListener('touchend', (e) => {
-                if (!isScrolling) return;
-                
-                const endTime = Date.now();
-                const duration = endTime - startTime;
-                
-                // Implementar scroll inercial similar a la navegación de títulos
-                if (duration < 300) {
-                    const velocity = Math.abs(startX - (e.changedTouches[0].pageX - container.offsetLeft)) / duration;
-                    if (velocity > 0.5) {
-                        const direction = startX > (e.changedTouches[0].pageX - container.offsetLeft) ? 1 : -1;
-                        const scrollDistance = velocity * 100 * direction;
-                        
-                        container.scrollTo({
-                            left: container.scrollLeft + scrollDistance,
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-                
-                isScrolling = false;
-                container.classList.remove('scrolling');
-            });
-        });
-    }
-    
-    // Inicializar scroll táctil
-    initTouchScroll();
-    
     // Mejorar botones en móvil
     function enhanceMobileButtons() {
         const buttons = document.querySelectorAll('.table .btn');
@@ -2767,7 +2683,7 @@ function initMobileNavigation() {
     // Inicializar mejoras de botones
     enhanceMobileButtons();
     
-    // Mejorar navegación de tabs (consistente con navegación de tablas)
+    // Mejorar navegación de tabs
     function enhanceTabNavigation() {
         const tabButtons = document.querySelectorAll('.nav-tabs .nav-link');
         
