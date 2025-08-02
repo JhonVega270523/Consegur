@@ -1898,6 +1898,54 @@ input[type="number"] {
         max-width: calc(100% - 20px);
     }
     
+    /* Indicador de scroll para tablas */
+    .table-responsive {
+        position: relative;
+    }
+    
+    .scroll-indicator {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 8px;
+        border-radius: 50%;
+        font-size: 12px;
+        z-index: 10;
+        animation: pulse-scroll 2s infinite;
+    }
+    
+    [data-theme="dark"] .scroll-indicator {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    
+    @keyframes pulse-scroll {
+        0%, 100% { opacity: 0.7; transform: translateY(-50%) scale(1); }
+        50% { opacity: 1; transform: translateY(-50%) scale(1.1); }
+    }
+    
+    /* Feedback visual durante scroll */
+    .table-responsive.scrolling {
+        transition: transform 0.1s ease;
+    }
+    
+    .table-responsive.scrolling .table {
+        transition: transform 0.1s ease;
+    }
+    
+    /* Mejorar navegación de tabs */
+    .nav-tabs .nav-link {
+        touch-action: manipulation;
+        transition: transform 0.2s ease;
+    }
+    
+    .nav-tabs .nav-link:active {
+        transform: scale(0.98);
+    }
+    
     .modal-body {
         max-height: 70vh;
         overflow-y: auto;

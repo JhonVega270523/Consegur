@@ -15,9 +15,10 @@
                 <!-- Logo (centro en móvil, izquierda en desktop) -->
                 <a class="navbar-brand order-1" href="#">Gestión de Servicios - Consegur S.A.S.</a>
                 
-                <!-- Cerrar Sesión (centro en móvil) -->
+                <!-- Iniciar/Cerrar Sesión (centro en móvil) -->
                 <div class="navbar-nav order-2 d-lg-none">
-                    <a class="nav-link" id="nav-login-mobile" href="#" onclick="showLogin()">Cerrar Sesión</a>
+                    <a class="nav-link" id="nav-login-mobile" href="#" onclick="showLogin()">Iniciar Sesión</a>
+                    <a class="nav-link d-none" id="nav-logout-mobile" href="#" onclick="logout()">Cerrar Sesión</a>
                 </div>
                 
                 <!-- Botón de tema (derecha) -->
@@ -29,7 +30,7 @@
                 <div class="collapse navbar-collapse order-4" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item d-none d-lg-block">
-                            <a class="nav-link" id="nav-login" href="#" onclick="showLogin()">Cerrar Sesión</a>
+                            <a class="nav-link" id="nav-login" href="#" onclick="showLogin()">Iniciar Sesión</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link d-none" id="nav-admin-dashboard" href="#" onclick="showAdminDashboard()">Administrador</a>

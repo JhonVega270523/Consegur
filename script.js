@@ -221,6 +221,7 @@ function updateNavigationVisibility() {
     const navLogin = document.getElementById('nav-login');
     const navLoginMobile = document.getElementById('nav-login-mobile');
     const navLogout = document.getElementById('nav-logout');
+    const navLogoutMobile = document.getElementById('nav-logout-mobile');
     const navAdminDashboard = document.getElementById('nav-admin-dashboard');
     const navEmployeeDashboard = document.getElementById('nav-employee-dashboard');
     
@@ -229,6 +230,7 @@ function updateNavigationVisibility() {
         if (navLogin) navLogin.classList.add('d-none');
         if (navLoginMobile) navLoginMobile.classList.add('d-none');
         if (navLogout) navLogout.classList.remove('d-none');
+        if (navLogoutMobile) navLogoutMobile.classList.remove('d-none');
         
         // Mostrar enlace al dashboard correspondiente
         if (currentUser.role === 'admin') {
@@ -243,6 +245,7 @@ function updateNavigationVisibility() {
         if (navLogin) navLogin.classList.remove('d-none');
         if (navLoginMobile) navLoginMobile.classList.remove('d-none');
         if (navLogout) navLogout.classList.add('d-none');
+        if (navLogoutMobile) navLogoutMobile.classList.add('d-none');
         if (navAdminDashboard) navAdminDashboard.classList.add('d-none');
         if (navEmployeeDashboard) navEmployeeDashboard.classList.add('d-none');
     }
@@ -2663,8 +2666,17 @@ function initMobileNavigation() {
             const table = container.querySelector('.table');
             if (table && container.scrollWidth > container.clientWidth) {
                 container.classList.add('has-overflow');
+                // Agregar indicador visual de scroll
+                if (!container.querySelector('.scroll-indicator')) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'scroll-indicator';
+                    indicator.innerHTML = '<i class="bi bi-arrow-left-right"></i>';
+                    container.appendChild(indicator);
+                }
             } else {
                 container.classList.remove('has-overflow');
+                const indicator = container.querySelector('.scroll-indicator');
+                if (indicator) indicator.remove();
             }
         });
     }
@@ -2673,7 +2685,7 @@ function initMobileNavigation() {
     window.addEventListener('resize', checkTableOverflow);
     window.addEventListener('load', checkTableOverflow);
     
-    // Mejorar navegación táctil en tablas
+    // Mejorar navegación táctil en tablas (consistente con navegación de títulos)
     function initTouchScroll() {
         const tableResponsives = document.querySelectorAll('.table-responsive');
         
@@ -2681,23 +2693,48 @@ function initMobileNavigation() {
             let isScrolling = false;
             let startX = 0;
             let scrollLeft = 0;
+            let startTime = 0;
             
             container.addEventListener('touchstart', (e) => {
                 isScrolling = true;
                 startX = e.touches[0].pageX - container.offsetLeft;
                 scrollLeft = container.scrollLeft;
+                startTime = Date.now();
+                
+                // Agregar clase para feedback visual
+                container.classList.add('scrolling');
             });
             
             container.addEventListener('touchmove', (e) => {
                 if (!isScrolling) return;
                 e.preventDefault();
                 const x = e.touches[0].pageX - container.offsetLeft;
-                const walk = (x - startX) * 2;
+                const walk = (x - startX) * 1.5; // Sensibilidad mejorada
                 container.scrollLeft = scrollLeft - walk;
             });
             
-            container.addEventListener('touchend', () => {
+            container.addEventListener('touchend', (e) => {
+                if (!isScrolling) return;
+                
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                
+                // Implementar scroll inercial similar a la navegación de títulos
+                if (duration < 300) {
+                    const velocity = Math.abs(startX - (e.changedTouches[0].pageX - container.offsetLeft)) / duration;
+                    if (velocity > 0.5) {
+                        const direction = startX > (e.changedTouches[0].pageX - container.offsetLeft) ? 1 : -1;
+                        const scrollDistance = velocity * 100 * direction;
+                        
+                        container.scrollTo({
+                            left: container.scrollLeft + scrollDistance,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+                
                 isScrolling = false;
+                container.classList.remove('scrolling');
             });
         });
     }
@@ -2714,13 +2751,15 @@ function initMobileNavigation() {
             btn.style.minHeight = '44px';
             btn.style.minWidth = '44px';
             
-            // Agregar feedback táctil
+            // Agregar feedback táctil mejorado
             btn.addEventListener('touchstart', () => {
                 btn.style.transform = 'scale(0.95)';
+                btn.style.transition = 'transform 0.1s ease';
             });
             
             btn.addEventListener('touchend', () => {
                 btn.style.transform = '';
+                btn.style.transition = 'transform 0.2s ease';
             });
         });
     }
@@ -2728,34 +2767,25 @@ function initMobileNavigation() {
     // Inicializar mejoras de botones
     enhanceMobileButtons();
     
-    // Mejorar navegación del menú hamburguesa
-    const navbarToggler = document.querySelector('.navbar-toggler');
-    const navbarCollapse = document.querySelector('.navbar-collapse');
-    
-    if (navbarToggler && navbarCollapse) {
-        // Cerrar menú al hacer clic en un enlace
-        const navLinks = navbarCollapse.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth < 992) {
-                    const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
-                        hide: true
-                    });
-                }
+    // Mejorar navegación de tabs (consistente con navegación de tablas)
+    function enhanceTabNavigation() {
+        const tabButtons = document.querySelectorAll('.nav-tabs .nav-link');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('touchstart', () => {
+                button.style.transform = 'scale(0.98)';
+                button.style.transition = 'transform 0.1s ease';
+            });
+            
+            button.addEventListener('touchend', () => {
+                button.style.transform = '';
+                button.style.transition = 'transform 0.2s ease';
             });
         });
-        
-        // Cerrar menú al hacer clic fuera
-        document.addEventListener('click', (e) => {
-            if (!navbarToggler.contains(e.target) && !navbarCollapse.contains(e.target)) {
-                if (window.innerWidth < 992 && navbarCollapse.classList.contains('show')) {
-                    const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
-                        hide: true
-                    });
-                }
-            }
-        });
     }
+    
+    // Inicializar mejoras de tabs
+    enhanceTabNavigation();
 }
 
 // ===== FUNCIÓN DE INICIALIZACIÓN MEJORADA =====
