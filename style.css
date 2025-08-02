@@ -191,6 +191,50 @@ body {
     transform: rotate(180deg);
 }
 
+/* ===== BOTÓN SCROLL TO TOP ===== */
+.scroll-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--accent-color);
+    color: var(--text-light);
+    border: none;
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all var(--transition-normal);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.scroll-to-top-btn:hover {
+    background: var(--accent-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.scroll-to-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.scroll-to-top-btn i {
+    transition: transform var(--transition-normal);
+}
+
+.scroll-to-top-btn:hover i {
+    transform: translateY(-2px);
+}
+
 /* ===== CONTENEDOR PRINCIPAL ===== */
 .container {
     max-width: 1200px;
@@ -564,6 +608,10 @@ body {
     padding: var(--space-4);
     border-bottom: 2px solid var(--border-color);
     text-align: left;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .table tbody tr {
@@ -584,12 +632,238 @@ body {
     padding: var(--space-4);
     color: var(--text-primary);
     vertical-align: middle;
+    white-space: nowrap;
 }
 
 .table-responsive {
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
+    position: relative;
+}
+
+/* ===== MEJORAS PARA TABLAS EN MÓVIL ===== */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-color) var(--bg-secondary);
+        /* Asegurar que el scroll funcione correctamente */
+        touch-action: pan-x;
+        /* Prevenir zoom en tablas */
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+        border-radius: var(--radius-full);
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: var(--radius-full);
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+    }
+    
+    .table {
+        min-width: 600px; /* Ancho mínimo para asegurar legibilidad */
+        /* Asegurar que la tabla sea scrolleable */
+        table-layout: fixed;
+        width: 100%;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: var(--space-3);
+        font-size: 0.875rem;
+        min-width: 100px; /* Ancho mínimo para cada columna */
+        /* Prevenir que el texto se corte */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    /* Columnas específicas con ancho fijo */
+    .table th:nth-child(1),
+    .table td:nth-child(1) {
+        min-width: 80px; /* ID */
+        max-width: 80px;
+    }
+    
+    .table th:nth-child(2),
+    .table td:nth-child(2) {
+        min-width: 120px; /* Cliente */
+    }
+    
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+        min-width: 100px; /* Tipo Caja */
+    }
+    
+    .table th:nth-child(4),
+    .table td:nth-child(4) {
+        min-width: 150px; /* Ubicación */
+    }
+    
+    .table th:nth-child(5),
+    .table td:nth-child(5) {
+        min-width: 100px; /* Técnico */
+    }
+    
+    .table th:nth-child(6),
+    .table td:nth-child(6) {
+        min-width: 100px; /* Estado */
+    }
+    
+    .table th:nth-child(7),
+    .table td:nth-child(7) {
+        min-width: 150px; /* Acciones */
+    }
+    
+    /* Indicador de scroll horizontal */
+    .table-responsive::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 20px;
+        background: linear-gradient(to right, transparent, var(--bg-primary));
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity var(--transition-normal);
+    }
+    
+    .table-responsive.has-overflow::after {
+        opacity: 1;
+    }
+    
+    /* Mejorar botones en tablas móviles */
+    .table .btn {
+        padding: var(--space-2) var(--space-3);
+        font-size: 0.8rem;
+        min-height: 36px;
+        margin: var(--space-1);
+        border-radius: var(--radius-md);
+        /* Mejorar área táctil */
+        min-width: 44px;
+        touch-action: manipulation;
+    }
+    
+    /* Agrupar botones de acciones */
+    .table .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+    }
+    
+    .table .btn-group .btn {
+        margin: 0;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Estados de servicios más compactos */
+    .status-badge {
+        padding: var(--space-1) var(--space-2);
+        font-size: 0.7rem;
+        border-radius: var(--radius-sm);
+    }
+    
+    /* Badges más compactos */
+    .badge {
+        padding: var(--space-1) var(--space-2);
+        font-size: 0.7rem;
+        min-width: 18px;
+        height: 18px;
+    }
+    
+    /* Mejorar navegación táctil */
+    .table tbody tr {
+        /* Asegurar que las filas sean tocables */
+        cursor: pointer;
+        /* Mejorar feedback táctil */
+        transition: all var(--transition-fast);
+    }
+    
+    .table tbody tr:active {
+        background: var(--accent-color) !important;
+        color: var(--text-light) !important;
+        transform: scale(0.98);
+    }
+    
+    /* Mejorar contraste en modo oscuro para móvil */
+    [data-theme="dark"] .table-responsive {
+        background: var(--bg-card);
+    }
+    
+    [data-theme="dark"] .table tbody tr:hover {
+        background: var(--bg-tertiary) !important;
+    }
+    
+    [data-theme="dark"] .table tbody tr:active {
+        background: var(--accent-color) !important;
+    }
+}
+
+/* Indicador de scroll para pantallas medianas */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table {
+        min-width: 800px;
+    }
+}
+
+/* Mejoras para tablas con muchas columnas */
+.table-responsive.wide-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive.wide-table .table {
+    min-width: 900px;
+}
+
+/* Indicador visual de que hay más contenido */
+.table-responsive::before {
+    content: '← Desliza para ver más →';
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-color);
+    color: var(--text-light);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    z-index: 20;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .table-responsive::before {
+        opacity: 1;
+    }
 }
 
 /* ===== MODALES MINIMALISTAS ===== */
@@ -1522,4 +1796,124 @@ input[type="number"] {
 [data-theme="dark"] #employee-report-replies-list div,
 [data-theme="dark"] #employee-report-replies-list span {
     color: #ffffff !important;
+}
+
+/* ===== MEJORAS PARA NAVEGACIÓN MÓVIL ===== */
+@media (max-width: 991.98px) {
+    .navbar .container-fluid {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .navbar-brand {
+        font-size: 1.2rem;
+        text-align: center;
+        flex: 1;
+        margin: 0;
+        order: 1;
+    }
+    
+    .navbar-nav.order-2 {
+        order: 2;
+        margin: 0;
+    }
+    
+    .navbar-nav.order-2 .nav-link {
+        padding: var(--space-2) var(--space-3);
+        font-size: 0.9rem;
+        text-align: center;
+    }
+    
+    #theme-toggle {
+        order: 3;
+        margin-left: 10px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    #theme-toggle i {
+        font-size: 1rem;
+    }
+    
+    .navbar-collapse {
+        order: 4;
+        width: 100%;
+        margin-top: var(--space-3);
+    }
+    
+    .navbar-collapse .navbar-nav {
+        margin: 0;
+        padding: var(--space-3) 0;
+    }
+    
+    .navbar-collapse .nav-link {
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--space-2);
+        text-align: left;
+    }
+}
+
+/* Ajustes adicionales para pantallas muy pequeñas */
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1rem;
+    }
+    
+    .scroll-to-top-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+}
+
+/* ===== MEJORAS ADICIONALES PARA NAVEGACIÓN TÁCTIL ===== */
+@media (max-width: 768px) {
+    /* Mejorar scroll en contenedores */
+    .card-body {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Mejorar botones de paginación */
+    .pagination-container .btn {
+        min-width: 44px;
+        min-height: 44px;
+        touch-action: manipulation;
+    }
+    
+    /* Mejorar inputs en móvil */
+    .form-control, .form-select {
+        font-size: 16px; /* Prevenir zoom en iOS */
+        min-height: 44px;
+    }
+    
+    /* Mejorar modales en móvil */
+    .modal-dialog {
+        margin: 10px;
+        max-width: calc(100% - 20px);
+    }
+    
+    .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Mejorar tabs en móvil */
+    .nav-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+    }
+    
+    .nav-tabs .nav-link {
+        white-space: nowrap;
+        min-width: 120px;
+        text-align: center;
+    }
 }

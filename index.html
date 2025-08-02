@@ -10,35 +10,45 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Gestión de Servicios - Consegur S.A.S.</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" id="nav-login" href="#" onclick="showLogin()">Iniciar Sesión</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link d-none" id="nav-admin-dashboard" href="#" onclick="showAdminDashboard()">Administrador</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link d-none" id="nav-employee-dashboard" href="#" onclick="showEmployeeDashboard()">Técnico</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link d-none" id="nav-logout" href="#" onclick="logout()">Cerrar Sesión</a>
-                    </li>
-                    <li class="nav-item">
-                        <button class="btn btn-outline-light btn-sm ms-2" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
-                            <i class="bi bi-sun-fill" id="theme-icon"></i>
-                        </button>
-                    </li>
-                </ul>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <!-- Logo (centro en móvil, izquierda en desktop) -->
+                <a class="navbar-brand order-1" href="#">Gestión de Servicios - Consegur S.A.S.</a>
+                
+                <!-- Cerrar Sesión (centro en móvil) -->
+                <div class="navbar-nav order-2 d-lg-none">
+                    <a class="nav-link" id="nav-login-mobile" href="#" onclick="showLogin()">Cerrar Sesión</a>
+                </div>
+                
+                <!-- Botón de tema (derecha) -->
+                <button class="btn btn-outline-light btn-sm order-3" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+                    <i class="bi bi-sun-fill" id="theme-icon"></i>
+                </button>
+                
+                <!-- Menú completo (desktop) -->
+                <div class="collapse navbar-collapse order-4" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item d-none d-lg-block">
+                            <a class="nav-link" id="nav-login" href="#" onclick="showLogin()">Cerrar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-none" id="nav-admin-dashboard" href="#" onclick="showAdminDashboard()">Administrador</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-none" id="nav-employee-dashboard" href="#" onclick="showEmployeeDashboard()">Técnico</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-none" id="nav-logout" href="#" onclick="logout()">Cerrar Sesión</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+
+    <!-- Botón Scroll to Top -->
+    <button id="scroll-to-top" class="scroll-to-top-btn" title="Ir arriba">
+        <i class="bi bi-arrow-up"></i>
+    </button>
 
     <div class="container mt-4">
 
