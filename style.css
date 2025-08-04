@@ -110,8 +110,8 @@ body {
 
 /* ===== NAVBAR MINIMALISTA ===== */
 .navbar {
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border-color);
+    background: var(--accent-color) !important;
+    border-bottom: 1px solid var(--accent-dark);
     box-shadow: var(--shadow-sm);
     padding: var(--space-4) 0;
     position: sticky;
@@ -140,7 +140,7 @@ body {
 
 .navbar-nav .nav-link:hover {
     color: #ffffff !important;
-    background: var(--bg-tertiary);
+    background: var(--accent-dark);
     transform: translateY(-1px);
 }
 
@@ -151,7 +151,7 @@ body {
     left: 50%;
     width: 0;
     height: 2px;
-    background: var(--accent-color);
+    background: #ffffff;
     transform: translateX(-50%);
     transition: width var(--transition-normal);
 }
@@ -1764,5 +1764,199 @@ input[type="number"] {
         width: 100%;
         height: auto;
         margin: var(--space-3) 0;
+    }
+}
+
+/* ===== BOTONES DE GOOGLE MAPS ===== */
+.btn-google-maps {
+    background: #4285f4;
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    transition: all var(--transition-normal);
+    margin-left: var(--space-2);
+}
+
+.btn-google-maps:hover {
+    background: #3367d6;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-google-maps i {
+    font-size: 1rem;
+}
+
+/* Modo oscuro para botones de Google Maps */
+[data-theme="dark"] .btn-google-maps {
+    background: #4285f4;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .btn-google-maps:hover {
+    background: #3367d6;
+    color: #ffffff;
+}
+
+/* ===== FILTROS DE ESTADO PARA TÉCNICO ===== */
+.employee-filters {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.employee-filters .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.employee-filters .btn {
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    padding: var(--space-2) var(--space-4);
+    border: 2px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    transition: all var(--transition-normal);
+}
+
+.employee-filters .btn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+}
+
+.employee-filters .btn.active {
+    background: var(--accent-color);
+    color: var(--text-light);
+    border-color: var(--accent-color);
+}
+
+.employee-filters .btn.active:hover {
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+
+/* Responsive para filtros */
+@media (max-width: 768px) {
+    .employee-filters .btn-group {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .employee-filters .btn {
+        flex: 1;
+        min-width: 120px;
+        max-width: 150px;
+        text-align: center;
+        font-size: 0.8rem;
+        padding: var(--space-2) var(--space-2);
+    }
+}
+
+/* ===== VISTA MÓVIL PARA SERVICIOS ASIGNADOS ===== */
+@media (max-width: 768px) {
+    /* Ocultar tabla en móvil */
+    #employee-services .table-responsive {
+        display: none;
+    }
+    
+    /* Mostrar vista de tarjetas en móvil */
+    #employee-services .mobile-services-view {
+        display: block;
+    }
+    
+    /* Estilos para las tarjetas de servicios */
+    .service-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4);
+        margin-bottom: var(--space-3);
+        box-shadow: var(--shadow-sm);
+        transition: all var(--transition-normal);
+    }
+    
+    .service-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+    
+    .service-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-3);
+        padding-bottom: var(--space-2);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .service-card-id {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+    }
+    
+    .service-card-status {
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-md);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .service-card-info {
+        margin-bottom: var(--space-3);
+    }
+    
+    .service-card-info-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: var(--space-2);
+        font-size: 0.9rem;
+    }
+    
+    .service-card-info-label {
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+    
+    .service-card-info-value {
+        color: var(--text-primary);
+        text-align: right;
+        max-width: 60%;
+        word-wrap: break-word;
+    }
+    
+    .service-card-actions {
+        display: flex;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+    }
+    
+    .service-card-actions .btn {
+        flex: 1;
+        min-width: 80px;
+        font-size: 0.8rem;
+        padding: var(--space-2) var(--space-3);
+    }
+}
+
+/* Ocultar vista móvil en desktop */
+@media (min-width: 769px) {
+    #employee-services .mobile-services-view {
+        display: none;
     }
 }

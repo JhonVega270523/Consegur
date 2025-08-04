@@ -5,6 +5,7 @@ let services = JSON.parse(localStorage.getItem('services')) || [];
 let reports = JSON.parse(localStorage.getItem('reports')) || [];
 let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
 let currentTheme = localStorage.getItem('theme') || 'light'; // Tema actual
+let currentEmployeeServicesFilter = 'todos'; // Filtro actual para servicios del técnico
 
 // Crear usuario administrador por defecto si no hay usuarios
 if (users.length === 0) {
@@ -1173,16 +1174,31 @@ function viewServiceDetails(id) {
             <p><strong>ID Servicio:</strong> ${service.id}</p>
             <p><strong>Fecha:</strong> ${service.date}</p>
             <p><strong>Tipo de Caja Fuerte:</strong> ${service.safeType}</p>
-            <p><strong>Ubicación:</strong> ${service.location}</p>
+            <p><strong>Ubicación:</strong> ${service.location}
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(service.location)}" 
+                   target="_blank" class="btn-google-maps" title="Abrir en Google Maps">
+                    <i class="bi bi-geo-alt"></i> Ver en Maps
+                </a>
+            </p>
             <p><strong>Técnico Encargado:</strong> ${getTechnicianNameById(service.technicianId)}</p>
             <p><strong>Nombre del Cliente:</strong> ${service.clientName}</p>
             <p><strong>Teléfono del Cliente:</strong> ${service.clientPhone}</p>
             <p><strong>Estado:</strong> ${service.status}</p>
             ${service.cancellationReason ? `<p><strong>Motivo de Cancelación:</strong> ${service.cancellationReason}</p>` : ''}
             ${service.startTime ? `<p><strong>Hora de Inicio:</strong> ${new Date(service.startTime).toLocaleString()}</p>` : ''}
-            ${service.startLocation ? `<p><strong>Ubicación de Inicio:</strong> Lat: ${service.startLocation.latitude.toFixed(8)}, Lon: ${service.startLocation.longitude.toFixed(8)}${service.startLocation.accuracy ? ` (Precisión: ±${Math.round(service.startLocation.accuracy)}m)` : ''}${service.startLocation.altitude ? ` | Altitud: ${service.startLocation.altitude.toFixed(1)}m` : ''}${service.startLocation.speed ? ` | Velocidad: ${service.startLocation.speed.toFixed(1)}m/s` : ''}${service.startLocation.heading ? ` | Dirección: ${service.startLocation.heading.toFixed(1)}°` : ''}</p>` : ''}
+            ${service.startLocation ? `<p><strong>Ubicación de Inicio:</strong> Lat: ${service.startLocation.latitude.toFixed(8)}, Lon: ${service.startLocation.longitude.toFixed(8)}${service.startLocation.accuracy ? ` (Precisión: ±${Math.round(service.startLocation.accuracy)}m)` : ''}${service.startLocation.altitude ? ` | Altitud: ${service.startLocation.altitude.toFixed(1)}m` : ''}${service.startLocation.speed ? ` | Velocidad: ${service.startLocation.speed.toFixed(1)}m/s` : ''}${service.startLocation.heading ? ` | Dirección: ${service.startLocation.heading.toFixed(1)}°` : ''}
+                <a href="https://www.google.com/maps?q=${service.startLocation.latitude},${service.startLocation.longitude}" 
+                   target="_blank" class="btn-google-maps" title="Abrir coordenadas de inicio en Google Maps">
+                    <i class="bi bi-geo-alt"></i> Ver en Maps
+                </a>
+            </p>` : ''}
             ${service.finalizationOrCancellationTime ? `<p><strong>Fecha/Hora de Finalización/Cancelación:</strong> ${new Date(service.finalizationOrCancellationTime).toLocaleString()}</p>` : ''}
-            ${service.finalizationOrCancellationLocation ? `<p><strong>Ubicación de Finalización/Cancelación:</strong> Lat: ${service.finalizationOrCancellationLocation.latitude.toFixed(8)}, Lon: ${service.finalizationOrCancellationLocation.longitude.toFixed(8)}${service.finalizationOrCancellationLocation.accuracy ? ` (Precisión: ±${Math.round(service.finalizationOrCancellationLocation.accuracy)}m)` : ''}${service.finalizationOrCancellationLocation.altitude ? ` | Altitud: ${service.finalizationOrCancellationLocation.altitude.toFixed(1)}m` : ''}${service.finalizationOrCancellationLocation.speed ? ` | Velocidad: ${service.finalizationOrCancellationLocation.speed.toFixed(1)}m/s` : ''}${service.finalizationOrCancellationLocation.heading ? ` | Dirección: ${service.finalizationOrCancellationLocation.heading.toFixed(1)}°` : ''}</p>` : ''}
+            ${service.finalizationOrCancellationLocation ? `<p><strong>Ubicación de Finalización/Cancelación:</strong> Lat: ${service.finalizationOrCancellationLocation.latitude.toFixed(8)}, Lon: ${service.finalizationOrCancellationLocation.longitude.toFixed(8)}${service.finalizationOrCancellationLocation.accuracy ? ` (Precisión: ±${Math.round(service.finalizationOrCancellationLocation.accuracy)}m)` : ''}${service.finalizationOrCancellationLocation.altitude ? ` | Altitud: ${service.finalizationOrCancellationLocation.altitude.toFixed(1)}m` : ''}${service.finalizationOrCancellationLocation.speed ? ` | Velocidad: ${service.finalizationOrCancellationLocation.speed.toFixed(1)}m/s` : ''}${service.finalizationOrCancellationLocation.heading ? ` | Dirección: ${service.finalizationOrCancellationLocation.heading.toFixed(1)}°` : ''}
+                <a href="https://www.google.com/maps?q=${service.finalizationOrCancellationLocation.latitude},${service.finalizationOrCancellationLocation.longitude}" 
+                   target="_blank" class="btn-google-maps" title="Abrir coordenadas de finalización en Google Maps">
+                    <i class="bi bi-geo-alt"></i> Ver en Maps
+                </a>
+            </p>` : ''}
             ${service.photo ? `<p><strong>Evidencia Fotográfica:</strong><br><img src="${service.photo}" class="service-photo-evidence" alt="Evidencia"></p>` : ''}
             ${service.clientSignature ? `<p><strong>Firma del Cliente:</strong><br><img src="${service.clientSignature}" class="img-fluid" alt="Firma del Cliente"></p>` : ''}
             ${service.technicianSignature ? `<p><strong>Firma del Técnico:</strong><br><img src="${service.technicianSignature}" class="img-fluid" alt="Firma del Técnico"></p>` : ''}
@@ -1521,6 +1537,7 @@ document.getElementById('reply-report-form').addEventListener('submit', (e) => {
 function renderEmployeeAssignedServices(page = 1) {
     currentEmployeeServicesPage = page;
     const employeeServicesList = document.getElementById('employee-assigned-services-list');
+    const employeeServicesCards = document.getElementById('employee-assigned-services-cards');
     const employeeTable = employeeServicesList.closest('table');
     const employeeTableHeader = employeeTable.querySelector('thead');
     
@@ -1530,12 +1547,19 @@ function renderEmployeeAssignedServices(page = 1) {
     }
     
     employeeServicesList.innerHTML = '';
-    const assignedToMe = services.filter(s => s.technicianId === currentUser.id);
+    employeeServicesCards.innerHTML = '';
+    let assignedToMe = services.filter(s => s.technicianId === currentUser.id);
+    
+    // Aplicar filtro de estado
+    if (currentEmployeeServicesFilter !== 'todos') {
+        assignedToMe = assignedToMe.filter(s => s.status === currentEmployeeServicesFilter);
+    }
     
     const totalPages = getTotalPages(assignedToMe.length);
     const paginatedServices = paginateArray(assignedToMe, page);
 
     if (paginatedServices.length === 0) {
+        // Mensaje para tabla
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
             <td colspan="7" class="text-center text-muted py-4">
@@ -1545,15 +1569,26 @@ function renderEmployeeAssignedServices(page = 1) {
             </td>
         `;
         employeeServicesList.appendChild(noResultsRow);
+        
+        // Mensaje para tarjetas móviles
+        const noResultsCard = document.createElement('div');
+        noResultsCard.className = 'text-center text-muted py-4';
+        noResultsCard.innerHTML = `
+            <i class="bi bi-person-check" style="font-size: 2rem;"></i>
+            <br><br>
+            <strong>No tienes servicios asignados</strong>
+        `;
+        employeeServicesCards.appendChild(noResultsCard);
     } else {
-        paginatedServices.forEach(service => {
-            const row = document.createElement('tr');
+        paginatedServices.forEach((service, index) => {
+            const globalIndex = (page - 1) * ITEMS_PER_PAGE + index + 1;
             const isStatusFixed = ['Finalizado', 'Cancelado'].includes(service.status);
             const dropdownDisabled = isStatusFixed ? 'disabled' : '';
             const dropdownTitle = isStatusFixed ? 'No se puede cambiar el estado de un servicio finalizado/cancelado' : '';
-
             const showStartButton = service.status === 'Pendiente';
 
+            // Generar fila de tabla (vista desktop)
+            const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${service.id}</td>
                 <td>${service.clientName}</td>
@@ -1578,6 +1613,65 @@ function renderEmployeeAssignedServices(page = 1) {
                 </td>
             `;
             employeeServicesList.appendChild(row);
+            
+            // Generar tarjeta móvil (vista móvil)
+            const serviceCard = document.createElement('div');
+            serviceCard.className = 'service-card';
+            
+            // Determinar clase de estado para la tarjeta
+            let statusClass = '';
+            switch(service.status) {
+                case 'Pendiente':
+                    statusClass = 'status-pendiente';
+                    break;
+                case 'En proceso':
+                    statusClass = 'status-en-proceso';
+                    break;
+                case 'Finalizado':
+                    statusClass = 'status-finalizado';
+                    break;
+                case 'Cancelado':
+                    statusClass = 'status-cancelado';
+                    break;
+            }
+            
+            serviceCard.innerHTML = `
+                <div class="service-card-header">
+                    <span class="service-card-id">#${service.id}</span>
+                    <span class="service-card-status ${statusClass}">${service.status}</span>
+                </div>
+                <div class="service-card-info">
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Cliente:</span>
+                        <span class="service-card-info-value">${service.clientName}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Tipo Caja:</span>
+                        <span class="service-card-info-value">${service.safeType}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Ubicación:</span>
+                        <span class="service-card-info-value">${service.location}</span>
+                    </div>
+                </div>
+                <div class="service-card-actions">
+                    <button class="btn btn-info btn-sm" onclick="viewServiceDetails('${service.id}')">Ver</button>
+                    <div class="dropdown d-inline-block">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButtonMobile${service.id}" data-bs-toggle="dropdown" aria-expanded="false" ${dropdownDisabled} title="${dropdownTitle}">
+                            Estado
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonMobile${service.id}">
+                            <li><a class="dropdown-item ${isStatusFixed || service.status === 'Pendiente' ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed} && '${service.status}' !== 'Pendiente') handleEmployeeServiceStatusChange('${service.id}', 'Pendiente')">Pendiente</a></li>
+                            <li><a class="dropdown-item ${isStatusFixed || service.status === 'En proceso' ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed} && '${service.status}' !== 'En proceso') handleEmployeeServiceStatusChange('${service.id}', 'En proceso')">En proceso</a></li>
+                            <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Finalizado')">Finalizado</a></li>
+                            <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Cancelado')">Cancelado</a></li>
+                        </ul>
+                    </div>
+                    ${showStartButton ? `<button class="btn btn-success btn-sm" onclick="startService('${service.id}')">Iniciar</button>` : ''}
+                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#reportNoveltyModal" onclick="prefillNoveltyServiceId('${service.id}')">Novedad</button>
+                </div>
+            `;
+            employeeServicesCards.appendChild(serviceCard);
         });
         
         // Agregar numeración a las filas
@@ -2688,4 +2782,21 @@ function initializeScrollToTop() {
     if (window.pageYOffset > 300) {
         scrollToTopBtn.classList.add('show');
     }
+}
+
+// Función para filtrar servicios del técnico por estado
+function filterEmployeeServices(status) {
+    currentEmployeeServicesFilter = status;
+    
+    // Actualizar botones activos
+    const filterButtons = document.querySelectorAll('.employee-filters .btn');
+    filterButtons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.trim() === status || (status === 'todos' && btn.textContent.trim() === 'Todos')) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Re-renderizar la lista con el filtro aplicado
+    renderEmployeeAssignedServices(1);
 }

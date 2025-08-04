@@ -297,6 +297,17 @@
                             </button>-->
                         </div>
                         <div class="card-body">
+                            <!-- Filtros de estado -->
+                            <div class="employee-filters">
+                                <h6 class="mb-3">Filtrar por estado:</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn active" onclick="filterEmployeeServices('todos')">Todos</button>
+                                    <button type="button" class="btn" onclick="filterEmployeeServices('Pendiente')">Pendientes</button>
+                                    <button type="button" class="btn" onclick="filterEmployeeServices('En proceso')">En Proceso</button>
+                                    <button type="button" class="btn" onclick="filterEmployeeServices('Finalizado')">Finalizados</button>
+                                    <button type="button" class="btn" onclick="filterEmployeeServices('Cancelado')">Cancelados</button>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover">
                                     <thead>
@@ -312,6 +323,10 @@
                                     <tbody id="employee-assigned-services-list">
                                         </tbody>
                                 </table>
+                            </div>
+                            
+                            <!-- Vista móvil de tarjetas -->
+                            <div class="mobile-services-view" id="employee-assigned-services-cards">
                             </div>
                         </div>
                     </div>
