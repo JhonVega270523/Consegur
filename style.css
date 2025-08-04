@@ -1878,6 +1878,11 @@ input[type="number"] {
         display: block;
     }
     
+    /* Asegurar que el texto "Filtrar por estado:" sea blanco en modo oscuro */
+    [data-theme="dark"] .employee-filters h6 {
+        color: #ffffff !important;
+    }
+    
     /* Estilos para las tarjetas de servicios */
     .service-card {
         background: var(--bg-card);
@@ -1959,4 +1964,86 @@ input[type="number"] {
     #employee-services .mobile-services-view {
         display: none;
     }
+}
+
+/* ===== VISTA MÓVIL PARA TABLAS ADMIN ===== */
+@media (max-width: 768px) {
+    /* Ocultar tablas admin en móvil */
+    #admin-dashboard-section .table-responsive {
+        display: none;
+    }
+    
+    /* Mostrar vista de tarjetas admin en móvil */
+    #admin-dashboard-section .mobile-services-view {
+        display: block;
+    }
+}
+
+/* Ocultar vista móvil admin en desktop */
+@media (min-width: 769px) {
+    #admin-dashboard-section .mobile-services-view {
+        display: none;
+    }
+}
+
+/* ===== TARJETAS DE USUARIOS PARA VISTA MÓVIL ===== */
+.user-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--space-3);
+    margin-bottom: var(--space-3);
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.user-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.user-card-username {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.user-card-role {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.user-card-role.admin {
+    background: var(--primary-color);
+    color: white;
+}
+
+.user-card-role.technician {
+    background: var(--accent-color);
+    color: white;
+}
+
+.user-card-actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+}
+
+.user-card-actions .btn {
+    flex: 1;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
 }

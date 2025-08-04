@@ -481,6 +481,7 @@ let currentReportsPage = 1;
 function renderUserList(page = 1) {
     currentUserPage = page;
     const userListElement = document.getElementById('user-list');
+    const userCardsElement = document.getElementById('user-list-cards');
     const userTable = userListElement.closest('table');
     const userTableHeader = userTable.querySelector('thead');
     
@@ -490,11 +491,13 @@ function renderUserList(page = 1) {
     }
     
     userListElement.innerHTML = '';
+    userCardsElement.innerHTML = '';
     
     const totalPages = getTotalPages(users.length);
     const paginatedUsers = paginateArray(users, page);
     
     if (paginatedUsers.length === 0) {
+        // Mensaje para tabla
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
             <td colspan="4" class="text-center text-muted py-4">
@@ -504,8 +507,19 @@ function renderUserList(page = 1) {
             </td>
         `;
         userListElement.appendChild(noResultsRow);
+        
+        // Mensaje para tarjetas móviles
+        const noResultsCard = document.createElement('div');
+        noResultsCard.className = 'text-center text-muted py-4';
+        noResultsCard.innerHTML = `
+            <i class="bi bi-people" style="font-size: 2rem;"></i>
+            <br><br>
+            <strong>No hay usuarios registrados</strong>
+        `;
+        userCardsElement.appendChild(noResultsCard);
     } else {
         paginatedUsers.forEach(user => {
+            // Generar fila de tabla (vista desktop)
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${user.username}</td>
@@ -516,6 +530,25 @@ function renderUserList(page = 1) {
                 </td>
             `;
             userListElement.appendChild(row);
+            
+            // Generar tarjeta móvil (vista móvil)
+            const userCard = document.createElement('div');
+            userCard.className = 'user-card';
+            
+            const roleClass = user.role === 'admin' ? 'admin' : 'technician';
+            const roleText = user.role === 'admin' ? 'Administrador' : 'Técnico';
+            
+            userCard.innerHTML = `
+                <div class="user-card-header">
+                    <span class="user-card-username">${user.username}</span>
+                    <span class="user-card-role ${roleClass}">${roleText}</span>
+                </div>
+                <div class="user-card-actions">
+                    <button class="btn btn-warning btn-sm" onclick="editUser('${user.id}')">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.id}')">Eliminar</button>
+                </div>
+            `;
+            userCardsElement.appendChild(userCard);
         });
         
         // Agregar numeración a las filas
@@ -627,6 +660,7 @@ function renderAdminServicesList(filteredServices = services, page = 1) {
     currentAdminServicesData = filteredServices;
     
     const servicesListElement = document.getElementById('services-list-admin');
+    const servicesCardsElement = document.getElementById('services-list-admin-cards');
     const servicesTable = servicesListElement.closest('table');
     const servicesTableHeader = servicesTable.querySelector('thead');
     
@@ -636,11 +670,13 @@ function renderAdminServicesList(filteredServices = services, page = 1) {
     }
     
     servicesListElement.innerHTML = '';
+    servicesCardsElement.innerHTML = '';
     
     const totalPages = getTotalPages(filteredServices.length);
     const paginatedServices = paginateArray(filteredServices, page);
     
     if (paginatedServices.length === 0) {
+        // Mensaje para tabla
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
             <td colspan="8" class="text-center text-muted py-4">
@@ -652,9 +688,20 @@ function renderAdminServicesList(filteredServices = services, page = 1) {
             </td>
         `;
         servicesListElement.appendChild(noResultsRow);
+        
+        // Mensaje para tarjetas móviles
+        const noResultsCard = document.createElement('div');
+        noResultsCard.className = 'text-center text-muted py-4';
+        noResultsCard.innerHTML = `
+            <i class="bi bi-search" style="font-size: 2rem;"></i>
+            <br><br>
+            <strong>No se encontraron servicios</strong>
+            <br>
+            <small>Intenta ajustar los filtros de búsqueda</small>
+        `;
+        servicesCardsElement.appendChild(noResultsCard);
     } else {
         paginatedServices.forEach(service => {
-            const row = document.createElement('tr');
             const canEdit = !['Finalizado', 'Cancelado'].includes(service.status);
             const editButton = canEdit ?
                 `<button class="btn btn-warning btn-sm" onclick="editService('${service.id}')">Editar</button>` :
@@ -663,6 +710,8 @@ function renderAdminServicesList(filteredServices = services, page = 1) {
                 `<button class="btn btn-danger btn-sm" onclick="deleteService('${service.id}')">Eliminar</button>` :
                 `<button class="btn btn-danger btn-sm" disabled title="No se puede eliminar servicio finalizado/cancelado">Eliminar</button>`;
 
+            // Generar fila de tabla (vista desktop)
+            const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${service.date}</td>
                 <td>${service.clientName}</td>
@@ -677,6 +726,62 @@ function renderAdminServicesList(filteredServices = services, page = 1) {
                 </td>
             `;
             servicesListElement.appendChild(row);
+            
+            // Generar tarjeta móvil (vista móvil)
+            const serviceCard = document.createElement('div');
+            serviceCard.className = 'service-card';
+            
+            // Determinar clase de estado para la tarjeta
+            let statusClass = '';
+            switch(service.status) {
+                case 'Pendiente':
+                    statusClass = 'status-pendiente';
+                    break;
+                case 'En proceso':
+                    statusClass = 'status-en-proceso';
+                    break;
+                case 'Finalizado':
+                    statusClass = 'status-finalizado';
+                    break;
+                case 'Cancelado':
+                    statusClass = 'status-cancelado';
+                    break;
+            }
+            
+            serviceCard.innerHTML = `
+                <div class="service-card-header">
+                    <span class="service-card-id">#${service.id}</span>
+                    <span class="service-card-status ${statusClass}">${service.status}</span>
+                </div>
+                <div class="service-card-info">
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Fecha:</span>
+                        <span class="service-card-info-value">${service.date}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Cliente:</span>
+                        <span class="service-card-info-value">${service.clientName}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Tipo Caja:</span>
+                        <span class="service-card-info-value">${service.safeType}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Ubicación:</span>
+                        <span class="service-card-info-value">${service.location}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Técnico:</span>
+                        <span class="service-card-info-value">${getTechnicianNameById(service.technicianId)}</span>
+                    </div>
+                </div>
+                <div class="service-card-actions">
+                    <button class="btn btn-info btn-sm" onclick="viewServiceDetails('${service.id}')">Ver</button>
+                    ${editButton}
+                    ${deleteButton}
+                </div>
+            `;
+            servicesCardsElement.appendChild(serviceCard);
         });
         
         // Agregar numeración a las filas
@@ -1287,6 +1392,7 @@ function assignServiceToTechnician() {
 function renderAssignedServicesList(page = 1) {
     currentAssignedServicesPage = page;
     const assignedListElement = document.getElementById('assigned-services-list');
+    const assignedCardsElement = document.getElementById('assigned-services-list-cards');
     const assignedTable = assignedListElement.closest('table');
     const assignedTableHeader = assignedTable.querySelector('thead');
     
@@ -1296,12 +1402,14 @@ function renderAssignedServicesList(page = 1) {
     }
     
     assignedListElement.innerHTML = '';
+    assignedCardsElement.innerHTML = '';
     
     const assignedServices = services.filter(s => s.technicianId);
     const totalPages = getTotalPages(assignedServices.length);
     const paginatedServices = paginateArray(assignedServices, page);
     
     if (paginatedServices.length === 0) {
+        // Mensaje para tabla
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
             <td colspan="6" class="text-center text-muted py-4">
@@ -1311,14 +1419,25 @@ function renderAssignedServicesList(page = 1) {
             </td>
         `;
         assignedListElement.appendChild(noResultsRow);
+        
+        // Mensaje para tarjetas móviles
+        const noResultsCard = document.createElement('div');
+        noResultsCard.className = 'text-center text-muted py-4';
+        noResultsCard.innerHTML = `
+            <i class="bi bi-list-check" style="font-size: 2rem;"></i>
+            <br><br>
+            <strong>No hay servicios asignados</strong>
+        `;
+        assignedCardsElement.appendChild(noResultsCard);
     } else {
         paginatedServices.forEach(service => {
-            const row = document.createElement('tr');
             const canUnassign = !['Finalizado', 'Cancelado'].includes(service.status);
             const unassignButton = canUnassign ?
                 `<button class="btn btn-secondary btn-sm" onclick="unassignService('${service.id}')">Desasignar</button>` :
                 `<button class="btn btn-secondary btn-sm" disabled title="No se puede desasignar servicio finalizado/cancelado">Desasignar</button>`;
 
+            // Generar fila de tabla (vista desktop)
+            const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${service.id}</td>
                 <td>${service.clientName}</td>
@@ -1330,6 +1449,49 @@ function renderAssignedServicesList(page = 1) {
                 </td>
             `;
             assignedListElement.appendChild(row);
+            
+            // Generar tarjeta móvil (vista móvil)
+            const serviceCard = document.createElement('div');
+            serviceCard.className = 'service-card';
+            
+            // Determinar clase de estado para la tarjeta
+            let statusClass = '';
+            switch(service.status) {
+                case 'Pendiente':
+                    statusClass = 'status-pendiente';
+                    break;
+                case 'En proceso':
+                    statusClass = 'status-en-proceso';
+                    break;
+                case 'Finalizado':
+                    statusClass = 'status-finalizado';
+                    break;
+                case 'Cancelado':
+                    statusClass = 'status-cancelado';
+                    break;
+            }
+            
+            serviceCard.innerHTML = `
+                <div class="service-card-header">
+                    <span class="service-card-id">#${service.id}</span>
+                    <span class="service-card-status ${statusClass}">${service.status}</span>
+                </div>
+                <div class="service-card-info">
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Cliente:</span>
+                        <span class="service-card-info-value">${service.clientName}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Técnico:</span>
+                        <span class="service-card-info-value">${getTechnicianNameById(service.technicianId)}</span>
+                    </div>
+                </div>
+                <div class="service-card-actions">
+                    <button class="btn btn-info btn-sm" onclick="viewServiceDetails('${service.id}')">Ver</button>
+                    ${unassignButton}
+                </div>
+            `;
+            assignedCardsElement.appendChild(serviceCard);
         });
         
         // Agregar numeración a las filas
@@ -2434,6 +2596,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar scroll to top
     initializeScrollToTop();
     
+    // Inicializar protecciones de seguridad
+    initializeSecurityProtections();
+    
     // ELIMINAR la inicialización de navegación táctil personalizada
     // initializeTableNavigation();
     
@@ -2799,4 +2964,87 @@ function filterEmployeeServices(status) {
     
     // Re-renderizar la lista con el filtro aplicado
     renderEmployeeAssignedServices(1);
+}
+
+// ===== FUNCIONES DE BLOQUEO DE ACCESO =====
+
+// Función para bloquear click derecho
+function blockRightClick(e) {
+    e.preventDefault();
+    return false;
+}
+
+// Función para bloquear atajos de teclado
+function blockKeyboardShortcuts(e) {
+    // Bloquear Ctrl+U (ver código fuente)
+    if (e.ctrlKey && e.key === 'u') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Bloquear Ctrl+Shift+I (herramientas de desarrollador)
+    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Bloquear F12
+    if (e.key === 'F12') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Bloquear Ctrl+Shift+C (inspeccionar elemento)
+    if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Bloquear Ctrl+Shift+J (consola)
+    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Bloquear Ctrl+Shift+K (consola web)
+    if (e.ctrlKey && e.shiftKey && e.key === 'K') {
+        e.preventDefault();
+        return false;
+    }
+}
+
+// Función para bloquear Fn+F12 (específico para algunos teclados)
+function blockFunctionKeys(e) {
+    // Bloquear F12
+    if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+    }
+}
+
+// Función para inicializar todas las protecciones
+function initializeSecurityProtections() {
+    // Bloquear click derecho
+    document.addEventListener('contextmenu', blockRightClick);
+    
+    // Bloquear atajos de teclado
+    document.addEventListener('keydown', blockKeyboardShortcuts);
+    document.addEventListener('keydown', blockFunctionKeys);
+    
+    // Bloquear también en el body y html
+    document.body.addEventListener('contextmenu', blockRightClick);
+    document.body.addEventListener('keydown', blockKeyboardShortcuts);
+    document.body.addEventListener('keydown', blockFunctionKeys);
+    
+    // Bloquear inspección de elementos
+    document.addEventListener('selectstart', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    // Bloquear arrastrar elementos
+    document.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+        return false;
+    });
 }
