@@ -7,6 +7,19 @@ let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
 let currentTheme = localStorage.getItem('theme') || 'light'; // Tema actual
 let currentEmployeeServicesFilter = 'todos'; // Filtro actual para servicios del técnico
 
+// Contadores para IDs únicos
+let serviceCounter = parseInt(localStorage.getItem('serviceCounter')) || 0;
+let reportCounter = parseInt(localStorage.getItem('reportCounter')) || 0;
+
+// Sistema de debugging para IDs
+let debugMode = true; // Cambiar a false en producción
+
+function debugLog(message, data = null) {
+    if (debugMode) {
+        console.log(`[DEBUG] ${message}`, data || '');
+    }
+}
+
 // Crear usuario administrador por defecto si no hay usuarios
 if (users.length === 0) {
     users = [
@@ -20,6 +33,260 @@ if (users.length === 0) {
     localStorage.setItem('users', JSON.stringify(users));
     console.log('Usuario administrador por defecto creado:', users[0]);
 }
+
+// Migrar servicios existentes al nuevo formato de IDs
+function migrateExistingIds() {
+    let needsMigration = false;
+    
+    // Migrar servicios
+    services.forEach(service => {
+        if (!service.id.startsWith('S')) {
+            const oldId = service.id;
+            service.id = generateServiceId();
+            needsMigration = true;
+            debugLog(`Servicio migrado: ${oldId} → ${service.id}`);
+        }
+    });
+    
+    // Migrar reportes
+    reports.forEach(report => {
+        if (!report.id.startsWith('R')) {
+            const oldId = report.id;
+            report.id = generateReportId();
+            needsMigration = true;
+            debugLog(`Reporte migrado: ${oldId} → ${report.id}`);
+        }
+    });
+    
+    if (needsMigration) {
+        saveServices();
+        saveReports();
+        debugLog('IDs migrados al nuevo formato');
+    }
+}
+
+// Inicializar contadores basándose en datos existentes
+function initializeCounters() {
+    // Migrar IDs existentes primero
+    migrateExistingIds();
+    
+    // Inicializar contador de servicios
+    if (services.length > 0) {
+        const serviceIds = services.map(s => s.id).filter(id => id.startsWith('S'));
+        if (serviceIds.length > 0) {
+            const maxServiceNumber = Math.max(...serviceIds.map(id => {
+                const match = id.match(/^S(\d+)$/);
+                return match ? parseInt(match[1]) : 0;
+            }));
+            serviceCounter = Math.max(serviceCounter, maxServiceNumber);
+            debugLog(`Contador de servicios inicializado: ${serviceCounter}`);
+        }
+    }
+    
+    // Inicializar contador de reportes
+    if (reports.length > 0) {
+        const reportIds = reports.map(r => r.id).filter(id => id.startsWith('R'));
+        if (reportIds.length > 0) {
+            const maxReportNumber = Math.max(...reportIds.map(id => {
+                const match = id.match(/^R(\d+)$/);
+                return match ? parseInt(match[1]) : 0;
+            }));
+            reportCounter = Math.max(reportCounter, maxReportNumber);
+            debugLog(`Contador de reportes inicializado: ${reportCounter}`);
+        }
+    }
+    
+    // Guardar contadores actualizados
+    localStorage.setItem('serviceCounter', serviceCounter.toString());
+    localStorage.setItem('reportCounter', reportCounter.toString());
+}
+
+// Ejecutar inicialización de contadores
+initializeCounters();
+
+// Forzar migración y reinicio de contadores si es necesario
+function forceMigrationAndReset() {
+    debugLog('Forzando migración y reinicio de contadores...');
+    
+    // Migrar todos los servicios que no tengan formato S001
+    let servicesMigrated = false;
+    services.forEach(service => {
+        if (!service.id.startsWith('S')) {
+            const oldId = service.id;
+            service.id = generateServiceId();
+            servicesMigrated = true;
+            debugLog(`Servicio migrado: ${oldId} → ${service.id}`);
+        }
+    });
+    
+    // Migrar todos los reportes que no tengan formato R001
+    let reportsMigrated = false;
+    reports.forEach(report => {
+        if (!report.id.startsWith('R')) {
+            const oldId = report.id;
+            report.id = generateReportId();
+            reportsMigrated = true;
+            debugLog(`Reporte migrado: ${oldId} → ${report.id}`);
+        }
+    });
+    
+    if (servicesMigrated || reportsMigrated) {
+        saveServices();
+        saveReports();
+        debugLog('Migración forzada completada');
+    }
+    
+    // Reiniciar contadores basándose en los datos migrados
+    if (services.length > 0) {
+        const serviceIds = services.map(s => s.id).filter(id => id.startsWith('S'));
+        if (serviceIds.length > 0) {
+            const maxServiceNumber = Math.max(...serviceIds.map(id => {
+                const match = id.match(/^S(\d+)$/);
+                return match ? parseInt(match[1]) : 0;
+            }));
+            serviceCounter = maxServiceNumber;
+            debugLog(`Contador de servicios reiniciado: ${serviceCounter}`);
+        }
+    }
+    
+    if (reports.length > 0) {
+        const reportIds = reports.map(r => r.id).filter(id => id.startsWith('R'));
+        if (reportIds.length > 0) {
+            const maxReportNumber = Math.max(...reportIds.map(id => {
+                const match = id.match(/^R(\d+)$/);
+                return match ? parseInt(match[1]) : 0;
+            }));
+            reportCounter = maxReportNumber;
+            debugLog(`Contador de reportes reiniciado: ${reportCounter}`);
+        }
+    }
+    
+    localStorage.setItem('serviceCounter', serviceCounter.toString());
+    localStorage.setItem('reportCounter', reportCounter.toString());
+}
+
+// Ejecutar migración forzada
+forceMigrationAndReset();
+
+// Verificar y corregir IDs existentes
+function ensureCorrectIds() {
+    debugLog('Verificando y corrigiendo IDs...');
+    
+    // Recargar datos del localStorage
+    services = JSON.parse(localStorage.getItem('services')) || [];
+    reports = JSON.parse(localStorage.getItem('reports')) || [];
+    
+    let needsUpdate = false;
+    
+    // Verificar servicios
+    services.forEach(service => {
+        if (!service.id || !service.id.startsWith('S') || !/^S\d{3}$/.test(service.id)) {
+            const oldId = service.id;
+            service.id = generateServiceId();
+            needsUpdate = true;
+            debugLog(`Servicio corregido: ${oldId} → ${service.id}`);
+        }
+    });
+    
+    // Verificar reportes
+    reports.forEach(report => {
+        if (!report.id || !report.id.startsWith('R') || !/^R\d{3}$/.test(report.id)) {
+            const oldId = report.id;
+            report.id = generateReportId();
+            needsUpdate = true;
+            debugLog(`Reporte corregido: ${oldId} → ${report.id}`);
+        }
+    });
+    
+    if (needsUpdate) {
+        saveServices();
+        saveReports();
+        debugLog('IDs corregidos y guardados');
+    }
+    
+    // Actualizar contadores basándose en los datos corregidos
+    if (services.length > 0) {
+        const serviceIds = services.map(s => s.id).filter(id => id.startsWith('S'));
+        if (serviceIds.length > 0) {
+            const maxServiceNumber = Math.max(...serviceIds.map(id => {
+                const match = id.match(/^S(\d+)$/);
+                return match ? parseInt(match[1]) : 0;
+            }));
+            serviceCounter = Math.max(serviceCounter, maxServiceNumber);
+            debugLog(`Contador de servicios actualizado: ${serviceCounter}`);
+        }
+    }
+    
+    if (reports.length > 0) {
+        const reportIds = reports.map(r => r.id).filter(id => id.startsWith('R'));
+        if (reportIds.length > 0) {
+            const maxReportNumber = Math.max(...reportIds.map(id => {
+                const match = id.match(/^R(\d+)$/);
+                return match ? parseInt(match[1]) : 0;
+            }));
+            reportCounter = Math.max(reportCounter, maxReportNumber);
+            debugLog(`Contador de reportes actualizado: ${reportCounter}`);
+        }
+    }
+    
+    localStorage.setItem('serviceCounter', serviceCounter.toString());
+    localStorage.setItem('reportCounter', reportCounter.toString());
+}
+
+// Validar y corregir IDs antes de crear nuevos elementos
+function validateAndCorrectIds() {
+    debugLog('Validando IDs antes de crear nuevos elementos...');
+    
+    // Sincronizar contadores con localStorage
+    const currentServiceCounter = parseInt(localStorage.getItem('serviceCounter')) || 0;
+    const currentReportCounter = parseInt(localStorage.getItem('reportCounter')) || 0;
+    
+    if (currentServiceCounter !== serviceCounter) {
+        serviceCounter = currentServiceCounter;
+        debugLog(`Contador de servicios sincronizado: ${serviceCounter}`);
+    }
+    
+    if (currentReportCounter !== reportCounter) {
+        reportCounter = currentReportCounter;
+        debugLog(`Contador de reportes sincronizado: ${reportCounter}`);
+    }
+    
+    // Verificar que no haya IDs duplicados o incorrectos
+    const serviceIds = services.map(s => s.id);
+    const reportIds = reports.map(r => r.id);
+    
+    const duplicateServiceIds = serviceIds.filter((id, index) => serviceIds.indexOf(id) !== index);
+    const duplicateReportIds = reportIds.filter((id, index) => reportIds.indexOf(id) !== index);
+    
+    if (duplicateServiceIds.length > 0) {
+        debugLog(`IDs de servicios duplicados detectados: ${duplicateServiceIds.join(', ')}`);
+    }
+    
+    if (duplicateReportIds.length > 0) {
+        debugLog(`IDs de reportes duplicados detectados: ${duplicateReportIds.join(', ')}`);
+    }
+    
+    // Verificar formato de IDs
+    const invalidServiceIds = serviceIds.filter(id => !/^S\d{3}$/.test(id));
+    const invalidReportIds = reportIds.filter(id => !/^R\d{3}$/.test(id));
+    
+    if (invalidServiceIds.length > 0) {
+        debugLog(`IDs de servicios con formato incorrecto: ${invalidServiceIds.join(', ')}`);
+    }
+    
+    if (invalidReportIds.length > 0) {
+        debugLog(`IDs de reportes con formato incorrecto: ${invalidReportIds.join(', ')}`);
+    }
+}
+
+// Ejecutar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    debugLog('DOM cargado, verificando IDs...');
+    ensureCorrectIds();
+});
+
+// También ejecutar inmediatamente
+ensureCorrectIds();
 
 // SignaturePad instances
 let signaturePadClient = null;
@@ -158,6 +425,20 @@ document.addEventListener('DOMContentLoaded', function() {
 // Function to generate unique IDs
 function generateId() {
     return '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Función para generar ID único de servicio (S001, S002, etc.)
+function generateServiceId() {
+    serviceCounter++;
+    localStorage.setItem('serviceCounter', serviceCounter.toString());
+    return 'S' + serviceCounter.toString().padStart(3, '0');
+}
+
+// Función para generar ID único de reporte (R001, R002, etc.)
+function generateReportId() {
+    reportCounter++;
+    localStorage.setItem('reportCounter', reportCounter.toString());
+    return 'R' + reportCounter.toString().padStart(3, '0');
 }
 
 // Save data to localStorage
@@ -713,6 +994,7 @@ function renderAdminServicesList(filteredServices = services, page = 1) {
             // Generar fila de tabla (vista desktop)
             const row = document.createElement('tr');
             row.innerHTML = `
+                <td>${service.id}</td>
                 <td>${service.date}</td>
                 <td>${service.clientName}</td>
                 <td>${service.safeType}</td>
@@ -818,12 +1100,14 @@ function filterServices() {
     // Filtrar por término de búsqueda
     if (searchTerm) {
         filtered = filtered.filter(service => {
+            const serviceId = service.id.toLowerCase();
             const clientName = service.clientName.toLowerCase();
             const safeType = service.safeType.toLowerCase();
             const technicianName = getTechnicianNameById(service.technicianId).toLowerCase();
             const status = service.status.toLowerCase();
             
-            return clientName.includes(searchTerm) ||
+            return serviceId.includes(searchTerm) ||
+                   clientName.includes(searchTerm) ||
                    safeType.includes(searchTerm) ||
                    technicianName.includes(searchTerm) ||
                    status.includes(searchTerm);
@@ -865,15 +1149,61 @@ function updateServicesStatistics(servicesToCount = services) {
     document.getElementById('cancelled-services-count').textContent = cancelled;
 }
 
+// Función para obtener los tipos de servicio seleccionados
+function getSelectedServiceTypes() {
+    const selectedTypes = [];
+    const checkboxes = [
+        document.getElementById('service-type-cajas'),
+        document.getElementById('service-type-camaras'),
+        document.getElementById('service-type-puertas')
+    ];
+    
+    checkboxes.forEach(checkbox => {
+        if (checkbox && checkbox.checked) {
+            selectedTypes.push(checkbox.value);
+        }
+    });
+    
+    return selectedTypes.join(', ');
+}
+
+// Función para establecer los tipos de servicio en los checkboxes
+function setServiceTypes(typesString) {
+    const types = typesString ? typesString.split(', ') : [];
+    const checkboxes = {
+        'Cajas fuerte': document.getElementById('service-type-cajas'),
+        'Sistema de seguridad de camaras': document.getElementById('service-type-camaras'),
+        'Puertas de seguridad': document.getElementById('service-type-puertas')
+    };
+    
+    // Limpiar todos los checkboxes
+    Object.values(checkboxes).forEach(checkbox => {
+        if (checkbox) checkbox.checked = false;
+    });
+    
+    // Marcar los checkboxes correspondientes
+    types.forEach(type => {
+        if (checkboxes[type]) {
+            checkboxes[type].checked = true;
+        }
+    });
+}
+
 document.getElementById('service-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const serviceId = document.getElementById('edit-service-id').value;
     const date = document.getElementById('service-date').value;
-    const safeType = document.getElementById('service-safe-type').value;
+    const safeType = getSelectedServiceTypes();
     const location = document.getElementById('service-location').value;
     const clientName = document.getElementById('service-client-name').value;
     const clientPhone = document.getElementById('service-client-phone').value;
     const status = document.getElementById('service-status').value;
+    
+    // Validar que al menos un tipo de servicio esté seleccionado
+    if (!safeType.trim()) {
+        showAlert('Por favor selecciona al menos un tipo de servicio.');
+        return;
+    }
 
     let photoData = '';
     const photoInput = document.getElementById('service-photo');
@@ -1058,8 +1388,24 @@ function saveServiceData(serviceId, date, safeType, location, clientName, client
         }
 
     function finalizeServiceSave() {
+        // Validar y corregir IDs antes de crear nuevo servicio
+        validateAndCorrectIds();
+        
+        // Obtener el serviceId del campo oculto
+        const serviceId = document.getElementById('edit-service-id').value;
+        
+        // Debug: Verificar el valor de serviceId
+        debugLog('Valor de serviceId antes de la asignación:', serviceId);
+        debugLog('serviceId.trim() !== "":', serviceId && serviceId.trim() !== '');
+        
+        const generatedId = generateServiceId();
+        debugLog('ID generado por generateServiceId():', generatedId);
+        
+        const finalId = serviceId && serviceId.trim() !== '' ? serviceId : generatedId;
+        debugLog('ID final asignado al servicio:', finalId);
+        
         const newService = {
-            id: serviceId || generateId(),
+            id: finalId,
             date,
             safeType,
             location,
@@ -1128,7 +1474,7 @@ function editService(id) {
 
         document.getElementById('edit-service-id').value = service.id;
         document.getElementById('service-date').value = service.date;
-        document.getElementById('service-safe-type').value = service.safeType;
+        setServiceTypes(service.safeType);
         document.getElementById('service-location').value = service.location;
 
         const technicianField = document.getElementById('service-technician-field');
@@ -1412,7 +1758,7 @@ function renderAssignedServicesList(page = 1) {
         // Mensaje para tabla
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
-            <td colspan="6" class="text-center text-muted py-4">
+            <td colspan="9" class="text-center text-muted py-4">
                 <i class="bi bi-list-check" style="font-size: 2rem;"></i>
                 <br><br>
                 <strong>No hay servicios asignados</strong>
@@ -1440,7 +1786,10 @@ function renderAssignedServicesList(page = 1) {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${service.id}</td>
+                <td>${service.date}</td>
                 <td>${service.clientName}</td>
+                <td>${service.safeType}</td>
+                <td>${service.location}</td>
                 <td>${getTechnicianNameById(service.technicianId)}</td>
                 <td>${service.status}</td>
                 <td>
@@ -1546,11 +1895,19 @@ function unassignService(serviceId) {
 
 document.getElementById('novelty-form').addEventListener('submit', (e) => {
     e.preventDefault();
+    
+    // Validar y corregir IDs antes de crear nuevo reporte
+    validateAndCorrectIds();
+    
     const serviceId = document.getElementById('novelty-service-id').value;
     const description = document.getElementById('novelty-description').value;
 
+    // Debug: Verificar la generación del ID del reporte
+    const generatedReportId = generateReportId();
+    debugLog('ID de reporte generado:', generatedReportId);
+
     const newReport = {
-        id: generateId(),
+        id: generatedReportId,
         date: new Date().toISOString().split('T')[0],
         serviceId: serviceId || 'N/A',
         reporterId: currentUser.id,
@@ -1559,6 +1916,8 @@ document.getElementById('novelty-form').addEventListener('submit', (e) => {
         replies: [],
         readForAdmin: false // Mark as unread for admin when a new report is created
     };
+    
+    debugLog('Nuevo reporte creado:', newReport);
     reports.push(newReport);
     saveReports();
     renderReportsList(1);
@@ -1903,7 +2262,7 @@ function openServiceFinalizationModal(serviceId) {
 
         // Llenar los campos del formulario
         document.getElementById('service-date').value = service.date;
-        document.getElementById('service-safe-type').value = service.safeType;
+        setServiceTypes(service.safeType);
         document.getElementById('service-location').value = service.location;
         document.getElementById('service-client-name').value = service.clientName;
         document.getElementById('service-client-phone').value = service.clientPhone;
@@ -1951,7 +2310,10 @@ function openServiceFinalizationModal(serviceId) {
 
         // Deshabilitar campos que el técnico no debe editar al finalizar
         document.getElementById('service-date').disabled = true;
-        document.getElementById('service-safe-type').disabled = true;
+        // Deshabilitar checkboxes de tipo de servicio
+        document.getElementById('service-type-cajas').disabled = true;
+        document.getElementById('service-type-camaras').disabled = true;
+        document.getElementById('service-type-puertas').disabled = true;
         document.getElementById('service-location').disabled = true;
         document.getElementById('service-client-name').disabled = true;
         document.getElementById('service-client-phone').disabled = true;
@@ -2652,6 +3014,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('service-form').reset();
             document.getElementById('edit-service-id').value = '';
             document.getElementById('registerServiceModalLabel').textContent = 'Registrar Servicio Realizado';
+            
+            // Limpiar checkboxes de tipo de servicio
+            setServiceTypes('');
 
             // Limpiar y ocultar previsualización de foto
             document.getElementById('service-photo-preview').classList.add('d-none');
@@ -2670,7 +3035,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Habilitar campos que se deshabilitaron al finalizar un servicio
             document.getElementById('service-date').disabled = false;
-            document.getElementById('service-safe-type').disabled = false;
+            // Habilitar checkboxes de tipo de servicio
+            document.getElementById('service-type-cajas').disabled = false;
+            document.getElementById('service-type-camaras').disabled = false;
+            document.getElementById('service-type-puertas').disabled = false;
             document.getElementById('service-location').disabled = false;
             document.getElementById('service-client-name').disabled = false;
             document.getElementById('service-client-phone').disabled = false;
