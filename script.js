@@ -677,6 +677,7 @@ function showEmployeeDashboard() {
         renderEmployeeAssignedServices(1);
         renderEmployeeNotifications(1);
         renderEmployeeReportReplies(1);
+        updateEmployeeFilterCounts(); // Actualizar contadores de filtros
         updateNotificationBadges(); // Update badges for employee
         
         console.log('Employee dashboard mostrado correctamente');
@@ -960,7 +961,7 @@ function renderAdminServicesList(filteredServices = services, page = 1) {
         // Mensaje para tabla
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
-            <td colspan="8" class="text-center text-muted py-4">
+            <td colspan="9" class="text-center text-muted py-4">
                 <i class="bi bi-search" style="font-size: 2rem;"></i>
                 <br><br>
                 <strong>No se encontraron servicios</strong>
@@ -998,6 +999,7 @@ function renderAdminServicesList(filteredServices = services, page = 1) {
                 <td>${service.date}</td>
                 <td>${service.clientName}</td>
                 <td>${service.safeType}</td>
+                <td>${service.description || '-'}</td>
                 <td>${service.location}</td>
                 <td>${getTechnicianNameById(service.technicianId)}</td>
                 <td>${service.status}</td>
@@ -1045,7 +1047,7 @@ function renderAdminServicesList(filteredServices = services, page = 1) {
                         <span class="service-card-info-value">${service.clientName}</span>
                     </div>
                     <div class="service-card-info-item">
-                        <span class="service-card-info-label">Tipo Caja:</span>
+                        <span class="service-card-info-label">Tipo Servicio:</span>
                         <span class="service-card-info-value">${service.safeType}</span>
                     </div>
                     <div class="service-card-info-item">
@@ -1103,12 +1105,14 @@ function filterServices() {
             const serviceId = service.id.toLowerCase();
             const clientName = service.clientName.toLowerCase();
             const safeType = service.safeType.toLowerCase();
+            const description = (service.description || '').toLowerCase();
             const technicianName = getTechnicianNameById(service.technicianId).toLowerCase();
             const status = service.status.toLowerCase();
             
             return serviceId.includes(searchTerm) ||
                    clientName.includes(searchTerm) ||
                    safeType.includes(searchTerm) ||
+                   description.includes(searchTerm) ||
                    technicianName.includes(searchTerm) ||
                    status.includes(searchTerm);
         });
@@ -1153,9 +1157,9 @@ function updateServicesStatistics(servicesToCount = services) {
 function getSelectedServiceTypes() {
     const selectedTypes = [];
     const checkboxes = [
-        document.getElementById('service-type-cajas'),
-        document.getElementById('service-type-camaras'),
-        document.getElementById('service-type-puertas')
+        document.getElementById('service-type-bovedas'),
+        document.getElementById('service-type-puertas'),
+        document.getElementById('service-type-pasatulas')
     ];
     
     checkboxes.forEach(checkbox => {
@@ -1171,9 +1175,9 @@ function getSelectedServiceTypes() {
 function setServiceTypes(typesString) {
     const types = typesString ? typesString.split(', ') : [];
     const checkboxes = {
-        'Cajas fuerte': document.getElementById('service-type-cajas'),
-        'Sistema de seguridad de camaras': document.getElementById('service-type-camaras'),
-        'Puertas de seguridad': document.getElementById('service-type-puertas')
+        'Bovedas y cajas fuertes de seguridad': document.getElementById('service-type-bovedas'),
+        'Puertas de seguridad': document.getElementById('service-type-puertas'),
+        'Pasatulas o tombolas': document.getElementById('service-type-pasatulas')
     };
     
     // Limpiar todos los checkboxes
@@ -1194,6 +1198,7 @@ document.getElementById('service-form').addEventListener('submit', (e) => {
     const serviceId = document.getElementById('edit-service-id').value;
     const date = document.getElementById('service-date').value;
     const safeType = getSelectedServiceTypes();
+    const description = document.getElementById('service-description').value;
     const location = document.getElementById('service-location').value;
     const clientName = document.getElementById('service-client-name').value;
     const clientPhone = document.getElementById('service-client-phone').value;
@@ -1225,7 +1230,7 @@ document.getElementById('service-form').addEventListener('submit', (e) => {
         const reader = new FileReader();
         reader.onload = function(event) {
             photoData = event.target.result;
-            saveServiceData(serviceId, date, safeType, location, clientName, clientPhone, status, photoData);
+            saveServiceData(serviceId, date, safeType, description, location, clientName, clientPhone, status, photoData);
         };
         reader.readAsDataURL(photoInput.files[0]);
     } else {
@@ -1236,11 +1241,11 @@ document.getElementById('service-form').addEventListener('submit', (e) => {
                 photoData = existingService.photo;
             }
         }
-        saveServiceData(serviceId, date, safeType, location, clientName, clientPhone, status, photoData);
+        saveServiceData(serviceId, date, safeType, description, location, clientName, clientPhone, status, photoData);
     }
 });
 
-function saveServiceData(serviceId, date, safeType, location, clientName, clientPhone, status, photoData) {
+function saveServiceData(serviceId, date, safeType, description, location, clientName, clientPhone, status, photoData) {
     let clientSignatureData = '';
     let technicianSignatureData = '';
 
@@ -1299,7 +1304,7 @@ function saveServiceData(serviceId, date, safeType, location, clientName, client
                 }
                 cancellationReason = inputReason;
                 // Since confirm is async, re-call the main save function with the reason
-                saveServiceData(serviceId, date, safeType, location, clientName, clientPhone, status, photoData);
+                saveServiceData(serviceId, date, safeType, description, location, clientName, clientPhone, status, photoData);
             });
             return; // Exit to wait for confirm modal input
         }
@@ -1408,6 +1413,7 @@ function saveServiceData(serviceId, date, safeType, location, clientName, client
             id: finalId,
             date,
             safeType,
+            description,
             location,
             technicianId: currentTechnicianId,
             photo: photoData,
@@ -1475,6 +1481,7 @@ function editService(id) {
         document.getElementById('edit-service-id').value = service.id;
         document.getElementById('service-date').value = service.date;
         setServiceTypes(service.safeType);
+        document.getElementById('service-description').value = service.description || '';
         document.getElementById('service-location').value = service.location;
 
         const technicianField = document.getElementById('service-technician-field');
@@ -1624,7 +1631,8 @@ function viewServiceDetails(id) {
         const detailsHtml = `
             <p><strong>ID Servicio:</strong> ${service.id}</p>
             <p><strong>Fecha:</strong> ${service.date}</p>
-            <p><strong>Tipo de Caja Fuerte:</strong> ${service.safeType}</p>
+            <p><strong>Tipo de Servicio:</strong> ${service.safeType}</p>
+            ${service.description ? `<p><strong>Descripción:</strong> ${service.description}</p>` : ''}
             <p><strong>Ubicación:</strong> ${service.location}
                 <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(service.location)}" 
                    target="_blank" class="btn-google-maps" title="Abrir en Google Maps">
@@ -1722,6 +1730,11 @@ function assignServiceToTechnician() {
         document.getElementById('assign-service-id').value = '';
         document.getElementById('assign-technician').value = '';
         renderEmployeeAssignedServices();
+        
+        // Actualizar contadores de filtros si el técnico asignado está logueado
+        if (currentUser && currentUser.role === 'employee' && currentUser.id === technicianId) {
+            updateEmployeeFilterCounts();
+        }
 
         // Hide message after 3 seconds
         setTimeout(() => {
@@ -1758,7 +1771,7 @@ function renderAssignedServicesList(page = 1) {
         // Mensaje para tabla
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
-            <td colspan="9" class="text-center text-muted py-4">
+            <td colspan="10" class="text-center text-muted py-4">
                 <i class="bi bi-list-check" style="font-size: 2rem;"></i>
                 <br><br>
                 <strong>No hay servicios asignados</strong>
@@ -1789,6 +1802,7 @@ function renderAssignedServicesList(page = 1) {
                 <td>${service.date}</td>
                 <td>${service.clientName}</td>
                 <td>${service.safeType}</td>
+                <td>${service.description || '-'}</td>
                 <td>${service.location}</td>
                 <td>${getTechnicianNameById(service.technicianId)}</td>
                 <td>${service.status}</td>
@@ -1827,8 +1841,20 @@ function renderAssignedServicesList(page = 1) {
                 </div>
                 <div class="service-card-info">
                     <div class="service-card-info-item">
+                        <span class="service-card-info-label">Fecha:</span>
+                        <span class="service-card-info-value">${service.date}</span>
+                    </div>
+                    <div class="service-card-info-item">
                         <span class="service-card-info-label">Cliente:</span>
                         <span class="service-card-info-value">${service.clientName}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Tipo Servicio:</span>
+                        <span class="service-card-info-value">${service.safeType}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Ubicación:</span>
+                        <span class="service-card-info-value">${service.location}</span>
                     </div>
                     <div class="service-card-info-item">
                         <span class="service-card-info-label">Técnico:</span>
@@ -1884,6 +1910,11 @@ function unassignService(serviceId) {
                     sendNotification(oldTechnicianId, `El servicio ID: ${serviceId} (Cliente: ${service.clientName}, Tipo: ${service.safeType}) ha sido DESASIGNADO por el administrador. Ya no está asignado a ti.`);
                 }
                 renderEmployeeAssignedServices(1);
+                
+                // Actualizar contadores de filtros si el técnico desasignado está logueado
+                if (currentUser && currentUser.role === 'employee' && currentUser.id === oldTechnicianId) {
+                    updateEmployeeFilterCounts();
+                }
                 //showAlert('Servicio desasignado exitosamente.');
             }
         }
@@ -2083,7 +2114,7 @@ function renderEmployeeAssignedServices(page = 1) {
         // Mensaje para tabla
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
-            <td colspan="7" class="text-center text-muted py-4">
+            <td colspan="10" class="text-center text-muted py-4">
                 <i class="bi bi-person-check" style="font-size: 2rem;"></i>
                 <br><br>
                 <strong>No tienes servicios asignados</strong>
@@ -2112,9 +2143,13 @@ function renderEmployeeAssignedServices(page = 1) {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${service.id}</td>
-                <td>${service.clientName}</td>
+                <td>${service.date}</td>
                 <td>${service.safeType}</td>
+                <td>${service.description || '-'}</td>
                 <td>${service.location}</td>
+                <td>${getTechnicianNameById(service.technicianId)}</td>
+                <td>${service.clientName}</td>
+                <td>${service.clientPhone}</td>
                 <td>${service.status}</td>
                 <td>
                     <button class="btn btn-info btn-sm" onclick="viewServiceDetails('${service.id}')">Ver</button>
@@ -2163,16 +2198,28 @@ function renderEmployeeAssignedServices(page = 1) {
                 </div>
                 <div class="service-card-info">
                     <div class="service-card-info-item">
-                        <span class="service-card-info-label">Cliente:</span>
-                        <span class="service-card-info-value">${service.clientName}</span>
+                        <span class="service-card-info-label">Fecha:</span>
+                        <span class="service-card-info-value">${service.date}</span>
                     </div>
                     <div class="service-card-info-item">
-                        <span class="service-card-info-label">Tipo Caja:</span>
+                        <span class="service-card-info-label">Tipo Servicio:</span>
                         <span class="service-card-info-value">${service.safeType}</span>
                     </div>
                     <div class="service-card-info-item">
                         <span class="service-card-info-label">Ubicación:</span>
                         <span class="service-card-info-value">${service.location}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Técnico:</span>
+                        <span class="service-card-info-value">${getTechnicianNameById(service.technicianId)}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Cliente:</span>
+                        <span class="service-card-info-value">${service.clientName}</span>
+                    </div>
+                    <div class="service-card-info-item">
+                        <span class="service-card-info-label">Teléfono:</span>
+                        <span class="service-card-info-value">${service.clientPhone}</span>
                     </div>
                 </div>
                 <div class="service-card-actions">
@@ -2212,6 +2259,9 @@ function renderEmployeeAssignedServices(page = 1) {
     paginationContainer.appendChild(paginationDiv);
     
     generatePaginationControls(page, totalPages, 'employee-services-pagination', renderEmployeeAssignedServices);
+    
+    // Actualizar contadores de filtros
+    updateEmployeeFilterCounts();
     
     updateNotificationBadges();
 }
@@ -2416,6 +2466,7 @@ function changeServiceStatus(id, newStatus, cancellationReason = null) {
             saveServices();
             renderEmployeeAssignedServices(1);
             renderAdminServicesList(services, 1);
+            updateEmployeeFilterCounts(); // Actualizar contadores de filtros
             sendNotification('admin', `El servicio ID: ${id} ha cambiado de estado de "${oldStatus}" a "${newStatus}" por el técnico ${currentUser.username}. ${newStatus === 'Cancelado' ? `Motivo: ${cancellationReason}` : ''}`);
             //showAlert(`Estado del servicio ID ${id} cambiado a "${newStatus}".`);
         }
@@ -2864,7 +2915,8 @@ function exportServicesToExcel() {
         return {
             'ID Servicio': service.id,
             'Fecha': service.date,
-            'Tipo de Caja Fuerte': service.safeType,
+            'Tipo de Servicio': service.safeType,
+            'Descripción': service.description || 'N/A',
             'Ubicación': service.location,
             'Técnico Encargado': technicianName,
             'Nombre del Cliente': service.clientName,
@@ -3315,6 +3367,47 @@ function initializeScrollToTop() {
     if (window.pageYOffset > 300) {
         scrollToTopBtn.classList.add('show');
     }
+}
+
+// Función para actualizar los contadores de filtros del técnico
+function updateEmployeeFilterCounts() {
+    if (!currentUser || currentUser.role !== 'employee') return;
+    
+    // Obtener servicios asignados al técnico actual
+    const assignedToMe = services.filter(s => s.technicianId === currentUser.id);
+    
+    // Calcular cantidades por estado
+    const counts = {
+        todos: assignedToMe.length,
+        pendiente: assignedToMe.filter(s => s.status === 'Pendiente').length,
+        'en-proceso': assignedToMe.filter(s => s.status === 'En proceso').length,
+        finalizado: assignedToMe.filter(s => s.status === 'Finalizado').length,
+        cancelado: assignedToMe.filter(s => s.status === 'Cancelado').length
+    };
+    
+    // Actualizar los badges
+    const badgeIds = {
+        'todos': 'filter-count-todos',
+        'pendiente': 'filter-count-pendiente',
+        'en-proceso': 'filter-count-en-proceso',
+        'finalizado': 'filter-count-finalizado',
+        'cancelado': 'filter-count-cancelado'
+    };
+    
+    Object.keys(counts).forEach(key => {
+        const badgeElement = document.getElementById(badgeIds[key]);
+        if (badgeElement) {
+            badgeElement.textContent = counts[key];
+            
+            // Agregar animación si hay servicios
+            if (counts[key] > 0) {
+                badgeElement.style.animation = 'badge-pulse-green 2s ease-in-out';
+                setTimeout(() => {
+                    badgeElement.style.animation = '';
+                }, 2000);
+            }
+        }
+    });
 }
 
 // Función para filtrar servicios del técnico por estado
