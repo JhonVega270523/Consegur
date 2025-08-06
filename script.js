@@ -1347,10 +1347,10 @@ function saveServiceData(serviceId, date, safeType, description, location, clien
                     
                     switch(error.code) {
                         case error.PERMISSION_DENIED:
-                            errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
+                            errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador. El servicio no se puede finalizar sin ubicación precisa.';
                             break;
                         case error.POSITION_UNAVAILABLE:
-                            errorMessage += 'Información de ubicación no disponible. Verifica que el GPS esté activado.';
+                            errorMessage += 'Información de ubicación no disponible. Verifica que el GPS esté activado y que tengas conexión a internet.';
                             break;
                         case error.TIMEOUT:
                             if (attempts < 2) {
@@ -1359,7 +1359,7 @@ function saveServiceData(serviceId, date, safeType, description, location, clien
                                 setTimeout(() => getPreciseFinalizationLocation(attempts + 1), 3000);
                                 return;
                             }
-                            errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
+                            errorMessage += 'Tiempo de espera agotado. Verifica tu conexión a internet y GPS.';
                             break;
                         default:
                             errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
@@ -1463,7 +1463,15 @@ function saveServiceData(serviceId, date, safeType, description, location, clien
         if (currentUser.role === 'employee') {
             renderEmployeeAssignedServices(1);
         }
-        //showAlert('Servicio guardado exitosamente.');
+        
+        // Mostrar mensaje de éxito apropiado según el estado
+        if (status === 'Finalizado') {
+            showAlert(`✅ Servicio finalizado exitosamente.\n\n📍 Ubicación registrada:\nLatitud: ${finalizationOrCancellationLocation?.latitude?.toFixed(8) || 'N/A'}\nLongitud: ${finalizationOrCancellationLocation?.longitude?.toFixed(8) || 'N/A'}\nPrecisión: ±${Math.round(finalizationOrCancellationLocation?.accuracy || 0)} metros\n\nEl servicio ha sido marcado como "Finalizado" y se ha registrado la ubicación de finalización.`);
+        } else if (status === 'En proceso') {
+            showAlert(`✅ Servicio iniciado exitosamente.\n\n📍 Ubicación registrada:\nLatitud: ${startLocation?.latitude?.toFixed(8) || 'N/A'}\nLongitud: ${startLocation?.longitude?.toFixed(8) || 'N/A'}\nPrecisión: ±${Math.round(startLocation?.accuracy || 0)} metros\n\nEl estado del servicio ha cambiado a "En proceso".`);
+        } else {
+            showAlert('Servicio guardado exitosamente.');
+        }
     }
 }
 
@@ -2160,7 +2168,7 @@ function renderEmployeeAssignedServices(page = 1) {
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${service.id}">
                             <li><a class="dropdown-item ${isStatusFixed || service.status === 'Pendiente' ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed} && '${service.status}' !== 'Pendiente') handleEmployeeServiceStatusChange('${service.id}', 'Pendiente')">Pendiente</a></li>
                             <li><a class="dropdown-item ${isStatusFixed || service.status === 'En proceso' ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed} && '${service.status}' !== 'En proceso') handleEmployeeServiceStatusChange('${service.id}', 'En proceso')">En proceso</a></li>
-                            <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Finalizado')">Finalizado</a></li>
+                            <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="console.log('Click en Finalizado (desktop) para servicio:', '${service.id}'); if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Finalizado')">Finalizado</a></li>
                             <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Cancelado')">Cancelado</a></li>
                         </ul>
                     </div>
@@ -2231,7 +2239,7 @@ function renderEmployeeAssignedServices(page = 1) {
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonMobile${service.id}">
                             <li><a class="dropdown-item ${isStatusFixed || service.status === 'Pendiente' ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed} && '${service.status}' !== 'Pendiente') handleEmployeeServiceStatusChange('${service.id}', 'Pendiente')">Pendiente</a></li>
                             <li><a class="dropdown-item ${isStatusFixed || service.status === 'En proceso' ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed} && '${service.status}' !== 'En proceso') handleEmployeeServiceStatusChange('${service.id}', 'En proceso')">En proceso</a></li>
-                            <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Finalizado')">Finalizado</a></li>
+                            <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="console.log('Click en Finalizado (móvil) para servicio:', '${service.id}'); if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Finalizado')">Finalizado</a></li>
                             <li><a class="dropdown-item ${isStatusFixed ? 'disabled' : ''}" href="#" onclick="if(!${isStatusFixed}) handleEmployeeServiceStatusChange('${service.id}', 'Cancelado')">Cancelado</a></li>
                         </ul>
                     </div>
@@ -2267,15 +2275,24 @@ function renderEmployeeAssignedServices(page = 1) {
 }
 
 function handleEmployeeServiceStatusChange(id, newStatus) {
+    console.log('handleEmployeeServiceStatusChange llamado con id:', id, 'newStatus:', newStatus);
+    
     const service = services.find(s => s.id === id);
-    if (!service) return;
+    console.log('Servicio encontrado en handleEmployeeServiceStatusChange:', service);
+    
+    if (!service) {
+        console.error('No se encontró el servicio con ID:', id);
+        return;
+    }
 
     if (['Finalizado', 'Cancelado'].includes(service.status)) {
+        console.log('Servicio ya finalizado o cancelado, no se puede cambiar estado');
         showAlert('No se puede cambiar el estado de un servicio finalizado o cancelado.');
         return;
     }
 
     if (newStatus === 'Finalizado') {
+        console.log('Intentando abrir modal de finalización para servicio:', id);
         openServiceFinalizationModal(id);
     } else if (newStatus === 'Cancelado') {
         // Show the modal for cancellation reason
@@ -2305,72 +2322,100 @@ function handleEmployeeServiceStatusChange(id, newStatus) {
 }
 
 function openServiceFinalizationModal(serviceId) {
+    console.log('openServiceFinalizationModal llamado con serviceId:', serviceId);
+    
     const service = services.find(s => s.id === serviceId);
+    console.log('Servicio encontrado:', service);
+    
     if (service) {
-        document.getElementById('edit-service-id').value = service.id;
-        document.getElementById('registerServiceModalLabel').textContent = `Finalizar Servicio: ${service.id}`;
+        try {
+            // Verificar que el modal existe
+            const modalElement = document.getElementById('registerServiceModal');
+            console.log('Elemento del modal encontrado:', modalElement);
+            
+            if (!modalElement) {
+                console.error('ERROR: No se encontró el elemento del modal registerServiceModal');
+                showAlert('Error: No se pudo abrir el modal de finalización. Contacte al administrador.');
+                return;
+            }
+            
+            // Llenar los campos del formulario
+            document.getElementById('edit-service-id').value = service.id;
+            document.getElementById('registerServiceModalLabel').textContent = `Finalizar Servicio: ${service.id}`;
+            document.getElementById('service-date').value = service.date;
+            setServiceTypes(service.safeType);
+            document.getElementById('service-description').value = service.description || ''; // Pre-llenar descripción
+            document.getElementById('service-location').value = service.location;
+            document.getElementById('service-client-name').value = service.clientName;
+            document.getElementById('service-client-phone').value = service.clientPhone;
+            document.getElementById('service-status').value = 'Finalizado'; // Establece el estado a Finalizado
 
-        // Llenar los campos del formulario
-        document.getElementById('service-date').value = service.date;
-        setServiceTypes(service.safeType);
-        document.getElementById('service-location').value = service.location;
-        document.getElementById('service-client-name').value = service.clientName;
-        document.getElementById('service-client-phone').value = service.clientPhone;
-        document.getElementById('service-status').value = 'Finalizado'; // Establece el estado a Finalizado
+            // Ocultar campo de técnico para el técnico
+            document.getElementById('service-technician-field').classList.add('d-none');
 
-        // Ocultar campo de técnico para el técnico
-        document.getElementById('service-technician-field').classList.add('d-none');
+            // --- ESTA ES LA CLAVE ---
+            // Aseguramos que los campos se muestren y se inicialicen
+            document.getElementById('photo-evidence-section').classList.remove('d-none');
+            document.getElementById('client-signature-section').classList.remove('d-none');
+            document.getElementById('technician-signature-section').classList.remove('d-none');
 
-        // --- ESTA ES LA CLAVE ---
-        // Aseguramos que los campos se muestren y se inicialicen
-        document.getElementById('photo-evidence-section').classList.remove('d-none');
-        document.getElementById('client-signature-section').classList.remove('d-none');
-        document.getElementById('technician-signature-section').classList.remove('d-none');
+            // Pre-cargar foto si existe
+            if (service.photo) {
+                document.getElementById('service-photo-preview').src = service.photo;
+                document.getElementById('service-photo-preview').classList.remove('d-none');
+            } else {
+                document.getElementById('service-photo-preview').classList.add('d-none');
+                document.getElementById('service-photo').value = ''; // Limpiar input de archivo
+            }
 
-        // Pre-cargar foto si existe
-        if (service.photo) {
-            document.getElementById('service-photo-preview').src = service.photo;
-            document.getElementById('service-photo-preview').classList.remove('d-none');
-        } else {
-            document.getElementById('service-photo-preview').classList.add('d-none');
-            document.getElementById('service-photo').value = ''; // Limpiar input de archivo
+            // Inicializar y cargar firmas
+            console.log('Inicializando signature pads...');
+            initializeSignaturePads(); // Asegura que los objetos signaturePad existan
+            
+            if (service.clientSignature) {
+                const imgClient = new Image();
+                imgClient.onload = function() {
+                    if (signaturePadClient) signaturePadClient.fromDataURL(service.clientSignature);
+                };
+                imgClient.src = service.clientSignature;
+            } else {
+                clearSignaturePad('client');
+            }
+
+            if (service.technicianSignature) {
+                const imgTechnician = new Image();
+                imgTechnician.onload = function() {
+                    if (signaturePadTechnician) signaturePadTechnician.fromDataURL(service.technicianSignature);
+                };
+                imgTechnician.src = service.technicianSignature;
+            } else {
+                clearSignaturePad('technician');
+            }
+
+            // Deshabilitar campos que el técnico no debe editar al finalizar
+            document.getElementById('service-date').disabled = true;
+            // Deshabilitar checkboxes de tipo de servicio
+            document.getElementById('service-type-bovedas').disabled = true;
+            document.getElementById('service-type-puertas').disabled = true;
+            document.getElementById('service-type-pasatulas').disabled = true;
+            document.getElementById('service-description').disabled = true; // Bloquear campo descripción
+            document.getElementById('service-location').disabled = true;
+            document.getElementById('service-client-name').disabled = true;
+            document.getElementById('service-client-phone').disabled = true;
+            document.getElementById('service-status').disabled = true; // El estado ya está en 'Finalizado'
+
+            console.log('Intentando abrir el modal...');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            console.log('Modal abierto exitosamente');
+            
+        } catch (error) {
+            console.error('Error al abrir el modal de finalización:', error);
+            showAlert('Error al abrir el modal de finalización: ' + error.message);
         }
-
-        // Inicializar y cargar firmas
-        initializeSignaturePads(); // Asegura que los objetos signaturePad existan
-        if (service.clientSignature) {
-            const imgClient = new Image();
-            imgClient.onload = function() {
-                if (signaturePadClient) signaturePadClient.fromDataURL(service.clientSignature);
-            };
-            imgClient.src = service.clientSignature;
-        } else {
-            clearSignaturePad('client');
-        }
-
-        if (service.technicianSignature) {
-            const imgTechnician = new Image();
-            imgTechnician.onload = function() {
-                if (signaturePadTechnician) signaturePadTechnician.fromDataURL(service.technicianSignature);
-            };
-            imgTechnician.src = service.technicianSignature;
-        } else {
-            clearSignaturePad('technician');
-        }
-
-        // Deshabilitar campos que el técnico no debe editar al finalizar
-        document.getElementById('service-date').disabled = true;
-        // Deshabilitar checkboxes de tipo de servicio
-        document.getElementById('service-type-cajas').disabled = true;
-        document.getElementById('service-type-camaras').disabled = true;
-        document.getElementById('service-type-puertas').disabled = true;
-        document.getElementById('service-location').disabled = true;
-        document.getElementById('service-client-name').disabled = true;
-        document.getElementById('service-client-phone').disabled = true;
-        document.getElementById('service-status').disabled = true; // El estado ya está en 'Finalizado'
-
-        const modal = new bootstrap.Modal(document.getElementById('registerServiceModal'));
-        modal.show();
+    } else {
+        console.error('ERROR: No se encontró el servicio con ID:', serviceId);
+        showAlert('Error: No se encontró el servicio especificado.');
     }
 }
 
@@ -2418,10 +2463,10 @@ function changeServiceStatus(id, newStatus, cancellationReason = null) {
                     
                     switch(error.code) {
                         case error.PERMISSION_DENIED:
-                            errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
+                            errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador. El servicio no se puede finalizar sin ubicación precisa.';
                             break;
                         case error.POSITION_UNAVAILABLE:
-                            errorMessage += 'Información de ubicación no disponible. Verifica que el GPS esté activado.';
+                            errorMessage += 'Información de ubicación no disponible. Verifica que el GPS esté activado y que tengas conexión a internet.';
                             break;
                         case error.TIMEOUT:
                             if (attempts < 2) {
@@ -2430,7 +2475,7 @@ function changeServiceStatus(id, newStatus, cancellationReason = null) {
                                 setTimeout(() => getPreciseStatusChangeLocation(attempts + 1), 3000);
                                 return;
                             }
-                            errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
+                            errorMessage += 'Tiempo de espera agotado. Verifica tu conexión a internet y GPS.';
                             break;
                         default:
                             errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
@@ -2453,6 +2498,13 @@ function changeServiceStatus(id, newStatus, cancellationReason = null) {
                     heading: coords.heading || null,
                     speed: coords.speed || null
                 };
+                
+                // Cerrar el modal de finalización si está abierto
+                const finalizationModal = bootstrap.Modal.getInstance(document.getElementById('registerServiceModal'));
+                if (finalizationModal) {
+                    finalizationModal.hide();
+                }
+                
                 saveAndNotify();
             }
 
@@ -2508,10 +2560,10 @@ function startService(serviceId) {
                 
                 switch(error.code) {
                     case error.PERMISSION_DENIED:
-                        errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.';
+                        errorMessage += 'Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador. El servicio no se puede iniciar sin ubicación precisa.';
                         break;
                     case error.POSITION_UNAVAILABLE:
-                        errorMessage += 'Información de ubicación no disponible. Verifica que el GPS esté activado.';
+                        errorMessage += 'Información de ubicación no disponible. Verifica que el GPS esté activado y que tengas conexión a internet.';
                         break;
                     case error.TIMEOUT:
                         if (attempts < 2) {
@@ -2520,7 +2572,7 @@ function startService(serviceId) {
                             setTimeout(() => getPreciseLocation(attempts + 1), 3000);
                             return;
                         }
-                        errorMessage += 'Tiempo de espera agotado. Intenta de nuevo.';
+                        errorMessage += 'Tiempo de espera agotado. Verifica tu conexión a internet y GPS.';
                         break;
                     default:
                         errorMessage += 'Error desconocido. Asegúrate de que la ubicación esté activada y permitida.';
@@ -2563,9 +2615,15 @@ function saveServiceLocation(serviceId, coords) {
         renderEmployeeAssignedServices(1);
         renderAdminServicesList(services, 1);
 
+        // Cerrar cualquier modal abierto
+        const finalizationModal = bootstrap.Modal.getInstance(document.getElementById('registerServiceModal'));
+        if (finalizationModal) {
+            finalizationModal.hide();
+        }
+
         const message = `El técnico ${currentUser.username} ha iniciado el servicio ID: ${serviceId} a las ${new Date().toLocaleString()} en la ubicación: Lat ${coords.latitude.toFixed(8)}, Lon ${coords.longitude.toFixed(8)} (Precisión: ±${Math.round(coords.accuracy)}m).`;
         sendNotification('admin', message);
-        showAlert(`Servicio iniciado exitosamente. Ubicación: Lat ${coords.latitude.toFixed(8)}, Lon ${coords.longitude.toFixed(8)} (Precisión: ±${Math.round(coords.accuracy)}m)`);
+        showAlert(`✅ Servicio iniciado exitosamente.\n\n📍 Ubicación registrada:\nLatitud: ${coords.latitude.toFixed(8)}\nLongitud: ${coords.longitude.toFixed(8)}\nPrecisión: ±${Math.round(coords.accuracy)} metros\n\nEl estado del servicio ha cambiado a "En proceso".`);
     }
 }
 
@@ -2948,23 +3006,43 @@ function exportServicesToExcel() {
 // --- Signature Pad Logic ---
 
 function initializeSignaturePads() {
+    console.log('initializeSignaturePads llamado');
+    
     const canvasClient = document.getElementById('signature-pad-client');
     const canvasTechnician = document.getElementById('signature-pad-technician');
+    
+    console.log('Canvas client encontrado:', canvasClient);
+    console.log('Canvas technician encontrado:', canvasTechnician);
+    console.log('SignaturePad disponible:', typeof SignaturePad !== 'undefined');
 
     if (canvasClient && typeof SignaturePad !== 'undefined') {
-        if (signaturePadClient) signaturePadClient.off(); // Detach existing event listeners
-        signaturePadClient = new SignaturePad(canvasClient, {
-            backgroundColor: 'rgb(255, 255, 255)'
-        });
-        resizeCanvas(canvasClient, signaturePadClient);
+        try {
+            if (signaturePadClient) signaturePadClient.off(); // Detach existing event listeners
+            signaturePadClient = new SignaturePad(canvasClient, {
+                backgroundColor: 'rgb(255, 255, 255)'
+            });
+            resizeCanvas(canvasClient, signaturePadClient);
+            console.log('SignaturePad client inicializado correctamente');
+        } catch (error) {
+            console.error('Error al inicializar SignaturePad client:', error);
+        }
+    } else {
+        console.warn('No se pudo inicializar SignaturePad client - canvas o librería no disponible');
     }
 
     if (canvasTechnician && typeof SignaturePad !== 'undefined') {
-        if (signaturePadTechnician) signaturePadTechnician.off(); // Detach existing event listeners
-        signaturePadTechnician = new SignaturePad(canvasTechnician, {
-            backgroundColor: 'rgb(255, 255, 255)'
-        });
-        resizeCanvas(canvasTechnician, signaturePadTechnician);
+        try {
+            if (signaturePadTechnician) signaturePadTechnician.off(); // Detach existing event listeners
+            signaturePadTechnician = new SignaturePad(canvasTechnician, {
+                backgroundColor: 'rgb(255, 255, 255)'
+            });
+            resizeCanvas(canvasTechnician, signaturePadTechnician);
+            console.log('SignaturePad technician inicializado correctamente');
+        } catch (error) {
+            console.error('Error al inicializar SignaturePad technician:', error);
+        }
+    } else {
+        console.warn('No se pudo inicializar SignaturePad technician - canvas o librería no disponible');
     }
 }
 
