@@ -1469,8 +1469,6 @@ function saveServiceData(serviceId, date, safeType, description, location, clien
             showAlert(`✅ Servicio finalizado exitosamente.\n\n📍 Ubicación registrada:\nLatitud: ${finalizationOrCancellationLocation?.latitude?.toFixed(8) || 'N/A'}\nLongitud: ${finalizationOrCancellationLocation?.longitude?.toFixed(8) || 'N/A'}\nPrecisión: ±${Math.round(finalizationOrCancellationLocation?.accuracy || 0)} metros\n\nEl servicio ha sido marcado como "Finalizado" y se ha registrado la ubicación de finalización.`);
         } else if (status === 'En proceso') {
             showAlert(`✅ Servicio iniciado exitosamente.\n\n📍 Ubicación registrada:\nLatitud: ${startLocation?.latitude?.toFixed(8) || 'N/A'}\nLongitud: ${startLocation?.longitude?.toFixed(8) || 'N/A'}\nPrecisión: ±${Math.round(startLocation?.accuracy || 0)} metros\n\nEl estado del servicio ha cambiado a "En proceso".`);
-        } else {
-            showAlert('Servicio guardado exitosamente.');
         }
     }
 }
@@ -2310,7 +2308,11 @@ function handleEmployeeServiceStatusChange(id, newStatus) {
         confirmCancelBtn.onclick = () => {
             const reason = document.getElementById('cancel-reason-input').value;
             if (reason === null || reason.trim() === '') {
-                showAlert('El motivo de cancelación es obligatorio.');
+                // Cerrar el modal antes de mostrar la alerta para evitar que aparezca detrás
+                cancelReasonModal.hide();
+                setTimeout(() => {
+                    showAlert('El motivo de cancelación es obligatorio.');
+                }, 300);
                 return;
             }
             changeServiceStatus(id, newStatus, reason);
@@ -2520,7 +2522,20 @@ function changeServiceStatus(id, newStatus, cancellationReason = null) {
             renderAdminServicesList(services, 1);
             updateEmployeeFilterCounts(); // Actualizar contadores de filtros
             sendNotification('admin', `El servicio ID: ${id} ha cambiado de estado de "${oldStatus}" a "${newStatus}" por el técnico ${currentUser.username}. ${newStatus === 'Cancelado' ? `Motivo: ${cancellationReason}` : ''}`);
-            //showAlert(`Estado del servicio ID ${id} cambiado a "${newStatus}".`);
+            
+            // Mostrar mensaje de éxito con ubicación para cancelación
+            if (newStatus === 'Cancelado') {
+                // Cerrar el modal de cancelación si está abierto
+                const cancelReasonModal = bootstrap.Modal.getInstance(document.getElementById('cancelReasonModal'));
+                if (cancelReasonModal) {
+                    cancelReasonModal.hide();
+                }
+                
+                // Mostrar alerta con ubicación después de un pequeño delay para asegurar que el modal se cierre
+                setTimeout(() => {
+                    showAlert(`✅ Servicio cancelado exitosamente.\n\n📍 Ubicación registrada:\nLatitud: ${oldService.finalizationOrCancellationLocation?.latitude?.toFixed(8) || 'N/A'}\nLongitud: ${oldService.finalizationOrCancellationLocation?.longitude?.toFixed(8) || 'N/A'}\nPrecisión: ±${Math.round(oldService.finalizationOrCancellationLocation?.accuracy || 0)} metros\n\nMotivo de cancelación: ${cancellationReason}\n\nEl servicio ha sido marcado como "Cancelado" y se ha registrado la ubicación de cancelación.`);
+                }, 300);
+            }
         }
     }
 }

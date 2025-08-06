@@ -896,6 +896,15 @@ body {
     overflow: hidden;
 }
 
+/* Asegurar que las alertas aparezcan por encima de otros modales */
+#customAlertModal {
+    z-index: 1060 !important;
+}
+
+#customAlertModal .modal-dialog {
+    z-index: 1061 !important;
+}
+
 .alert::before {
     content: '';
     position: absolute;
@@ -1428,6 +1437,9 @@ input[type="number"] {
     background-color: var(--bg-card);
     border-color: var(--border-color);
     box-shadow: var(--shadow-md);
+    z-index: 1050;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .table .dropdown-item {
@@ -1443,6 +1455,16 @@ input[type="number"] {
 .table .dropdown-item:active {
     background-color: var(--border-color);
     color: var(--text-primary);
+}
+
+/* Asegurar que los dropdowns no se corten en la vista laptop */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu.show {
+    display: block !important;
+    z-index: 1050 !important;
 }
 
 /* ===== MEJORAS ESPECÍFICAS PARA MODO OSCURO ===== */
