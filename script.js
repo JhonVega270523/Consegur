@@ -611,8 +611,8 @@ function showAdminDashboard() {
         renderAdminNotifications(1);
         updateNotificationBadges(); // Update badges for admin
         
-        // Establecer fechas por defecto (último mes)
-        setDefaultDateFilters();
+        // Limpiar todos los filtros al entrar al módulo de servicios
+        clearFilters();
         
         console.log('Admin dashboard mostrado correctamente');
     } else {
