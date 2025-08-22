@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Servicios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center justify-content-center" href="#" style="height: 100%;">
+                <img src="assets/logoconsegur2.png" alt="Consegur S.A.S." height="80" class="d-inline-block">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" id="nav-login" href="#" onclick="showLogin()">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-none" id="nav-admin-dashboard" href="#" onclick="showAdminDashboard()">Administrador</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-none" id="nav-employee-dashboard" href="#" onclick="showEmployeeDashboard()">Técnico</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-none" id="nav-logout" href="#" onclick="logout()">Cerrar Sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-outline-light btn-sm" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+                            <i class="bi bi-sun-fill" id="theme-icon"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+
+        <section id="login-section" class="d-block">
+            <div class="card mx-auto" style="max-width: 400px;">
+                <div class="card-header text-center">
+                    <h4>Iniciar Sesión</h4>
+                </div>
+                <div class="card-body">
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Usuario</label>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+                        <p id="login-error" class="text-danger mt-2"></p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="admin-dashboard-section" class="d-none">
+            <h2 class="mb-4">Administrador</h2>
+
+            <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="true">Usuarios</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="services-tab" data-bs-toggle="tab" data-bs-target="#services" type="button" role="tab" aria-controls="services" aria-selected="false">Servicios</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="costo-servicios-tab" data-bs-toggle="tab" data-bs-target="#costo-servicios" type="button" role="tab" aria-controls="costo-servicios" aria-selected="false">Costo Servicios</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="remisiones-tab" data-bs-toggle="tab" data-bs-target="#remisiones" type="button" role="tab" aria-controls="remisiones" aria-selected="false">Remisiones</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="assign-tab" data-bs-toggle="tab" data-bs-target="#assign" type="button" role="tab" aria-controls="assign" aria-selected="false">Asignar Servicios</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="false">
+                        <span id="admin-reports-tab">Reportes/Novedades</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="admin-notifications-tab-button" data-bs-toggle="tab" data-bs-target="#admin-notifications" type="button" role="tab" aria-controls="admin-notifications" aria-selected="false">
+                        <span id="admin-notifications-tab">Notificaciones</span>
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3" id="adminTabsContent">
+                <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            Gestión de Usuarios
+                            <div>
+                                <button class="btn btn-success btn-sm me-2" onclick="exportUsersToExcel()">Exportar Usuarios en Excel</button>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createUserModal">Crear Usuario</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Usuario</th>
+                                            <th>Rol</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="user-list">
+                                        </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Vista móvil de tarjetas para usuarios admin -->
+                            <div class="mobile-services-view" id="user-list-cards">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="services" role="tabpanel" aria-labelledby="services-tab">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            Servicios Registrados
+                            <div>
+                                <button class="btn btn-success btn-sm me-2" onclick="exportServicesToExcel()">Exportar Servicios en Excel</button>
+                                <button class="btn btn-warning btn-sm me-2" onclick="importServicesFromExcel()">Importar Servicios desde Excel</button>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#registerServiceModal">Registrar Servicio</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="filter-date-from" class="form-label">Fecha Desde:</label>
+                                    <input type="date" class="form-control" id="filter-date-from" onchange="filterServices()">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="filter-date-to" class="form-label">Fecha Hasta:</label>
+                                    <input type="date" class="form-control" id="filter-date-to" onchange="filterServices()">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="search-services" class="form-label">Buscar:</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="search-services" onkeyup="filterServices()" placeholder="Buscar por ID, cliente, tipo servicio, descripción, técnico o estado...">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="clearFilters()" title="Limpiar filtros">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="row g-3">
+                                    <div class="col-md-2">
+                                        <div class="stats-card bg-primary">
+                                            <div class="card-title">Total Servicios</div>
+                                            <div class="card-number" id="total-services-count">0</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="stats-card bg-success">
+                                            <div class="card-title">Finalizados</div>
+                                            <div class="card-number" id="completed-services-count">0</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="stats-card bg-warning">
+                                            <div class="card-title">En Proceso</div>
+                                            <div class="card-number" id="in-progress-services-count">0</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="stats-card bg-info">
+                                            <div class="card-title">Pendientes</div>
+                                            <div class="card-number" id="pending-services-count">0</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="stats-card bg-danger">
+                                            <div class="card-title">Cancelados</div>
+                                            <div class="card-number" id="cancelled-services-count">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Fecha</th>
+                                            <th>Hora</th>
+                                            <th>Cliente</th>
+                                            <th>Código Servicio</th>
+                                            <th>Tipo Servicio</th>
+                                            <th>Descripción</th>
+                                            <th>Ubicación</th>
+                                            <th>Técnico</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="services-list-admin">
+                                        </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Vista móvil de tarjetas para servicios admin -->
+                            <div class="mobile-services-view" id="services-list-admin-cards">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="costo-servicios" role="tabpanel" aria-labelledby="costo-servicios-tab">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            Gestión de Costos de Servicios
+                            <div>
+                                <button class="btn btn-success btn-sm me-2" onclick="exportCostoServiciosToExcel()">Exportar a Excel</button>
+                                <button class="btn btn-warning btn-sm me-2" onclick="importCostoServiciosFromExcel()">Importar desde Excel</button>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createCostoServicioModal">Crear Servicio</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="filter-costo-servicio-date-from" class="form-label">Fecha Desde:</label>
+                                    <input type="date" class="form-control" id="filter-costo-servicio-date-from" onchange="filterCostoServicios()">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="filter-costo-servicio-date-to" class="form-label">Fecha Hasta:</label>
+                                    <input type="date" class="form-control" id="filter-costo-servicio-date-to" onchange="filterCostoServicios()">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="search-costo-servicios" class="form-label">Buscar:</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="search-costo-servicios" onkeyup="filterCostoServicios()" placeholder="Buscar por código, tipo de servicio, descripción o precio...">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="clearCostoServiciosFilters()" title="Limpiar filtros">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Código Servicio</th>
+                                            <th>Fecha</th>
+                                            <th>Tipo de Servicio</th>
+                                            <th>Descripción</th>
+                                            <th>Precio</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="costo-servicios-list">
+                                        </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Vista móvil de tarjetas para costo servicios -->
+                            <div class="mobile-services-view" id="costo-servicios-cards">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="remisiones" role="tabpanel" aria-labelledby="remisiones-tab">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            Gestión de Remisiones
+                            <div>
+                                <button class="btn btn-success btn-sm me-2" onclick="exportRemisionesToExcel()">Exportar a Excel</button>
+                                <button class="btn btn-info btn-sm" onclick="generateRemisionFromService()">Generar Remisión</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="filter-remision-date-from" class="form-label">Fecha Desde:</label>
+                                    <input type="date" class="form-control" id="filter-remision-date-from" onchange="filterRemisiones()">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="filter-remision-date-to" class="form-label">Fecha Hasta:</label>
+                                    <input type="date" class="form-control" id="filter-remision-date-to" onchange="filterRemisiones()">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="search-remisiones" class="form-label">Buscar:</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="search-remisiones" onkeyup="filterRemisiones()" placeholder="Buscar por ID, código servicio, cliente...">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="clearRemisionesFilters()" title="Limpiar filtros">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID Remisión</th>
+                                            <th>Fecha</th>
+                                            <th>Código Servicio</th>
+                                            <th>Tipo Servicio</th>
+                                            <th>Cliente</th>
+                                            <th>Técnico</th>
+                                            <th>Precio</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="remisiones-list">
+                                        </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Vista móvil de tarjetas para remisiones -->
+                            <div class="mobile-services-view" id="remisiones-cards">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="assign" role="tabpanel" aria-labelledby="assign-tab">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            Asignar Servicios a Técnicos
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="assign-service-id" class="form-label">Seleccionar Servicio</label>
+                                <select class="form-select" id="assign-service-id">
+                                    </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="assign-technician" class="form-label">Seleccionar Técnico</label>
+                                <select class="form-select" id="assign-technician">
+                                    </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="assignServiceToTechnician()">Asignar Servicio</button>
+                            <p id="assign-message" class="mt-3"></p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            Servicios Asignados
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Fecha</th>
+                                            <th>Hora</th>
+                                            <th>Cliente</th>
+                                            <th>Código Servicio</th>
+                                            <th>Tipo Servicio</th>
+                                            <th>Descripción</th>
+                                            <th>Ubicación</th>
+                                            <th>Técnico</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="assigned-services-list">
+                                        </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Vista móvil de tarjetas para servicios asignados admin -->
+                            <div class="mobile-services-view" id="assigned-services-list-cards">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            Reportes y Novedades
+                        </div>
+                        <div class="card-body" id="reports-list">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="admin-notifications" role="tabpanel" aria-labelledby="admin-notifications-tab-button">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Notificaciones de Administrador</span>
+
+                        </div>
+                        <div class="card-body" id="admin-notifications-list">
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="employee-dashboard-section" class="d-none">
+            <h2 class="mb-4">Técnico</h2>
+
+            <ul class="nav nav-tabs" id="employeeTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="employee-services-tab" data-bs-toggle="tab" data-bs-target="#employee-services" type="button" role="tab" aria-controls="employee-services" aria-selected="true">Servicios Asignados</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="employee-notifications-tab-button" data-bs-toggle="tab" data-bs-target="#employee-notifications" type="button" role="tab" aria-controls="employee-notifications" aria-selected="false">
+                        <span id="employee-notifications-tab">Notificaciones</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="employee-report-replies-tab-button" data-bs-toggle="tab" data-bs-target="#employee-report-replies" type="button" role="tab" aria-controls="employee-report-replies" aria-selected="false">
+                        <span id="employee-report-replies-tab">Respuestas de Reportes</span>
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3" id="employeeTabsContent">
+                <div class="tab-pane fade show active" id="employee-services" role="tabpanel" aria-labelledby="employee-services-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <span>Servicios Asignados</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- Filtros de estado -->
+                            <div class="employee-filters">
+                                <h6 class="mb-3">Filtrar por estado:</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn active" onclick="filterEmployeeServices('todos')">
+                                        Todos
+                                        <span class="badge bg-secondary ms-1" id="filter-count-todos">0</span>
+                                    </button>
+                                    <button type="button" class="btn" onclick="filterEmployeeServices('Pendiente')">
+                                        Pendientes
+                                        <span class="badge bg-warning ms-1" id="filter-count-pendiente">0</span>
+                                    </button>
+                                    <button type="button" class="btn" onclick="filterEmployeeServices('En proceso')">
+                                        En Proceso
+                                        <span class="badge bg-info ms-1" id="filter-count-en-proceso">0</span>
+                                    </button>
+                                    <button type="button" class="btn" onclick="filterEmployeeServices('Finalizado')">
+                                        Finalizados
+                                        <span class="badge bg-success ms-1" id="filter-count-finalizado">0</span>
+                                    </button>
+                                    <button type="button" class="btn" onclick="filterEmployeeServices('Cancelado')">
+                                        Cancelados
+                                        <span class="badge bg-danger ms-1" id="filter-count-cancelado">0</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Fecha</th>
+                                            <th>Hora</th>
+                                            <th>Cliente</th>
+                                            <th>Código Servicio</th>
+                                            <th>Tipo Servicio</th>
+                                            <th>Descripción</th>
+                                            <th>Ubicación</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="employee-assigned-services-list">
+                                        </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Vista móvil de tarjetas -->
+                            <div class="mobile-services-view" id="employee-assigned-services-cards">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="employee-notifications" role="tabpanel" aria-labelledby="employee-notifications-tab-button">
+                    <div class="card">
+                        <div class="card-header">
+                            Mis Notificaciones
+                        </div>
+                        <div class="card-body" id="employee-notifications-list">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="employee-report-replies" role="tabpanel" aria-labelledby="employee-report-replies-tab-button">
+                    <div class="card">
+                        <div class="card-header">
+                            Respuestas a Mis Reportes
+                        </div>
+                        <div class="card-body" id="employee-report-replies-list">
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Modal para crear/editar usuario -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createUserModalLabel">Crear/Editar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="user-form">
+                        <input type="hidden" id="edit-user-id">
+                        <div class="mb-3">
+                            <label for="user-username" class="form-label">Nombre de Usuario</label>
+                            <input type="text" class="form-control" id="user-username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="user-password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="user-password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="user-role" class="form-label">Rol</label>
+                            <select class="form-select" id="user-role" required>
+                                <option value="employee">Técnico</option>
+                                <option value="admin">Administrador</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar costo de servicio -->
+    <div class="modal fade" id="createCostoServicioModal" tabindex="-1" aria-labelledby="createCostoServicioModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createCostoServicioModalLabel">Crear/Editar Servicio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="costo-servicio-form">
+                        <input type="hidden" id="edit-costo-servicio-id">
+                        <div class="mb-3">
+                            <label for="costo-servicio-codigo" class="form-label">Código de Servicio</label>
+                            <input type="text" class="form-control" id="costo-servicio-codigo" readonly placeholder="Se generará automáticamente">
+                        </div>
+                        <div class="mb-3">
+                            <label for="costo-servicio-tipo" class="form-label">Tipo de Servicio</label>
+                            <select class="form-select" id="costo-servicio-tipo" required onchange="toggleOtroTipo()">
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="Bovedas y cajas fuertes de seguridad">Bovedas y cajas fuertes de seguridad</option>
+                                <option value="Puertas de seguridad">Puertas de seguridad</option>
+                                <option value="Pasatulas o tombolas">Pasatulas o tombolas</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-none" id="otro-tipo-container">
+                            <label for="costo-servicio-otro-tipo" class="form-label">Especificar Tipo de Servicio</label>
+                            <input type="text" class="form-control" id="costo-servicio-otro-tipo" placeholder="Ingresa el tipo de servicio personalizado">
+                        </div>
+                        <div class="mb-3">
+                            <label for="costo-servicio-descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="costo-servicio-descripcion" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="costo-servicio-precio" class="form-label">Precio</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="costo-servicio-precio" min="0" step="0.01" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Servicio</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para registrar servicio -->
+    <div class="modal fade" id="registerServiceModal" tabindex="-1" aria-labelledby="registerServiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerServiceModalLabel">Registrar Servicio Realizado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="service-form">
+                        <input type="hidden" id="edit-service-id">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="service-date" class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="service-date" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="service-time" class="form-label">Hora de Servicio</label>
+                                <input type="time" class="form-control" id="service-time" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="service-code" class="form-label">Código de Servicio</label>
+                                <select class="form-select" id="service-code" required onchange="loadServiceDetails()">
+                                    <option value="">Seleccionar código de servicio...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="service-type" class="form-label">Tipo de Servicio</label>
+                                <input type="text" class="form-control" id="service-type" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="service-description" class="form-label">Descripción</label>
+                                <input type="text" class="form-control" id="service-description" readonly>
+                            </div>
+                        </div>
+                        
+                        <!-- Sección de servicios adicionales -->
+                        <div class="mb-3" id="additional-services-section">
+                            <label class="form-label">Servicios Adicionales</label>
+                            <div id="additional-services-container">
+                                <!-- Los servicios adicionales se agregarán aquí dinámicamente -->
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addAdditionalService()">
+                                <i class="bi bi-plus-circle"></i> Agregar Servicio Adicional
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <label for="service-location" class="form-label">Ubicación</label>
+                            <input type="text" class="form-control" id="service-location" placeholder="Ej: Calle 123 #4-56, Barrio" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="service-client-name" class="form-label">Nombre del Cliente</label>
+                            <input type="text" class="form-control" id="service-client-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="service-client-phone" class="form-label">Teléfono del Cliente</label>
+                            <input type="number" class="form-control" id="service-client-phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="service-status" class="form-label">Estado</label>
+                            <select class="form-select" id="service-status" required>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="En proceso">En proceso</option>
+                                <option value="Finalizado">Finalizado</option>
+                                <option value="Cancelado">Cancelado</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3 d-none" id="service-technician-field">
+                            <label for="service-technician" class="form-label">Técnico Asignado</label>
+                            <select class="form-select" id="service-technician">
+                                </select>
+                        </div>
+
+                        <!-- Secciones dinámicas que se muestran según el estado -->
+                        <div class="mb-3 d-none" id="photo-evidence-section">
+                            <label for="service-photo" class="form-label">Foto de Evidencia (JPG, PNG)</label>
+                            <input type="file" class="form-control" id="service-photo" accept="image/jpeg, image/png" capture="camera">
+                            <img id="service-photo-preview" class="service-photo-evidence mt-2 d-none" style="max-height: 200px;" alt="Previsualización de Foto">
+                        </div>
+
+                        <div class="mb-3 d-none" id="client-signature-section">
+                            <label class="form-label">Firma del Cliente</label>
+                            <div class="signature-pad-container border">
+                                <canvas id="signature-pad-client" class="signature-pad" width="400" height="200"></canvas>
+                            </div>
+                            <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="clearSignaturePad('client')">Borrar Firma Cliente</button>
+                        </div>
+
+                        <div class="mb-3 d-none" id="technician-signature-section">
+                            <label class="form-label">Firma del Técnico</label>
+                            <div class="signature-pad-container border">
+                                <canvas id="signature-pad-technician" class="signature-pad" width="400" height="200"></canvas>
+                            </div>
+                            <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="clearSignaturePad('technician')">Borrar Firma Técnico</button>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Guardar Servicio</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para generar remisión -->
+    <div class="modal fade" id="generateRemisionModal" tabindex="-1" aria-labelledby="generateRemisionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="generateRemisionModalLabel">Generar Remisión</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="generate-remision-form">
+                        <div class="mb-3">
+                            <label for="remision-service-search" class="form-label">Buscar Servicio</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" id="remision-service-search" placeholder="Buscar por ID, cliente, descripción..." autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" id="clear-remision-search" title="Limpiar búsqueda">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="form-text" id="remision-search-results">
+                                <span class="text-muted">Escribe para buscar servicios finalizados</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="remision-service-id" class="form-label">Seleccionar Servicio</label>
+                            <select class="form-select" id="remision-service-id" required>
+                                <option value="">Seleccionar servicio...</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Generar Remisión</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles de servicio -->
+    <div class="modal fade" id="viewServiceModal" tabindex="-1" aria-labelledby="viewServiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewServiceModalLabel">Detalles del Servicio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="view-service-details">
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para reportar novedad -->
+    <div class="modal fade" id="reportNoveltyModal" tabindex="-1" aria-labelledby="reportNoveltyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reportNoveltyModalLabel">Reportar Novedad/Problema</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="novelty-form">
+                        <div class="mb-3">
+                            <label for="novelty-service-id" class="form-label">ID del Servicio (opcional)</label>
+                            <input type="text" class="form-control" id="novelty-service-id">
+                        </div>
+                        <div class="mb-3">
+                            <label for="novelty-description" class="form-label">Descripción de la Novedad</label>
+                            <textarea class="form-control" id="novelty-description" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Enviar Reporte</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para responder reporte -->
+    <div class="modal fade" id="replyReportModal" tabindex="-1" aria-labelledby="replyReportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="replyReportModalLabel">Responder Reporte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reply-report-form">
+                        <input type="hidden" id="reply-report-id">
+                        <div class="mb-3">
+                            <label for="reply-report-message" class="form-label">Mensaje de Respuesta</label>
+                            <textarea class="form-control" id="reply-report-message" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enviar Respuesta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para alerta personalizada -->
+    <div class="modal fade" id="customAlertModal" tabindex="-1" aria-labelledby="customAlertModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customAlertModalLabel">Alerta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="customAlertModalBody">
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para confirmación personalizada -->
+    <div class="modal fade" id="customConfirmModal" tabindex="-1" aria-labelledby="customConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customConfirmModalLabel">Confirmación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="customConfirmModalBody">
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="customConfirmBtn">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para motivo de cancelación -->
+    <div class="modal fade" id="cancelReasonModal" tabindex="-1" aria-labelledby="cancelReasonModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelReasonModalLabel">Motivo de Cancelación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Por favor, ingresa el motivo por el cual el servicio será cancelado.</p>
+                    <div class="mb-3">
+                        <label for="cancel-reason-input" class="form-label">Motivo:</label>
+                        <textarea class="form-control" id="cancel-reason-input" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-danger" id="confirmCancelReasonBtn">Confirmar Cancelación</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input oculto para importar archivos -->
+    <input type="file" id="import-services-file" accept=".xlsx,.xls" style="display: none;">
+    <input type="file" id="import-costo-servicios-file" accept=".xlsx,.xls" style="display: none;">
+
+    <!-- Botón Scroll to Top -->
+    <button id="scroll-to-top" class="scroll-to-top-btn" title="Ir arriba">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/signature_pad@4.1.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="js/geolocation-utils.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

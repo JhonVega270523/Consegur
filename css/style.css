@@ -1,0 +1,2661 @@
+/* ===== DISEÑO MINIMALISTA MODERNO ===== */
+
+/* Variables CSS para el nuevo diseño */
+:root {
+    /* Paleta de colores basada en el logo de Consegur */
+    --consegur-blue: #1e40af; /* Azul principal del logo */
+    --consegur-blue-light: #3b82f6; /* Azul más claro para hover */
+    --consegur-blue-dark: #1e3a8a; /* Azul más oscuro para active */
+    --primary-color: var(--consegur-blue);
+    --primary-light: var(--consegur-blue-light);
+    --primary-dark: var(--consegur-blue-dark);
+    --accent-color: var(--consegur-blue);
+    --accent-light: var(--consegur-blue-light);
+    --accent-dark: var(--consegur-blue-dark);
+    
+    /* Colores de estado */
+    --success-color: #38a169;
+    --warning-color: #d69e2e;
+    --danger-color: #e53e3e;
+    --info-color: #3182ce;
+    
+    /* Fondos */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f7fafc;
+    --bg-tertiary: #edf2f7;
+    --bg-card: #ffffff;
+    --bg-overlay: rgba(0, 0, 0, 0.5);
+    
+    /* Textos */
+    --text-primary: #1a202c;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --text-light: #ffffff;
+    --text-inverse: #2d3748;
+    
+    /* Bordes */
+    --border-color: #e2e8f0;
+    --border-light: #f7fafc;
+    --border-dark: #cbd5e0;
+    
+    /* Sombras */
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    
+    /* Radios */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-full: 9999px;
+    
+    /* Transiciones */
+    --transition-fast: 0.15s ease-in-out;
+    --transition-normal: 0.3s ease-in-out;
+    --transition-slow: 0.5s ease-in-out;
+    
+    /* Espaciado */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+}
+
+/* Modo oscuro */
+[data-theme="dark"] {
+    --bg-primary: #1a202c;
+    --bg-secondary: #2d3748;
+    --bg-tertiary: #4a5568;
+    --bg-card: #2d3748;
+    --bg-overlay: rgba(0, 0, 0, 0.7);
+    
+    --text-primary: #ffffff;
+    --text-secondary: #e2e8f0;
+    --text-muted: #cbd5e0;
+    --text-light: #1a202c;
+    --text-inverse: #ffffff;
+    
+    --border-color: #4a5568;
+    --border-light: #2d3748;
+    --border-dark: #718096;
+    
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== ESTILOS BASE ===== */
+
+/* Estilos para dropdowns - Asegurar que se muestren completamente */
+
+/* Mejoras específicas para la tabla de servicios del técnico en desktop */
+@media (min-width: 769px) {
+    #employee-services .table-responsive {
+        overflow-x: auto;
+    }
+    
+    #employee-services .table {
+        min-width: 1380px;
+    }
+    
+    /* Asegurar que la columna de acciones tenga suficiente espacio */
+#employee-services .table th:last-child,
+#employee-services .table td:last-child {
+    min-width: 480px;
+    max-width: 500px;
+}
+
+/* Estilos para la barra de búsqueda de remisiones */
+#remision-service-search {
+    border-radius: 0.375rem 0 0 0.375rem;
+}
+
+#remision-service-search:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+.input-group-text i {
+    color: #6c757d;
+}
+
+/* Animación para la búsqueda */
+#remision-service-search::placeholder {
+    color: #6c757d;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+#remision-service-search:focus::placeholder {
+    opacity: 0.5;
+}
+
+/* Estilos para el botón de limpiar */
+#clear-remision-search {
+    border-radius: 0 0.375rem 0.375rem 0;
+    border-left: 0;
+}
+
+#clear-remision-search:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+#clear-remision-search:focus {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+    
+    #employee-services .table th,
+    #employee-services .table td {
+        padding: 0.75rem 0.5rem;
+        vertical-align: middle;
+    }
+    
+    /* Permitir que algunas columnas se ajusten */
+    #employee-services .table th:nth-child(6), /* Descripción */
+    #employee-services .table td:nth-child(6) {
+        white-space: normal;
+        word-wrap: break-word;
+        max-width: 150px;
+    }
+    
+    #employee-services .table th:nth-child(7), /* Ubicación */
+    #employee-services .table td:nth-child(7) {
+        white-space: normal;
+        word-wrap: break-word;
+        max-width: 150px;
+    }
+    
+    #employee-services .table th:nth-child(4), /* Código Servicio */
+    #employee-services .table td:nth-child(4) {
+        white-space: normal;
+        word-wrap: break-word;
+        max-width: 80px;
+        min-width: 60px;
+    }
+    
+    #employee-services .table th:nth-child(5), /* Tipo Servicio */
+    #employee-services .table td:nth-child(5) {
+        white-space: normal;
+        word-wrap: break-word;
+        max-width: 120px;
+    }
+    
+    /* Mejorar los botones de acciones */
+    #employee-services .table .btn {
+        margin: 0 0.5px;
+        font-size: 0.7rem;
+        padding: 0.2rem 0.35rem;
+        white-space: nowrap;
+    }
+    
+    /* Optimizar espacio en columna de acciones cuando hay botón iniciar */
+    #employee-services .table td:last-child {
+        min-width: 480px;
+        white-space: nowrap;
+    }
+    
+    /* Hacer botones más compactos cuando hay muchos */
+    #employee-services .table .dropdown {
+        display: inline-block;
+    }
+    
+    #employee-services .table .dropdown-menu {
+        min-width: 120px;
+        font-size: 0.75rem;
+    }
+    
+    #employee-services .table .dropdown {
+        display: inline-block;
+    }
+    
+    #employee-services .table .dropdown-menu {
+        min-width: 150px;
+        font-size: 0.875rem;
+    }
+    
+    /* Estilos para pantallas medianas (tablets) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        #employee-services .table {
+            min-width: 1000px;
+        }
+        
+        #employee-services .table th,
+        #employee-services .table td {
+            padding: 0.5rem 0.3rem;
+            font-size: 0.85rem;
+        }
+        
+        #employee-services .table .btn {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.3rem;
+        }
+        
+        /* Optimizar columna de acciones en tablets */
+        #employee-services .table td:last-child {
+            min-width: 320px;
+        }
+    }
+}
+.dropdown-menu {
+    z-index: 1050 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    position: absolute !important;
+    transform: none !important;
+}
+
+.dropdown-menu.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) !important;
+}
+
+.dropdown-item {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}
+
+/* Asegurar que los contenedores de dropdown no corten el contenido */
+.table-responsive {
+    overflow: visible !important;
+}
+
+/* Mejorar la responsividad general de las tablas */
+@media (max-width: 1200px) {
+    .table-responsive {
+        overflow-x: auto !important;
+    }
+    
+    .table {
+        min-width: 100%;
+    }
+}
+
+/* Asegurar que la tabla de servicios asignados del técnico tenga scroll horizontal */
+#employee-services .table-responsive {
+    overflow-x: auto;
+}
+
+.table {
+    overflow: visible !important;
+}
+
+.table td {
+    overflow: visible !important;
+}
+
+/* Asegurar que el texto "Filtrar por estado:" sea blanco en modo oscuro en todas las vistas */
+[data-theme="dark"] .employee-filters h6,
+[data-theme="dark"] .employee-filters .mb-3 {
+    color: #ffffff !important;
+}
+
+/* Estilos para el logo en la barra de navegación */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 1rem 1rem;
+    transition: all var(--transition-fast);
+}
+
+.navbar-brand img {
+    max-height: 50px;
+    width: auto;
+    object-fit: contain;
+    transition: none;
+}
+
+.navbar-brand:hover img {
+    transform: none;
+}
+
+/* Responsive para el logo */
+@media (max-width: 768px) {
+    .navbar-brand img {
+        max-height: 40px;
+    }
+    
+    .navbar-brand {
+        padding: 0.75rem 1rem;
+    }
+    
+    .navbar {
+        padding: 1rem 0;
+    }
+}
+
+/* Centrar logo en vista laptop y desktop grande (pantallas medianas y grandes) */
+@media (min-width: 769px) {
+    .navbar-brand {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1001;
+    }
+    
+    .navbar-brand img {
+        max-height: 80px;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* Logo centrado en navbar */
+.navbar-brand-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+    pointer-events: none; /* Evita que el logo interfiera con otros elementos */
+}
+
+.navbar-logo {
+    height: 40px;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    pointer-events: auto; /* Permite que el logo sea clickeable */
+}
+
+@media (max-width: 768px) {
+    .navbar-logo {
+        height: 35px;
+        max-width: 150px;
+    }
+    
+    .navbar-brand-container {
+        position: fixed;
+        left: 50%;
+        top: 12px;
+        transform: translateX(-50%);
+        width: auto;
+        z-index: 1001;
+        pointer-events: none;
+    }
+    
+    /* Asegurar que el logo no se mueva cuando se abre/cierra el menú hamburguesa */
+    .navbar-collapse {
+        position: relative;
+        z-index: 1000;
+    }
+    
+    .navbar-toggler {
+        position: relative;
+        z-index: 1002;
+    }
+    
+    /* Botón de tema completamente fijo e independiente */
+#theme-toggle {
+    position: fixed !important;
+    right: 90px !important;
+    top: 36px !important;
+    transform: none !important;
+    z-index: 9999 !important;
+    display: block !important;
+    transition: none !important;
+    animation: none !important;
+    pointer-events: auto !important;
+    will-change: auto !important;
+}
+    
+    /* Asegurar que el contenedor tenga posición relativa para el posicionamiento absoluto */
+    .navbar .container-fluid {
+        position: relative;
+    }
+}
+
+        /* En desktop, mantener el botón fijo pero ajustar posición */
+        @media (min-width: 769px) {
+            #theme-toggle {
+                position: fixed !important;
+                left: 20px !important;
+                top: 30px !important;
+                transform: none !important;
+                z-index: 9999 !important;
+            }
+        }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    transition: all var(--transition-normal);
+    font-size: 14px;
+}
+
+/* ===== NAVBAR MINIMALISTA ===== */
+.navbar {
+    background: linear-gradient(135deg, var(--consegur-blue), var(--consegur-blue-dark)) !important;
+    border-bottom: 2px solid var(--consegur-blue);
+    box-shadow: var(--shadow-lg);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    transition: none;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #ffffff !important;
+    text-decoration: none;
+    letter-spacing: -0.025em;
+    transition: none;
+}
+
+.navbar-nav .nav-link {
+    color: #ffffff !important;
+    font-weight: 500;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    position: relative;
+    text-decoration: none;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+    background: var(--consegur-blue-dark);
+    border: 1px solid var(--consegur-blue-light);
+}
+
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #ffffff;
+    transform: translateX(-50%);
+}
+
+.navbar-nav .nav-link:hover::after {
+    width: 80%;
+}
+
+/* Botón de tema minimalista completamente independiente */
+#theme-toggle {
+    background: var(--bg-tertiary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-full) !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: none !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+#theme-toggle:hover {
+    background: var(--consegur-blue);
+    color: var(--text-light);
+    transform: none !important;
+    box-shadow: var(--shadow-md);
+    border-color: var(--consegur-blue-light);
+}
+
+#theme-toggle i {
+    font-size: 1.1rem;
+    transition: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+#theme-toggle:hover i {
+    transform: none !important;
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+}
+
+.mt-4 {
+    margin-top: var(--space-8);
+}
+
+/* ===== SECCIÓN DE LOGIN ORIGINAL ===== */
+#login-section {
+    max-width: 400px;
+    margin: 50px auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 1000;
+}
+
+/* Reglas únicas y limpias para ocultar dashboards */
+#admin-dashboard-section.d-none,
+#employee-dashboard-section.d-none {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+}
+
+/* Cuando el login está visible, ocultar completamente el contenido del dashboard */
+#login-section:not(.d-none) ~ #admin-dashboard-section,
+#login-section:not(.d-none) ~ #employee-dashboard-section {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Regla adicional para asegurar que el login se oculte completamente cuando no debe estar visible */
+#login-section.d-none {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+}
+
+#login-section .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+#login-section .card-header {
+    background: var(--bg-secondary);
+    padding: var(--space-4);
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#login-section .card-header h4 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+
+#login-section .card-body {
+    padding: var(--space-4);
+}
+
+/* ===== FORMULARIOS MINIMALISTAS ===== */
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.form-control, .form-select {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all var(--transition-normal);
+    outline: none;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+/* ===== BOTONES MINIMALISTAS ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) var(--space-6);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    min-height: 44px;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left var(--transition-slow);
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: var(--consegur-blue);
+    color: var(--text-light);
+    border-color: var(--consegur-blue);
+}
+
+.btn-primary:hover {
+    background: var(--consegur-blue-dark);
+    border-color: var(--consegur-blue-dark);
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: var(--text-light);
+}
+
+.btn-warning {
+    background: var(--warning-color);
+    color: var(--text-inverse);
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: var(--text-light);
+}
+
+.btn-info {
+    background: var(--consegur-blue);
+    color: var(--text-light);
+    border-color: var(--consegur-blue);
+}
+
+.btn-outline-secondary {
+    background: transparent;
+    border: 2px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-outline-secondary:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+}
+
+.btn-sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: 0.75rem;
+    min-height: 32px;
+}
+
+.btn-lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: 1rem;
+    min-height: 52px;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+/* ===== CARDS MINIMALISTAS ===== */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.card-header {
+    background: var(--bg-secondary);
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-body {
+    padding: var(--space-6);
+}
+
+/* ===== TARJETAS DE ESTADÍSTICAS MINIMALISTAS ===== */
+.stats-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--accent-color);
+}
+
+.stats-card .card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+}
+
+.stats-card .card-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1;
+}
+
+/* Variantes de colores para estadísticas */
+.stats-card.bg-primary::before {
+    background: var(--accent-color);
+}
+
+.stats-card.bg-success::before {
+    background: var(--success-color);
+}
+
+.stats-card.bg-warning::before {
+    background: var(--warning-color);
+}
+
+.stats-card.bg-info::before {
+    background: var(--info-color);
+}
+
+.stats-card.bg-danger::before {
+    background: var(--danger-color);
+}
+
+/* ===== TABS MINIMALISTAS ===== */
+.nav-tabs {
+    border-bottom: 2px solid var(--border-color);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: var(--space-2);
+    margin-bottom: 0;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-6);
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all var(--transition-normal);
+    position: relative;
+    background: transparent;
+    margin-right: var(--space-2);
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--text-primary);
+    background: var(--bg-card);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--consegur-blue);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+}
+
+.nav-tabs .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--consegur-blue);
+    border-radius: var(--radius-full);
+}
+
+/* ===== TABLAS MINIMALISTAS ===== */
+.table {
+    width: 100%;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border-collapse: collapse;
+}
+
+.table thead th {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    padding: var(--space-4);
+    border-bottom: 2px solid var(--border-color);
+    text-align: left;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid var(--border-light);
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table tbody td {
+    padding: var(--space-4);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.table-responsive {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ===== MODALES MINIMALISTAS ===== */
+.modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: var(--bg-secondary);
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.modal-body {
+    padding: var(--space-6);
+}
+
+.modal-footer {
+    background: var(--bg-secondary);
+    padding: var(--space-6);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+}
+
+/* Deshabilitar animaciones de modales */
+.modal.fade .modal-dialog {
+    transition: none;
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+}
+
+.modal.fade .modal-dialog {
+    transform: none;
+}
+
+/* Deshabilitar completamente las animaciones de Bootstrap */
+.modal.fade {
+    transition: none;
+}
+
+.modal.fade .modal-dialog {
+    transition: none;
+    transform: none;
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+}
+
+/* Deshabilitar backdrop animations */
+.modal-backdrop {
+    transition: none;
+}
+
+.modal-backdrop.fade {
+    transition: none;
+}
+
+.modal-backdrop.show {
+    transition: none;
+}
+
+/* Prevenir movimiento horizontal al abrir/cerrar modales */
+body {
+    overflow-x: hidden !important;
+}
+
+/* Prevenir que Bootstrap modifique el overflow del body */
+body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+}
+
+/* Asegurar que no haya scroll horizontal */
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Prevenir cualquier transformación o movimiento en el body */
+body {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Aplicar las mismas reglas en modo oscuro */
+[data-theme="dark"] body {
+    overflow-x: hidden !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+[data-theme="dark"] body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+}
+
+/* ===== BADGES MINIMALISTAS ===== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    min-width: 20px;
+    height: 20px;
+}
+
+.badge.bg-danger {
+    background: var(--danger-color);
+    color: var(--text-light);
+}
+
+.badge.bg-success {
+    background: var(--success-color);
+    color: var(--text-light);
+}
+
+/* ===== ESTADOS DE SERVICIOS ===== */
+.status-badge {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-pendiente {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.status-en-proceso {
+    background: rgba(214, 158, 46, 0.1);
+    color: var(--warning-color);
+}
+
+.status-finalizado {
+    background: rgba(56, 161, 105, 0.1);
+    color: var(--success-color);
+}
+
+.status-cancelado {
+    background: rgba(229, 62, 62, 0.1);
+    color: var(--danger-color);
+}
+
+/* ===== ALERTAS MINIMALISTAS ===== */
+.alert {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    margin-bottom: var(--space-4);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Asegurar que las alertas aparezcan por encima de otros modales */
+#customAlertModal {
+    z-index: 1060 !important;
+}
+
+#customAlertModal .modal-dialog {
+    z-index: 1061 !important;
+}
+
+.alert::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent-color);
+}
+
+.alert-success::before {
+    background: var(--success-color);
+}
+
+.alert-danger::before {
+    background: var(--danger-color);
+}
+
+.alert-warning::before {
+    background: var(--warning-color);
+}
+
+.alert-info::before {
+    background: var(--info-color);
+}
+
+.alert-danger.border-danger {
+    border-color: var(--danger-color);
+    background: rgba(229, 62, 62, 0.05);
+}
+
+/* ===== UTILIDADES ===== */
+.text-center {
+    text-align: center;
+}
+
+.text-danger {
+    color: var(--danger-color);
+}
+
+.text-success {
+    color: var(--success-color);
+}
+
+.text-warning {
+    color: var(--warning-color);
+}
+
+.text-info {
+    color: var(--info-color);
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+.mb-3 {
+    margin-bottom: var(--space-6);
+}
+
+.mb-4 {
+    margin-bottom: var(--space-8);
+}
+
+.mt-2 {
+    margin-top: var(--space-4);
+}
+
+.mt-3 {
+    margin-top: var(--space-6);
+}
+
+.me-2 {
+    margin-right: var(--space-4);
+}
+
+.ms-2 {
+    margin-left: var(--space-4);
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.d-block {
+    display: block !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 var(--space-3);
+    }
+    
+    .card-header {
+        padding: var(--space-4);
+    }
+    
+    .card-body {
+        padding: var(--space-4);
+    }
+    
+    .stats-card {
+        padding: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+    
+    .stats-card .card-number {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: var(--space-3) var(--space-4);
+        font-size: 0.875rem;
+    }
+    
+    /* Botones específicos más pequeños en móvil */
+    .card-header .btn {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+        margin: 0.1rem;
+    }
+    
+    /* Botones de exportar/importar específicamente */
+    .card-header .btn-success,
+    .card-header .btn-warning {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.4rem;
+        white-space: nowrap;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: var(--space-3);
+    }
+    
+    .modal-dialog {
+        margin: var(--space-4);
+    }
+    
+    .nav-tabs .nav-link {
+        padding: var(--space-2) var(--space-4);
+        font-size: 0.875rem;
+    }
+}
+
+/* ===== ANIMACIONES SUAVES ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.slide-in {
+    animation: slideIn 0.6s ease-out;
+}
+
+/* ===== SCROLLBAR PERSONALIZADO ===== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ===== ESTILOS DE COMPATIBILIDAD ===== */
+
+/* Signature pad */
+#signature-pad {
+    background-color: var(--bg-primary);
+    cursor: crosshair;
+}
+
+.signature-pad-container {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    width: 100%;
+    height: 200px;
+    background-color: var(--bg-primary);
+    overflow: hidden;
+}
+
+.signature-pad {
+    width: 100%;
+    height: 100%;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Ocultar spin buttons */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Fotos de evidencia */
+.service-photo-evidence {
+    max-width: 400px;
+    height: auto;
+    display: block;
+    margin: var(--space-4) 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: transform var(--transition-normal);
+}
+
+.service-photo-evidence:hover {
+    transform: scale(1.02);
+}
+
+/* Input groups */
+.input-group .btn {
+    border-left: none;
+}
+
+.input-group .form-control {
+    border-right: none;
+}
+
+.input-group .form-control:focus {
+    border-right: none;
+    box-shadow: none;
+}
+
+.input-group .btn:focus {
+    box-shadow: none;
+}
+
+/* Paginación */
+.pagination-container {
+    margin-top: var(--space-4);
+    padding: var(--space-2) 0;
+}
+
+.pagination-container .btn {
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: all var(--transition-normal);
+}
+
+.pagination-container .btn:hover {
+    background: var(--consegur-blue);
+    border-color: var(--consegur-blue);
+    color: var(--text-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Botón de página actual en paginación */
+.pagination-container .btn.btn-primary {
+    background: var(--consegur-blue) !important;
+    border-color: var(--consegur-blue) !important;
+    color: var(--text-light) !important;
+}
+
+.pagination-container .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-container .text-muted {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Numeración de filas */
+.table td:first-child {
+    font-weight: 600;
+    color: var(--text-secondary);
+    background-color: var(--bg-tertiary) !important;
+    border-right: 2px solid var(--border-color);
+}
+
+.table th:first-child {
+    background-color: var(--accent-color) !important;
+    color: var(--text-light) !important;
+    font-weight: 600;
+    border-right: 2px solid var(--border-color);
+}
+
+/* Animaciones para badges */
+@keyframes badge-pulse-red {
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7);
+    }
+    50% { 
+        transform: scale(1.1);
+        box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.3);
+    }
+    100% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(229, 62, 62, 0);
+    }
+}
+
+@keyframes badge-pulse-green {
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.7);
+    }
+    50% { 
+        transform: scale(1.1);
+        box-shadow: 0 0 0 4px rgba(56, 161, 105, 0.3);
+    }
+    100% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(56, 161, 105, 0);
+    }
+}
+
+/* Badges específicos para pestañas */
+#admin-reports-tab .badge.bg-danger,
+#admin-notifications-tab .badge.bg-danger,
+#employee-notifications-tab .badge.bg-danger {
+    background-color: var(--danger-color) !important;
+    color: var(--text-light) !important;
+    font-weight: 700;
+    font-size: 0.75rem;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: var(--space-2);
+    animation: badge-pulse-red 2s infinite;
+}
+
+#employee-report-replies-tab .badge.bg-success {
+    background-color: var(--success-color) !important;
+    color: var(--text-light) !important;
+    font-weight: 700;
+    font-size: 0.75rem;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: var(--space-2);
+    animation: badge-pulse-green 2s infinite;
+}
+
+/* Animación para alertas de reportes */
+.alert-danger.border-danger {
+    border-width: 2px !important;
+    box-shadow: 0 0 10px rgba(229, 62, 62, 0.3);
+    animation: pulse-new 2s infinite;
+}
+
+[data-theme="dark"] .alert-danger.border-danger {
+    box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+    animation: pulse-new-dark 2s infinite;
+}
+
+@keyframes pulse-new {
+    0% {
+        box-shadow: 0 0 10px rgba(229, 62, 62, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(229, 62, 62, 0.6);
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(229, 62, 62, 0.3);
+    }
+}
+
+@keyframes pulse-new-dark {
+    0% {
+        box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(229, 62, 62, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+    }
+}
+
+/* Estilos para respuestas de reportes */
+.alert.alert-success {
+    border-left: 4px solid var(--success-color);
+    background-color: rgba(56, 161, 105, 0.05);
+}
+
+[data-theme="dark"] .alert.alert-success {
+    background-color: rgba(56, 161, 105, 0.1);
+    border-color: var(--success-color);
+}
+
+/* Animación para nuevas respuestas */
+@keyframes new-reply-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(56, 161, 105, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(56, 161, 105, 0); }
+}
+
+.alert.alert-success:not(.read) {
+    animation: new-reply-pulse 2s infinite;
+}
+
+/* Transiciones suaves */
+* {
+    transition: background-color var(--transition-normal), 
+                color var(--transition-normal), 
+                border-color var(--transition-normal);
+}
+
+/* Asegurar contraste */
+.card-title, .card-text {
+    color: var(--text-primary) !important;
+}
+
+.table th, .table td {
+    color: var(--text-primary) !important;
+}
+
+/* Ajustes para elementos de navegación */
+.navbar-brand {
+    color: #ffffff !important;
+}
+
+.navbar-nav .nav-link {
+    color: #ffffff !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* Ajustes para elementos de lista */
+.list-group-item {
+    color: var(--text-primary) !important;
+}
+
+.list-group-item-action:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary) !important;
+}
+
+/* Ajustes para elementos de alerta */
+.alert {
+    color: var(--text-primary);
+}
+
+/* Asegurar que los badges tengan contraste */
+.badge {
+    color: var(--text-light);
+}
+
+.badge.bg-light {
+    color: var(--text-inverse);
+}
+
+/* Ajustes para elementos de formulario */
+.form-label {
+    color: var(--text-primary) !important;
+    font-weight: 500;
+}
+
+.form-text {
+    color: var(--text-secondary) !important;
+}
+
+/* Botones en tablas */
+.table .btn {
+    margin: var(--space-1);
+    font-size: 0.875rem;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+}
+
+/* Estados de botones en tablas */
+.table .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Dropdowns en tablas */
+.table .dropdown-menu {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-md);
+    z-index: 1050;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.table .dropdown-item {
+    color: var(--text-primary);
+    padding: var(--space-2) var(--space-4);
+}
+
+.table .dropdown-item:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.table .dropdown-item:active {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Asegurar que los dropdowns no se corten en la vista laptop */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu.show {
+    display: block !important;
+    z-index: 1050 !important;
+}
+
+/* ===== MEJORAS ESPECÍFICAS PARA MODO OSCURO ===== */
+
+/* Asegurar visibilidad de texto en modo oscuro */
+[data-theme="dark"] .text-muted {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: #a0aec0 !important;
+}
+
+[data-theme="dark"] .table tbody td {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .table thead th {
+    color: #ffffff !important;
+    background-color: var(--consegur-blue) !important;
+}
+
+[data-theme="dark"] .card-header {
+    color: #ffffff !important;
+    background-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .modal-title {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .modal-header {
+    background-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .nav-tabs {
+    background-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link:hover {
+    color: #ffffff !important;
+    background-color: #2d3748 !important;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active {
+    color: #63b3ed !important;
+    background-color: #2d3748 !important;
+}
+
+[data-theme="dark"] .navbar-nav .nav-link {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar-brand {
+    color: #ffffff !important;
+}
+
+/* Mejorar contraste de badges en modo oscuro */
+[data-theme="dark"] .badge.bg-light {
+    background-color: #4a5568 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .badge.bg-secondary {
+    background-color: #718096 !important;
+    color: #ffffff !important;
+}
+
+/* Mejorar visibilidad de estados de servicios en modo oscuro */
+[data-theme="dark"] .status-pendiente {
+    background-color: #4a5568 !important;
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .status-en-proceso {
+    background-color: rgba(214, 158, 46, 0.2) !important;
+    color: #f6e05e !important;
+}
+
+[data-theme="dark"] .status-finalizado {
+    background-color: rgba(56, 161, 105, 0.2) !important;
+    color: #68d391 !important;
+}
+
+[data-theme="dark"] .status-cancelado {
+    background-color: rgba(229, 62, 62, 0.2) !important;
+    color: #fc8181 !important;
+}
+
+/* Mejorar visibilidad de formularios en modo oscuro */
+[data-theme="dark"] .form-control {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .form-control:focus {
+    background-color: #2d3748 !important;
+    border-color: #63b3ed !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2) !important;
+}
+
+[data-theme="dark"] .form-select {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .form-select:focus {
+    background-color: #2d3748 !important;
+    border-color: #63b3ed !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2) !important;
+}
+
+/* Mejorar visibilidad de tablas en modo oscuro */
+[data-theme="dark"] .table {
+    background-color: #2d3748 !important;
+}
+
+/* Eliminado efecto hover en modo oscuro para consistencia */
+
+[data-theme="dark"] .table tbody tr {
+    border-bottom-color: #4a5568 !important;
+}
+
+/* Aplicar características de primera fila y columna a todas las celdas en modo oscuro */
+[data-theme="dark"] .table tbody td {
+    background-color: #4a5568 !important;
+    color: #ffffff !important;
+    border-right-color: #718096 !important;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .table thead th {
+    background-color: var(--consegur-blue) !important;
+    color: #ffffff !important;
+    border-right-color: var(--consegur-blue) !important;
+    font-weight: 600;
+}
+
+/* Mejorar visibilidad de cards en modo oscuro */
+[data-theme="dark"] .card {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .card:hover {
+    background-color: #2d3748 !important;
+}
+
+/* Mejorar visibilidad de modales en modo oscuro */
+[data-theme="dark"] .modal-content {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .modal-footer {
+    background-color: #4a5568 !important;
+    border-top-color: #4a5568 !important;
+}
+
+/* Mejorar visibilidad de dropdowns en modo oscuro */
+[data-theme="dark"] .dropdown-menu {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: #4a5568 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-item:active {
+    background-color: #718096 !important;
+    color: #ffffff !important;
+}
+
+/* Mejorar visibilidad de paginación en modo oscuro */
+[data-theme="dark"] .pagination-container .text-muted {
+    color: #e2e8f0 !important;
+}
+
+/* Asegurar que los números de fila sean visibles en modo oscuro */
+[data-theme="dark"] .table td:first-child {
+    background-color: #4a5568 !important;
+    color: #ffffff !important;
+    border-right-color: #718096 !important;
+}
+
+[data-theme="dark"] .table th:first-child {
+    background-color: var(--consegur-blue) !important;
+    color: #ffffff !important;
+    border-right-color: var(--consegur-blue) !important;
+}
+
+/* Texto negro en reportes/novedades y notificaciones en modo oscuro */
+[data-theme="dark"] #reports-list .alert,
+[data-theme="dark"] #reports-list .alert-danger,
+[data-theme="dark"] #reports-list .alert-success,
+[data-theme="dark"] #reports-list .alert-warning,
+[data-theme="dark"] #reports-list .alert-info,
+[data-theme="dark"] #reports-list .list-group-item,
+[data-theme="dark"] #reports-list .list-group-item-light {
+    color: #000000 !important;
+}
+
+[data-theme="dark"] #reports-list .alert {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] #reports-list .alert-danger {
+    background-color: #fed7d7 !important;
+    border-color: #feb2b2 !important;
+}
+
+[data-theme="dark"] #reports-list .alert-success {
+    background-color: #c6f6d5 !important;
+    border-color: #9ae6b4 !important;
+}
+
+[data-theme="dark"] #reports-list .alert-warning {
+    background-color: #fef5e7 !important;
+    border-color: #fbd38d !important;
+}
+
+[data-theme="dark"] #reports-list .alert-info {
+    background-color: #bee3f8 !important;
+    border-color: #90cdf4 !important;
+}
+
+[data-theme="dark"] #admin-notifications-list .alert,
+[data-theme="dark"] #admin-notifications-list .alert-danger,
+[data-theme="dark"] #admin-notifications-list .alert-success,
+[data-theme="dark"] #admin-notifications-list .alert-warning,
+[data-theme="dark"] #admin-notifications-list .alert-info {
+    color: #000000 !important;
+}
+
+[data-theme="dark"] #admin-notifications-list .alert {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] #admin-notifications-list .alert-danger {
+    background-color: #fed7d7 !important;
+    border-color: #feb2b2 !important;
+}
+
+[data-theme="dark"] #admin-notifications-list .alert-success {
+    background-color: #c6f6d5 !important;
+    border-color: #9ae6b4 !important;
+}
+
+[data-theme="dark"] #admin-notifications-list .alert-warning {
+    background-color: #fef5e7 !important;
+    border-color: #fbd38d !important;
+}
+
+[data-theme="dark"] #admin-notifications-list .alert-info {
+    background-color: #bee3f8 !important;
+    border-color: #90cdf4 !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert,
+[data-theme="dark"] #employee-notifications-list .alert-danger,
+[data-theme="dark"] #employee-notifications-list .alert-success,
+[data-theme="dark"] #employee-notifications-list .alert-warning,
+[data-theme="dark"] #employee-notifications-list .alert-info {
+    color: #000000 !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert-danger {
+    background-color: #fed7d7 !important;
+    border-color: #feb2b2 !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert-success {
+    background-color: #c6f6d5 !important;
+    border-color: #9ae6b4 !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert-warning {
+    background-color: #fef5e7 !important;
+    border-color: #fbd38d !important;
+}
+
+[data-theme="dark"] #employee-notifications-list .alert-info {
+    background-color: #bee3f8 !important;
+    border-color: #90cdf4 !important;
+}
+
+/* Texto negro en respuestas de reportes del técnico en modo oscuro */
+[data-theme="dark"] #employee-report-replies-list .alert,
+[data-theme="dark"] #employee-report-replies-list .alert-danger,
+[data-theme="dark"] #employee-report-replies-list .alert-success,
+[data-theme="dark"] #employee-report-replies-list .alert-warning,
+[data-theme="dark"] #employee-report-replies-list .alert-info {
+    color: #000000 !important;
+}
+
+[data-theme="dark"] #employee-report-replies-list .alert {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] #employee-report-replies-list .alert-danger {
+    background-color: #742a2a !important;
+    border-color: #c53030 !important;
+}
+
+[data-theme="dark"] #employee-report-replies-list .alert-success {
+    background-color: #22543d !important;
+    border-color: #38a169 !important;
+}
+
+[data-theme="dark"] #employee-report-replies-list .alert-warning {
+    background-color: #744210 !important;
+    border-color: #d69e2e !important;
+}
+
+[data-theme="dark"] #employee-report-replies-list .alert-info {
+    background-color: #2a4365 !important;
+    border-color: #3182ce !important;
+}
+
+/* Texto negro para mensajes de "no hay datos" en respuestas de reportes del técnico */
+[data-theme="dark"] #employee-report-replies-list p,
+[data-theme="dark"] #employee-report-replies-list div,
+[data-theme="dark"] #employee-report-replies-list span {
+    color: #000000 !important;
+}
+
+/* Excepción: texto blanco para el mensaje "No hay respuestas nuevas a tus reportes" */
+[data-theme="dark"] #employee-report-replies-list .no-replies-message {
+    color: #ffffff !important;
+}
+
+/* ===== NAVEGACIÓN POR DEFECTO EN TABLAS ===== */
+.table {
+    /* Restaurar comportamiento por defecto del navegador */
+    tabindex: 0;
+}
+
+.table tbody tr {
+    /* Permitir navegación con teclado */
+    tabindex: 0;
+}
+
+.table tbody td {
+    /* Permitir navegación con teclado */
+    tabindex: 0;
+}
+
+/* Restaurar navegación por defecto */
+.table:focus,
+.table tbody tr:focus,
+.table tbody td:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* Navegación con teclado estándar */
+.table:focus-within {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* Asegurar que las tablas usen navegación por defecto del navegador */
+.table-responsive {
+    /* Permitir scroll nativo */
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+/* Quitar cualquier comportamiento personalizado de las tablas */
+.table tbody tr {
+    /* Sin efectos hover */
+    background: transparent;
+}
+
+.table tbody tr:nth-child(even) {
+    background: var(--bg-secondary);
+}
+
+.table tbody tr:nth-child(odd) {
+    background: var(--bg-card);
+}
+
+/* Asegurar que los enlaces y botones en las tablas sean navegables */
+.table a,
+.table button {
+    /* Permitir navegación con teclado */
+    tabindex: 0;
+}
+
+.table a:focus,
+.table button:focus {
+    outline: 2px solid var(--consegur-blue);
+    outline-offset: 2px;
+}
+
+/* ===== ESTILOS ESPECÍFICOS CON COLOR AZUL DEL LOGO ===== */
+
+/* Botones "Ver" en modo light */
+.btn-info:hover {
+    background: var(--consegur-blue-dark) !important;
+    border-color: var(--consegur-blue-dark) !important;
+    color: var(--text-light) !important;
+}
+
+/* Paginación en modo light */
+.pagination-container .btn:hover {
+    background: var(--consegur-blue) !important;
+    border-color: var(--consegur-blue) !important;
+    color: var(--text-light) !important;
+}
+
+/* ===== BOTÓN SCROLL TO TOP ===== */
+.scroll-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--consegur-blue);
+    color: var(--text-light);
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scroll-to-top-btn:hover {
+    background-color: var(--consegur-blue-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.scroll-to-top-btn:active {
+    transform: translateY(0);
+}
+
+.scroll-to-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top-btn i {
+    font-size: 1.2rem;
+}
+
+/* Modo oscuro para el botón scroll to top */
+[data-theme="dark"] .scroll-to-top-btn {
+    background-color: var(--consegur-blue);
+    color: var(--text-light);
+    box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .scroll-to-top-btn:hover {
+    background-color: var(--consegur-blue-light);
+    box-shadow: var(--shadow-xl);
+}
+
+/* ===== ESTILOS ESPECÍFICOS PARA MODO OSCURO ===== */
+
+/* Encabezados de tablas en modo oscuro */
+[data-theme="dark"] .table thead th {
+    background: var(--consegur-blue);
+    color: var(--text-light);
+}
+
+/* Títulos de secciones activas en modo oscuro */
+[data-theme="dark"] .nav-tabs .nav-link.active {
+    color: var(--consegur-blue) !important;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active::after {
+    background: var(--consegur-blue) !important;
+}
+
+/* Botones "Ver" en modo oscuro */
+[data-theme="dark"] .btn-info:hover {
+    background: var(--consegur-blue) !important;
+    border-color: var(--consegur-blue) !important;
+    color: var(--text-light) !important;
+}
+
+/* Paginación en modo oscuro */
+[data-theme="dark"] .pagination-container .btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .pagination-container .btn:hover {
+    background: var(--consegur-blue) !important;
+    border-color: var(--consegur-blue) !important;
+    color: var(--text-light) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Botón de página actual en paginación - modo oscuro */
+[data-theme="dark"] .pagination-container .btn.btn-primary {
+    background: var(--consegur-blue) !important;
+    border-color: var(--consegur-blue) !important;
+    color: var(--text-light) !important;
+}
+
+/* Márgenes de inputs en modo oscuro */
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    border-color: var(--consegur-blue) !important;
+    box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25) !important;
+}
+
+/* Responsive para el botón scroll to top */
+@media (max-width: 768px) {
+    .scroll-to-top-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+    }
+    
+    .scroll-to-top-btn i {
+        font-size: 1rem;
+    }
+    
+    /* Adaptar fotos de evidencia para móvil */
+    .service-photo-evidence {
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+        margin: var(--space-3) 0;
+    }
+}
+
+/* ===== BOTONES DE GOOGLE MAPS ===== */
+.btn-google-maps {
+    background: var(--consegur-blue);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    transition: all var(--transition-normal);
+    margin-left: var(--space-2);
+}
+
+.btn-google-maps:hover {
+    background: var(--consegur-blue-dark);
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-google-maps i {
+    font-size: 1rem;
+}
+
+/* Modo oscuro para botones de Google Maps */
+[data-theme="dark"] .btn-google-maps {
+    background: var(--consegur-blue);
+    color: #ffffff;
+}
+
+[data-theme="dark"] .btn-google-maps:hover {
+    background: var(--consegur-blue);
+    color: #ffffff;
+}
+
+/* ===== FILTROS DE ESTADO PARA TÉCNICO ===== */
+.employee-filters {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.employee-filters .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.employee-filters .btn {
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    padding: var(--space-2) var(--space-4);
+    border: 2px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    transition: all var(--transition-normal);
+}
+
+.employee-filters .btn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+}
+
+.employee-filters .btn.active,
+.employee-filters .btn-group .btn.active {
+    background: #007bff !important;
+    color: #ffffff !important;
+    border-color: #007bff !important;
+}
+
+.employee-filters .btn.active:hover {
+    background: #0056b3 !important;
+    border-color: #0056b3;
+}
+
+/* Estilos para los badges de notificación en filtros */
+.employee-filters .btn .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.employee-filters .btn:hover .badge {
+    transform: scale(1.1);
+}
+
+.employee-filters .btn.active .badge {
+    background-color: var(--text-light) !important;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* Colores específicos para cada tipo de filtro */
+.employee-filters .btn .badge.bg-secondary {
+    background-color: var(--text-secondary) !important;
+    color: var(--text-light);
+}
+
+.employee-filters .btn .badge.bg-warning {
+    background-color: var(--warning-color) !important;
+    color: var(--text-light);
+}
+
+.employee-filters .btn .badge.bg-info {
+    background-color: var(--info-color) !important;
+    color: var(--text-light);
+}
+
+.employee-filters .btn .badge.bg-success {
+    background-color: var(--success-color) !important;
+    color: var(--text-light);
+}
+
+.employee-filters .btn .badge.bg-danger {
+    background-color: var(--danger-color) !important;
+    color: var(--text-light);
+}
+
+/* Modo oscuro para badges */
+[data-theme="dark"] .employee-filters .btn .badge.bg-secondary {
+    background-color: var(--text-muted) !important;
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .employee-filters .btn.active .badge {
+    background-color: var(--primary-color) !important;
+    color: var(--text-light);
+}
+
+/* Responsive para filtros */
+@media (max-width: 768px) {
+    .employee-filters .btn-group {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .employee-filters .btn {
+        flex: 1;
+        min-width: 120px;
+        max-width: 150px;
+        text-align: center;
+        font-size: 0.8rem;
+        padding: var(--space-2) var(--space-2);
+    }
+    
+    /* Ajustes para badges en móvil */
+    .employee-filters .btn .badge {
+        font-size: 0.6rem;
+        padding: 0.2rem 0.4rem;
+        margin-left: 0.25rem;
+    }
+}
+
+/* ===== VISTA MÓVIL PARA SERVICIOS ASIGNADOS ===== */
+@media (max-width: 768px) {
+    /* Ocultar tabla en móvil */
+    #employee-services .table-responsive {
+        display: none;
+    }
+    
+    /* Mostrar vista de tarjetas en móvil */
+    #employee-services .mobile-services-view {
+        display: block;
+    }
+    
+    /* Asegurar que el texto "Filtrar por estado:" sea blanco en modo oscuro */
+    [data-theme="dark"] .employee-filters h6,
+    [data-theme="dark"] .employee-filters .mb-3 {
+        color: #ffffff !important;
+    }
+    
+    /* Estilos para las tarjetas de servicios */
+    .service-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4);
+        margin-bottom: var(--space-3);
+        box-shadow: var(--shadow-sm);
+        transition: all var(--transition-normal);
+    }
+    
+    .service-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+    
+    .service-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-3);
+        padding-bottom: var(--space-2);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .service-card-id {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+    }
+    
+    .service-card-status {
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-md);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .service-card-info {
+        margin-bottom: var(--space-3);
+    }
+    
+    .service-card-info-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: var(--space-2);
+        font-size: 0.9rem;
+    }
+    
+    .service-card-info-label {
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+    
+    .service-card-info-value {
+        color: var(--text-primary);
+        text-align: right;
+        max-width: 60%;
+        word-wrap: break-word;
+    }
+    
+    .service-card-actions {
+        display: flex;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+    }
+    
+    .service-card-actions .btn {
+        flex: 1;
+        min-width: 80px;
+        font-size: 0.8rem;
+        padding: var(--space-2) var(--space-3);
+    }
+}
+
+/* Ocultar vista móvil en desktop */
+@media (min-width: 769px) {
+    #employee-services .mobile-services-view {
+        display: none;
+    }
+}
+
+/* ===== VISTA MÓVIL PARA TABLAS ADMIN ===== */
+@media (max-width: 768px) {
+    /* Ocultar tablas admin en móvil */
+    #admin-dashboard-section .table-responsive {
+        display: none;
+    }
+    
+    /* Mostrar vista de tarjetas admin en móvil */
+    #admin-dashboard-section .mobile-services-view {
+        display: block;
+    }
+}
+
+/* Ocultar vista móvil admin en desktop */
+@media (min-width: 769px) {
+    #admin-dashboard-section .mobile-services-view {
+        display: none;
+    }
+}
+
+/* ===== VISTA MÓVIL PARA ASIGNAR SERVICIOS ===== */
+@media (max-width: 768px) {
+    /* Ocultar tabla de asignar servicios en móvil */
+    #assign .table-responsive {
+        display: none;
+    }
+    
+    /* Mostrar vista de tarjetas de asignar servicios en móvil */
+    #assign .mobile-services-view {
+        display: block;
+    }
+}
+
+/* ===== VISTA MÓVIL PARA COSTO SERVICIOS ===== */
+@media (max-width: 768px) {
+    /* Ocultar tabla de costo servicios en móvil */
+    #costo-servicios .table-responsive {
+        display: none;
+    }
+    
+    /* Mostrar vista de tarjetas de costo servicios en móvil */
+    #costo-servicios .mobile-services-view {
+        display: block;
+    }
+}
+
+/* ===== VISTA MÓVIL PARA REMISIONES ===== */
+@media (max-width: 768px) {
+    /* Ocultar tabla de remisiones en móvil */
+    #remisiones .table-responsive {
+        display: none;
+    }
+    
+    /* Mostrar vista de tarjetas de remisiones en móvil */
+    #remisiones .mobile-services-view {
+        display: block;
+    }
+}
+
+/* Ocultar vista móvil de asignar servicios en desktop */
+@media (min-width: 769px) {
+    #assign .mobile-services-view {
+        display: none;
+    }
+}
+
+/* Ocultar vista móvil de costo servicios en desktop */
+@media (min-width: 769px) {
+    #costo-servicios .mobile-services-view {
+        display: none;
+    }
+}
+
+/* Ocultar vista móvil de remisiones en desktop */
+@media (min-width: 769px) {
+    #remisiones .mobile-services-view {
+        display: none;
+    }
+}
+
+/* ===== TARJETAS DE USUARIOS PARA VISTA MÓVIL ===== */
+.user-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--space-3);
+    margin-bottom: var(--space-3);
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.user-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.user-card-username {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.user-card-role {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.user-card-role.admin {
+    background: var(--primary-color);
+    color: white;
+}
+
+.user-card-role.technician {
+    background: var(--accent-color);
+    color: white;
+}
+
+.user-card-actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+}
+
+.user-card-actions .btn {
+    flex: 1;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+}
